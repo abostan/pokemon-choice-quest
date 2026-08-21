@@ -1,0 +1,10 @@
+{
+  "name": "pokemon-choice-quest",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Avventura Pokémon guidata da scelte del giocatore invece che da una roulette. Nessuna build richiesta: React viene caricato via CDN (esm.sh) tramite import map.",
+  "scripts": {
+    "start": "npx --yes serve ."
+  }
+}
