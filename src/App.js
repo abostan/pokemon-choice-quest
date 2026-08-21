@@ -12,8 +12,10 @@ import { PokedexModal } from "./components/PokedexModal.js";
 import { ResumeScreen } from "./components/ResumeScreen.js";
 import { EvolutionNotice } from "./components/EvolutionNotice.js";
 import { BoxModal } from "./components/BoxModal.js";
+import { HallOfFameModal } from "./components/HallOfFameModal.js";
 import { getGeneration, getExplorationTier, getNextGeneration } from "./data/generations.js";
 import { checkEvolution } from "./data/evolutions.js";
+import { addHallOfFameEntry } from "./engine/hallOfFame.js";
 import {
   saveGame,
   loadGame,
@@ -80,6 +82,7 @@ function initialState() {
 
     // --- UI ---
     boxModalOpen: false,
+    hallOfFameOpen: false,
   };
 }
 
@@ -950,8 +953,16 @@ export default function App() {
       rewardBadge: champion.badge,
       onUseItem: useItem,
       onResolved: ({ won }) => {
-        if (won) resolveBattleWin(champion.badge);
-        else handleNuzlockeLoss();
+        if (won) {
+          resolveBattleWin(champion.badge);
+          addHallOfFameEntry({
+            genName: generation.name,
+            team: state.team,
+            isNuzlocke: state.isNuzlocke,
+          });
+        } else {
+          handleNuzlockeLoss();
+        }
         checkNextGeneration();
       },
     });
@@ -1057,6 +1068,12 @@ export default function App() {
         onClose: () => update({ boxModalOpen: false }),
       }),
 
+    // Sala della Fama modale
+    state.hallOfFameOpen &&
+      e(HallOfFameModal, {
+        onClose: () => update({ hallOfFameOpen: false }),
+      }),
+
     // Header
     e(
       "header",
@@ -1072,16 +1089,30 @@ export default function App() {
             ? `${generation.name} — guidato dalle tue scelte`
             : "Ispirato a Pokemon Roulette, ma guidato dalle tue scelte"
         ),
-        // Pulsante Pokédex
+        // Pulsanti Header: Pokédex e Sala della Fama
         state.phase !== "generationSelect" && state.phase !== "resume" &&
           e(
-            "button",
-            {
-              className: "pokedex-header-btn",
-              onClick: () => update({ pokedexOpen: true }),
-              title: "Apri il Pokédex",
-            },
-            "📖 Pokédex"
+            "div",
+            { style: { display: "flex", gap: "8px" } },
+            e(
+              "button",
+              {
+                className: "pokedex-header-btn",
+                onClick: () => update({ pokedexOpen: true }),
+                title: "Apri il Pokédex",
+              },
+              "📖 Pokédex"
+            ),
+            e(
+              "button",
+              {
+                className: "pokedex-header-btn",
+                style: { background: "linear-gradient(135deg, #d97706, #92400e)", border: "1px solid #f59e0b" },
+                onClick: () => update({ hallOfFameOpen: true }),
+                title: "Apri la Sala della Fama",
+              },
+              "🏆 Sala della Fama"
+            )
           )
       )
     ),

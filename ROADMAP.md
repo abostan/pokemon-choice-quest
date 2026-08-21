@@ -165,12 +165,20 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] Badge animato `🔮 MEGAEVOLUZIONE / GIGAMAX ATTIVA (+30% POTENZA SQUADRA!)` visibile durante la battaglia.
 - [x] Limite di 1 attivazione per battaglia durante le sfide contro Capipalestra, Boss dei Team malvagi, Alto Comando e Campione.
 
+### Versione 6.0 — Sala della Fama & Hall of Fame Storica (attuale)
+
+#### 🏆 Sala della Fama & Hall of Fame Storica
+- [x] Persistenza automatica in `localStorage` (`pcq_hall_of_fame`) ad ogni vittoria contro il Campione della Lega in qualsiasi regione.
+- [x] Registro d'onore permanente con nome della regione, data e ora del trionfo, membri della squadra vincente e badge Nuzlocke.
+- [x] **📖 Modale `HallOfFameModal.js`**: Tema dorato stile champagne con carte celebrate per ogni trionfo e sprite visivi pixel di tutti i Pokémon campioni.
+- [x] **🔘 Pulsante Header (`🏆 Sala della Fama`)**: Accesso rapido consultabile in qualsiasi momento nell'header della app accanto al Pokédex.
+
 ---
 
-## 🔮 Prossimi Sviluppi & Idee Future (v6.0)
+## 🔮 Prossimi Sviluppi & Idee Future (v6.5)
 
 - [ ] **Effetti Sonori & Audio 8-bit (Web Audio API)**: piccoli jingle retro per cattura, vittoria, evoluzione ed incontri Shiny.
-- [ ] **🏆 Sala della Fama & Hall of Fame Storica**: archivio visivo consultabile delle squadre campioni delle varie regioni.
+- [ ] **⚔️ Torneo dei Campioni della Lega**: evento post-game ad eliminazione diretta contro i Campioni storici (Rosso, Camilla, Rocco, Dandel).
 
 
 
