@@ -585,6 +585,25 @@ export default function App() {
 
   const showSidebar = state.phase !== "generationSelect" && state.phase !== "resume" && state.phase !== "nextGenSelect" && state.phase !== "postgame";
 
+  function handleDismissEvolutions(rejectedList) {
+    setState((prev) => {
+      let updatedTeam = [...prev.team];
+      if (rejectedList && rejectedList.length > 0) {
+        for (const rej of rejectedList) {
+          const idx = updatedTeam.findIndex((p) => p.id === rej.id);
+          if (idx !== -1) {
+            updatedTeam[idx] = { ...updatedTeam[idx], id: rej.evolvedFrom };
+          }
+        }
+      }
+      return {
+        ...prev,
+        team: updatedTeam,
+        pendingEvolutions: [],
+      };
+    });
+  }
+
   // -------------------------------------------------------
   // Render
   // -------------------------------------------------------
@@ -596,7 +615,7 @@ export default function App() {
     state.pendingEvolutions && state.pendingEvolutions.length > 0 &&
       e(EvolutionNotice, {
         evolutions: state.pendingEvolutions,
-        onDismiss: () => update({ pendingEvolutions: [] }),
+        onDismiss: handleDismissEvolutions,
       }),
 
     // Pokédex modale

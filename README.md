@@ -29,25 +29,17 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa versione (v2)
+## Cosa contiene questa versione (v3+)
 
-- Scelta della regione/generazione (Kanto o Johto), poi dello starter di
-  quella generazione
-- Un bivio prima di ogni palestra: erba alta, pesca, grotta (con possibilità
-  di trovare un oggetto) oppure allenamento
-- Incontri con Pokémon selvatici dove scegli il metodo di cattura (Poké
-  Ball, cibo, oppure ignorare), con Pokémon e livelli che diventano via via
-  più forti
-- **8 palestre** in sequenza, fedeli per tipo/ordine ai giochi originali,
-  ciascuna con una propria tattica di battaglia da scegliere (attacco
-  diretto, bilanciata, difensiva)
-- Una battaglia a sorpresa contro il Rivale a metà avventura
-- **Alto Comando (4 membri)** e infine il **Campione**, come nei giochi
-- Schermata finale con squadra, medaglie e zaino, e pulsante "Gioca di nuovo"
+- **4 Generazioni giocabili**: Kanto (Gen 1), Johto (Gen 2), Hoenn (Gen 3), Sinnoh (Gen 4)
+- **Progressione Multi-Generazione**: dopo aver battuto la Lega di una regione, si può passare alla generazione successiva mantenendo squadra, box e zaino!
+- **Evoluzioni dei Pokémon**: evoluzioni automatiche al raggiungimento del livello soglia, con possibilità di annullare/bloccare l'evoluzione (Premendo il tasto B)
+- **Gestione Box**: gestione riserva per scambiare i Pokémon quando la squadra (max 6) è piena
+- **Pokédex completo**: modale sempre accessibile con due viste (Run attuale e Storico persistito su `localStorage`)
+- **Salvataggio Automatico**: salvataggio stato su `localStorage` e schermata per riprendere la partita
+- **Modalità Infinita Post-Game**: completate le generazioni, l'esplorazione continua liberamente a difficoltà crescente
+- **Incontri Leggendari**: probabilità del 5% ad ogni round post-game di incontrare Pokémon leggendari unici (Articuno, Zapdos, Groudon, Dialga, ecc.)
 
-Non ancora incluso (prossimi blocchi, vedi `SPEC.md`): continuare nella
-generazione successiva mantenendo la squadra dopo aver battuto una Lega,
-modalità infinita post-generazioni, e il Pokédex (run + storico).
 
 ## Struttura del progetto
 

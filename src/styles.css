@@ -557,6 +557,45 @@ body {
   margin: 20px 0;
 }
 
+.evo-card-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: var(--panel-alt);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--accent-2);
+  transition: all 0.2s ease;
+}
+.evo-card-box.evo-rejected {
+  border-color: var(--danger);
+  background: #23181a;
+}
+
+.evo-toggle-btn {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.evo-toggle-btn:hover {
+  background: var(--accent);
+  color: #1a1a1a;
+}
+.evo-toggle-btn.canceled {
+  border-color: var(--text-dim);
+  color: var(--text-dim);
+}
+.evo-toggle-btn.canceled:hover {
+  background: var(--text-dim);
+  color: #1a1a1a;
+}
+
 .evo-card {
   display: flex;
   align-items: center;
@@ -584,6 +623,7 @@ body {
   color: var(--text-dim);
 }
 .evo-name-new { color: var(--accent); font-weight: 700; }
+
 
 /* ------------------------------------------------------------------
    Resume screen

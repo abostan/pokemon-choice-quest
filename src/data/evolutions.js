@@ -154,6 +154,110 @@ export const EVOLUTIONS = {
   241:{ evolvesAt: 36, evolvesTo: 241 }, // Miltank    (forma finale)
   246:{ evolvesAt: 30, evolvesTo: 247 }, // Larvitar   → Pupitar
   247:{ evolvesAt: 55, evolvesTo: 248 }, // Pupitar    → Tyranitar
+
+  // --- Gen 3 Starter ---
+  252:{ evolvesAt: 16, evolvesTo: 253 }, // Treecko    → Grovyle
+  253:{ evolvesAt: 36, evolvesTo: 254 }, // Grovyle    → Sceptile
+  255:{ evolvesAt: 16, evolvesTo: 256 }, // Torchic    → Combusken
+  256:{ evolvesAt: 36, evolvesTo: 257 }, // Combusken  → Blaziken
+  258:{ evolvesAt: 16, evolvesTo: 259 }, // Mudkip     → Marshtomp
+  259:{ evolvesAt: 36, evolvesTo: 260 }, // Marshtomp   → Swampert
+
+  // --- Gen 3 selvatici/avversari ---
+  261:{ evolvesAt: 18, evolvesTo: 262 }, // Poochyena  → Mightyena
+  263:{ evolvesAt: 20, evolvesTo: 264 }, // Zigzagoon  → Linoone
+  265:{ evolvesAt: 7,  evolvesTo: 266 }, // Wurmple    → Silcoon
+  266:{ evolvesAt: 10, evolvesTo: 267 }, // Silcoon    → Beautifly
+  270:{ evolvesAt: 14, evolvesTo: 271 }, // Lotad      → Lombre
+  271:{ evolvesAt: 36, evolvesTo: 272 }, // Lombre     → Ludicolo
+  273:{ evolvesAt: 14, evolvesTo: 274 }, // Seedot     → Nuzleaf
+  274:{ evolvesAt: 36, evolvesTo: 275 }, // Nuzleaf    → Shiftry
+  276:{ evolvesAt: 22, evolvesTo: 277 }, // Taillow    → Swellow
+  278:{ evolvesAt: 25, evolvesTo: 279 }, // Wingull    → Pelipper
+  280:{ evolvesAt: 20, evolvesTo: 281 }, // Ralts      → Kirlia
+  281:{ evolvesAt: 30, evolvesTo: 282 }, // Kirlia     → Gardevoir
+  283:{ evolvesAt: 22, evolvesTo: 284 }, // Surskit    → Masquerain
+  285:{ evolvesAt: 23, evolvesTo: 286 }, // Shroomish  → Breloom
+  287:{ evolvesAt: 18, evolvesTo: 288 }, // Slakoth    → Vigoroth
+  288:{ evolvesAt: 36, evolvesTo: 289 }, // Vigoroth   → Slaking
+  290:{ evolvesAt: 20, evolvesTo: 291 }, // Nincada    → Ninjask
+  293:{ evolvesAt: 20, evolvesTo: 294 }, // Whismur    → Loudred
+  294:{ evolvesAt: 40, evolvesTo: 295 }, // Loudred    → Exploud
+  296:{ evolvesAt: 24, evolvesTo: 297 }, // Makuhita   → Hariyama
+  300:{ evolvesAt: 36, evolvesTo: 301 }, // Skitty     → Delcatty
+  304:{ evolvesAt: 32, evolvesTo: 305 }, // Aron       → Lairon
+  305:{ evolvesAt: 42, evolvesTo: 306 }, // Lairon     → Aggron
+  307:{ evolvesAt: 37, evolvesTo: 308 }, // Meditite   → Medicham
+  309:{ evolvesAt: 26, evolvesTo: 310 }, // Electrike  → Manectric
+  318:{ evolvesAt: 30, evolvesTo: 319 }, // Carvanha   → Sharpedo
+  320:{ evolvesAt: 40, evolvesTo: 321 }, // Wailmer    → Wailord
+  322:{ evolvesAt: 33, evolvesTo: 323 }, // Numel      → Camerupt
+  325:{ evolvesAt: 32, evolvesTo: 326 }, // Spoink     → Grumpig
+  328:{ evolvesAt: 35, evolvesTo: 329 }, // Trapinch   → Vibrava
+  329:{ evolvesAt: 45, evolvesTo: 330 }, // Vibrava    → Flygon
+  331:{ evolvesAt: 32, evolvesTo: 332 }, // Cacnea     → Cacturne
+  333:{ evolvesAt: 35, evolvesTo: 334 }, // Swablu     → Altaria
+  339:{ evolvesAt: 30, evolvesTo: 340 }, // Barboach   → Whiscash
+  341:{ evolvesAt: 30, evolvesTo: 342 }, // Corphish   → Crawdaunt
+  343:{ evolvesAt: 36, evolvesTo: 344 }, // Baltoy     → Claydol
+  345:{ evolvesAt: 40, evolvesTo: 346 }, // Lileep     → Cradily
+  347:{ evolvesAt: 40, evolvesTo: 348 }, // Anorith    → Armaldo
+  349:{ evolvesAt: 36, evolvesTo: 350 }, // Feebas     → Milotic
+  353:{ evolvesAt: 37, evolvesTo: 354 }, // Shuppet    → Banette
+  355:{ evolvesAt: 37, evolvesTo: 356 }, // Duskull    → Dusclops
+  361:{ evolvesAt: 42, evolvesTo: 362 }, // Snorunt    → Glalie
+  363:{ evolvesAt: 32, evolvesTo: 364 }, // Spheal     → Sealeo
+  364:{ evolvesAt: 44, evolvesTo: 365 }, // Sealeo     → Walrein
+  371:{ evolvesAt: 30, evolvesTo: 372 }, // Bagon      → Shelgon
+  372:{ evolvesAt: 50, evolvesTo: 373 }, // Shelgon    → Salamence
+  374:{ evolvesAt: 20, evolvesTo: 375 }, // Beldum     → Metang
+  375:{ evolvesAt: 45, evolvesTo: 376 }, // Metang     → Metagross
+
+  // --- Gen 4 Starter ---
+  387:{ evolvesAt: 18, evolvesTo: 388 }, // Turtwig    → Grotle
+  388:{ evolvesAt: 32, evolvesTo: 389 }, // Grotle     → Torterra
+  390:{ evolvesAt: 14, evolvesTo: 391 }, // Chimchar   → Monferno
+  391:{ evolvesAt: 36, evolvesTo: 392 }, // Monferno   → Infernape
+  393:{ evolvesAt: 16, evolvesTo: 394 }, // Piplup     → Prinplup
+  394:{ evolvesAt: 36, evolvesTo: 395 }, // Prinplup   → Empoleon
+
+  // --- Gen 4 selvatici/avversari ---
+  396:{ evolvesAt: 14, evolvesTo: 397 }, // Starly     → Staravia
+  397:{ evolvesAt: 34, evolvesTo: 398 }, // Staravia   → Staraptor
+  399:{ evolvesAt: 15, evolvesTo: 400 }, // Bidoof     → Bibarel
+  401:{ evolvesAt: 10, evolvesTo: 402 }, // Kricketot  → Kricketune
+  403:{ evolvesAt: 15, evolvesTo: 404 }, // Shinx      → Luxio
+  404:{ evolvesAt: 30, evolvesTo: 405 }, // Luxio      → Luxray
+  406:{ evolvesAt: 16, evolvesTo: 315 }, // Budew      → Roselia
+  315:{ evolvesAt: 36, evolvesTo: 407 }, // Roselia    → Roserade
+  408:{ evolvesAt: 30, evolvesTo: 409 }, // Cranidos   → Rampardos
+  410:{ evolvesAt: 30, evolvesTo: 411 }, // Shieldon   → Bastiodon
+  412:{ evolvesAt: 20, evolvesTo: 413 }, // Burmy      → Wormadam
+  415:{ evolvesAt: 21, evolvesTo: 416 }, // Combee     → Vespiquen
+  418:{ evolvesAt: 26, evolvesTo: 419 }, // Buizel     → Floatzel
+  420:{ evolvesAt: 25, evolvesTo: 421 }, // Cherubi    → Cherrim
+  422:{ evolvesAt: 30, evolvesTo: 423 }, // Shellos    → Gastrodon
+  425:{ evolvesAt: 28, evolvesTo: 426 }, // Drifloon   → Drifblim
+  427:{ evolvesAt: 26, evolvesTo: 428 }, // Buneary    → Lopunny
+  431:{ evolvesAt: 38, evolvesTo: 432 }, // Glameow    → Purugly
+  434:{ evolvesAt: 34, evolvesTo: 435 }, // Stunky     → Skuntank
+  436:{ evolvesAt: 33, evolvesTo: 437 }, // Bronzor    → Bronzong
+  438:{ evolvesAt: 16, evolvesTo: 185 }, // Bonsly     → Sudowoodo
+  439:{ evolvesAt: 18, evolvesTo: 122 }, // Mime Jr.   → Mr. Mime
+  440:{ evolvesAt: 16, evolvesTo: 113 }, // Happiny    → Chansey
+  113:{ evolvesAt: 36, evolvesTo: 242 }, // Chansey    → Blissey
+  443:{ evolvesAt: 24, evolvesTo: 444 }, // Gible      → Gabite
+  444:{ evolvesAt: 48, evolvesTo: 445 }, // Gabite     → Garchomp
+  446:{ evolvesAt: 30, evolvesTo: 143 }, // Munchlax   → Snorlax
+  447:{ evolvesAt: 26, evolvesTo: 448 }, // Riolu      → Lucario
+  449:{ evolvesAt: 34, evolvesTo: 450 }, // Hippopotas → Hippowdon
+  451:{ evolvesAt: 40, evolvesTo: 452 }, // Skorupi    → Drapion
+  453:{ evolvesAt: 37, evolvesTo: 454 }, // Croagunk   → Toxicroak
+  456:{ evolvesAt: 31, evolvesTo: 457 }, // Finneon    → Lumineon
+  458:{ evolvesAt: 20, evolvesTo: 226 }, // Mantyke    → Mantine
+  459:{ evolvesAt: 40, evolvesTo: 460 }, // Snover     → Abomasnow
+  356:{ evolvesAt: 42, evolvesTo: 477 }, // Dusclops   → Dusknoir
+
 };
 
 /**

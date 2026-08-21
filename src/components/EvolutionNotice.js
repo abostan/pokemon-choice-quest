@@ -4,9 +4,9 @@ import { usePokemon } from "../hooks/usePokemon.js";
 const e = React.createElement;
 
 /**
- * Componente singola evoluzione: sprite before → sprite after.
+ * Componente singola evoluzione con opzione per accettare o annullare.
  */
-function EvoCard({ fromId, toId }) {
+function EvoCard({ fromId, toId, accepted, onToggle }) {
   const { data: fromData } = usePokemon(fromId);
   const { data: toData } = usePokemon(toId);
 
@@ -15,43 +15,69 @@ function EvoCard({ fromId, toId }) {
 
   return e(
     "div",
-    { className: "evo-card" },
+    { className: `evo-card-box ${!accepted ? "evo-rejected" : ""}` },
     e(
       "div",
-      { className: "evo-before" },
-      fromData?.sprite && e("img", { src: fromData.sprite, alt: fromName }),
-      e("span", { className: "evo-name" }, fromName)
+      { className: "evo-card" },
+      e(
+        "div",
+        { className: "evo-before" },
+        fromData?.sprite && e("img", { src: fromData.sprite, alt: fromName }),
+        e("span", { className: "evo-name" }, fromName)
+      ),
+      e("div", { className: "evo-arrow" }, accepted ? "→" : "✕"),
+      e(
+        "div",
+        { className: "evo-after" },
+        toData?.sprite && e("img", { src: toData.sprite, alt: toName, style: !accepted ? { opacity: 0.35, filter: "grayscale(1)" } : {} }),
+        e("span", { className: `evo-name ${accepted ? "evo-name-new" : ""}` }, accepted ? toName : "Bloccata")
+      )
     ),
-    e("div", { className: "evo-arrow" }, "→"),
     e(
-      "div",
-      { className: "evo-after" },
-      toData?.sprite && e("img", { src: toData.sprite, alt: toName }),
-      e("span", { className: "evo-name evo-name-new" }, toName)
+      "button",
+      {
+        className: `evo-toggle-btn ${!accepted ? "canceled" : ""}`,
+        onClick: onToggle,
+        title: accepted ? "Premi B per bloccare l'evoluzione" : "Ripristina l'evoluzione",
+      },
+      accepted ? "Annulla evoluzione (Tasto B)" : "Permetti evoluzione"
     )
   );
 }
 
 /**
  * Banner/overlay che appare dopo una battaglia se uno o più Pokémon
- * del team sono evoluti.
+ * del team sono evoluti. Permette di accettare o rifiutare ogni evoluzione.
  *
  * props:
  *  - evolutions: Array<{ evolvedFrom: number, id: number, level: number }>
- *    — lista dei Pokémon che hanno appena evoluto (id è il nuovo id,
- *      evolvedFrom è il vecchio id)
- *  - onDismiss(): callback per chiudere e proseguire
+ *  - onDismiss(rejectedItems): callback per applicare le decisioni e proseguire
  */
 export function EvolutionNotice({ evolutions, onDismiss }) {
   const [visible, setVisible] = useState(false);
+  // Mappa dell'accettazione per ciascuna evoluzione [idx]: boolean (true = accetta, false = rifiuta)
+  const [decisions, setDecisions] = useState(() => evolutions ? evolutions.map(() => true) : []);
 
-  // Animazione di ingresso
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 30);
     return () => clearTimeout(t);
   }, []);
 
   if (!evolutions || evolutions.length === 0) return null;
+
+  function toggleDecision(idx) {
+    setDecisions((prev) => {
+      const next = [...prev];
+      next[idx] = !next[idx];
+      return next;
+    });
+  }
+
+  function handleConfirm() {
+    // Raccoglie la lista delle evoluzioni rifiutate dall'utente
+    const rejected = evolutions.filter((_, idx) => !decisions[idx]);
+    onDismiss(rejected);
+  }
 
   return e(
     "div",
@@ -65,20 +91,26 @@ export function EvolutionNotice({ evolutions, onDismiss }) {
         "p",
         { className: "scene-text", style: { textAlign: "center" } },
         evolutions.length === 1
-          ? "Un membro del tuo team si è evoluto!"
-          : `${evolutions.length} membri del tuo team si sono evoluti!`
+          ? "Un membro del tuo team sta per evolversi! Puoi lasciarlo evolvere o bloccarlo."
+          : `${evolutions.length} membri del tuo team stanno per evolversi!`
       ),
       e(
         "div",
         { className: "evo-list" },
         evolutions.map((p, idx) =>
-          e(EvoCard, { key: idx, fromId: p.evolvedFrom, toId: p.id })
+          e(EvoCard, {
+            key: idx,
+            fromId: p.evolvedFrom,
+            toId: p.id,
+            accepted: decisions[idx] ?? true,
+            onToggle: () => toggleDecision(idx),
+          })
         )
       ),
       e(
         "button",
-        { className: "continue-btn", style: { marginTop: "20px" }, onClick: onDismiss },
-        "Continua"
+        { className: "continue-btn", style: { marginTop: "20px" }, onClick: handleConfirm },
+        "Conferma e Continua"
       )
     )
   );

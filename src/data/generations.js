@@ -152,6 +152,144 @@ export const GENERATIONS = [
     // Leggendari catturabili nella modalità post-game infinita (5% prob. per round)
     legendaries: [243, 244, 245, 249, 250], // Raikou, Entei, Suicune, Lugia, Ho-Oh
   },
+
+  {
+    id: "hoenn",
+    name: "Hoenn",
+    starterIds: [252, 255, 258], // Treecko, Torchic, Mudkip
+
+    explorationTiers: [
+      {
+        level: 6,
+        grass: [261, 263, 265, 276],
+        fishing: [129, 278, 339],
+        cave: [293, 304, 290],
+        grass2: [270, 273, 280],
+      },
+      {
+        level: 16,
+        grass: [285, 287, 296],
+        fishing: [318, 341, 118],
+        cave: [307, 309, 325],
+        grass2: [300, 311, 312],
+      },
+      {
+        level: 28,
+        grass: [322, 328, 331],
+        fishing: [320, 349, 130],
+        cave: [353, 355, 371],
+        grass2: [333, 343, 374],
+      },
+    ],
+
+    items: {
+      cave: ["Super Pozione", "Pietra Solare", "Antidoto"],
+      grass: ["Pozione", "Biscotto Lavarone", "Pallina Esca"],
+    },
+
+    gymLeaders: [
+      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Pietra", teamIds: [304, 304], opponentPower: 14 },
+      { title: "Capopalestra di tipo Lotta", badge: "Medaglia Pugno", teamIds: [296, 307], opponentPower: 20 },
+      { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Dinamo", teamIds: [100, 309, 101, 310], opponentPower: 27 },
+      { title: "Capopalestra di tipo Fuoco", badge: "Medaglia Fiamma", teamIds: [322, 218, 323], opponentPower: 35 },
+      { title: "Capopalestra di tipo Normale", badge: "Medaglia Armonia", teamIds: [287, 288, 289], opponentPower: 44 },
+      { title: "Capopalestra di tipo Volante", badge: "Medaglia Piuma", teamIds: [277, 279, 334], opponentPower: 54 },
+      { title: "Capopalestra di tipo Psico", badge: "Medaglia Mente", teamIds: [344, 338], opponentPower: 65 },
+      { title: "Capopalestra di tipo Acqua", badge: "Medaglia Pioggia", teamIds: [370, 340, 364, 350], opponentPower: 77 },
+    ],
+
+    eliteFour: [
+      { title: "Alto Comando — Buio", teamIds: [262, 275, 332, 359, 229], opponentPower: 88 },
+      { title: "Alto Comando — Spettro", teamIds: [354, 356, 354, 356, 302], opponentPower: 96 },
+      { title: "Alto Comando — Ghiaccio", teamIds: [362, 364, 362, 364, 365], opponentPower: 104 },
+      { title: "Alto Comando — Drago", teamIds: [330, 334, 330, 373, 230], opponentPower: 112 },
+    ],
+
+    champion: {
+      title: "Campione della Lega",
+      badge: "Titolo di Campione di Hoenn",
+      teamIds: [227, 344, 306, 346, 348, 376],
+      opponentPower: 125,
+    },
+
+    rival: {
+      title: "Il tuo Rivale",
+      teamIds: [263, 276, 255],
+      opponentPower: 26,
+      afterGymIndex: 2,
+    },
+
+    legendaries: [377, 378, 379, 380, 381, 382, 383, 384],
+  },
+
+  {
+    id: "sinnoh",
+    name: "Sinnoh",
+    starterIds: [387, 390, 393], // Turtwig, Chimchar, Piplup
+
+    explorationTiers: [
+      {
+        level: 6,
+        grass: [396, 399, 401, 403],
+        fishing: [129, 418, 118],
+        cave: [41, 74, 436],
+        grass2: [406, 412, 420],
+      },
+      {
+        level: 16,
+        grass: [415, 425, 427],
+        fishing: [422, 456, 130],
+        cave: [408, 410, 443],
+        grass2: [431, 434, 449],
+      },
+      {
+        level: 28,
+        grass: [451, 453, 459],
+        fishing: [457, 224, 117],
+        cave: [437, 444, 461],
+        grass2: [404, 419, 426],
+      },
+    ],
+
+    items: {
+      cave: ["Iper Pozione", "Pietra Brillante", "Rimedio Finale"],
+      grass: ["Pozione", "Miele", "Pallina Esca"],
+    },
+
+    gymLeaders: [
+      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Carbone", teamIds: [74, 408], opponentPower: 14 },
+      { title: "Capopalestra di tipo Erba", badge: "Medaglia Bosco", teamIds: [420, 315, 388], opponentPower: 20 },
+      { title: "Capopalestra di tipo Lotta", badge: "Medaglia Ciottolo", teamIds: [307, 67, 448], opponentPower: 27 },
+      { title: "Capopalestra di tipo Acqua", badge: "Medaglia Acstrino", teamIds: [418, 195, 423], opponentPower: 35 },
+      { title: "Capopalestra di tipo Spettro", badge: "Medaglia Relitto", teamIds: [425, 93, 429], opponentPower: 44 },
+      { title: "Capopalestra di tipo Acciaio", badge: "Medaglia Cava", teamIds: [81, 95, 411], opponentPower: 54 },
+      { title: "Capopalestra di tipo Ghiaccio", badge: "Medaglia Ghiacciolo", teamIds: [215, 460, 478], opponentPower: 65 },
+      { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Faro", teamIds: [405, 424, 224, 466], opponentPower: 77 },
+    ],
+
+    eliteFour: [
+      { title: "Alto Comando — Coleottero", teamIds: [269, 214, 416, 212, 452], opponentPower: 88 },
+      { title: "Alto Comando — Terra", teamIds: [195, 185, 450, 112, 389], opponentPower: 96 },
+      { title: "Alto Comando — Fuoco", teamIds: [78, 428, 135, 229, 392], opponentPower: 104 },
+      { title: "Alto Comando — Psico", teamIds: [122, 178, 103, 437, 65], opponentPower: 112 },
+    ],
+
+    champion: {
+      title: "Campione della Lega",
+      badge: "Titolo di Campione di Sinnoh",
+      teamIds: [442, 407, 423, 448, 460, 445],
+      opponentPower: 125,
+    },
+
+    rival: {
+      title: "Il tuo Rivale",
+      teamIds: [397, 404, 391],
+      opponentPower: 26,
+      afterGymIndex: 2,
+    },
+
+    legendaries: [480, 481, 482, 483, 484, 485, 486, 487],
+  },
 ];
 
 export function getGeneration(id) {
