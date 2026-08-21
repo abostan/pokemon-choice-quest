@@ -157,12 +157,20 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] **📦 Blocco Scambio Box**: `BoxModal` impedisce il reinserimento in squadra dei Pokémon svenuti con indicatore visivo `⚰️ Esausto`.
 - [x] **🏷️ Badge Visivo UI**: Badge rosso `💀 NUZLOCKE HARDCORE MODE` nel pannello laterale della squadra (`TeamPanel`).
 
+### Versione 5.9 — Sistema di Megaevoluzione / Gigamax (attuale)
+
+#### 🔮 Megaevoluzione / Gigamax (+30% Potenza)
+- [x] Pulsante speciale viola/dorato `🔮 Attiva MEGAEVOLUZIONE / GIGAMAX!` in `BattleScene.js`.
+- [x] Modulo `src/engine/megaLogic.js` per il calcolo dell'incremento del **+30% alla potenza della squadra**.
+- [x] Badge animato `🔮 MEGAEVOLUZIONE / GIGAMAX ATTIVA (+30% POTENZA SQUADRA!)` visibile durante la battaglia.
+- [x] Limite di 1 attivazione per battaglia durante le sfide contro Capipalestra, Boss dei Team malvagi, Alto Comando e Campione.
+
 ---
 
 ## 🔮 Prossimi Sviluppi & Idee Future (v6.0)
 
 - [ ] **Effetti Sonori & Audio 8-bit (Web Audio API)**: piccoli jingle retro per cattura, vittoria, evoluzione ed incontri Shiny.
-- [ ] **Sistema di Megaevoluzione / Gigamax**: attivazione temporanea della forma potenziata per lo starter durante le sfide boss.
+- [ ] **🏆 Sala della Fama & Hall of Fame Storica**: archivio visivo consultabile delle squadre campioni delle varie regioni.
 
 
 

@@ -3,6 +3,7 @@ import { PokemonChip } from "./PokemonSprite.js";
 import { computeTeamPower, computeWinChance, rollBattle } from "../engine/battleLogic.js";
 import { getItemDescription } from "../data/items.js";
 import { computeTypeEffectiveness } from "../engine/typeMatchup.js";
+import { computeMegaPower } from "../engine/megaLogic.js";
 
 const e = React.createElement;
 
@@ -66,7 +67,7 @@ function TrainerAvatar({ title, opponentPower }) {
 }
 
 /**
- * Scena di battaglia con Avatar dell'Allenatore, efficacia di tipo ed uso oggetti dallo zaino.
+ * Scena di battaglia con Avatar dell'Allenatore, Megaevoluzione ed efficacia di tipo.
  */
 export function BattleScene({
   title,
@@ -83,6 +84,7 @@ export function BattleScene({
 }) {
   const [result, setResult] = useState(null); // { tactic, won, winChance } | null
   const [usedItem, setUsedItem] = useState(null); // { name, boost } | null
+  const [isMegaActive, setIsMegaActive] = useState(false);
 
   // Estrae il tipo avversario dal titolo se non passato esplicitamente (es. "Capopalestra di tipo Roccia")
   const detectedType = opponentType || (opponentTitle.match(/tipo ([A-Za-z]+)/)?.[1] ?? "");
@@ -91,7 +93,8 @@ export function BattleScene({
   const baseTeamPower = computeTeamPower(team);
   const itemBoost = usedItem ? usedItem.boost : 0;
   const rawTeamPower = baseTeamPower + itemBoost;
-  const totalTeamPower = Math.round(rawTeamPower * typeEff.multiplier);
+  const typePower = Math.round(rawTeamPower * typeEff.multiplier);
+  const totalTeamPower = isMegaActive ? computeMegaPower(typePower) : typePower;
 
   function handleUseItem(itemIdx) {
     if (usedItem) return;
@@ -141,6 +144,47 @@ export function BattleScene({
         },
       },
       typeEff.message
+    ),
+
+    // Megaevoluzione Button / Badge
+    !result && !isMegaActive && e(
+      "button",
+      {
+        className: "mega-btn",
+        style: {
+          background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
+          color: "#fff",
+          border: "2px solid #a78bfa",
+          padding: "10px 16px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          cursor: "pointer",
+          margin: "10px 0",
+          width: "100%",
+          boxShadow: "0 4px 12px rgba(124, 58, 237, 0.3)",
+        },
+        onClick: () => setIsMegaActive(true),
+      },
+      "🔮 Attiva MEGAEVOLUZIONE / GIGAMAX! (+30% Potenza Squadra)"
+    ),
+
+    isMegaActive && e(
+      "div",
+      {
+        className: "mega-active-badge",
+        style: {
+          padding: "8px 12px",
+          borderRadius: "8px",
+          background: "rgba(124, 58, 237, 0.25)",
+          border: "1px solid #a78bfa",
+          color: "#c4b5fd",
+          fontWeight: "bold",
+          fontSize: "0.9rem",
+          margin: "10px 0",
+          textAlign: "center",
+        },
+      },
+      "🔮 MEGAEVOLUZIONE / GIGAMAX ATTIVA (+30% POTENZA SQUADRA!)"
     ),
 
     // Squadra Avversario
