@@ -374,6 +374,104 @@ export const EVOLUTIONS = {
   712:{ evolvesAt: 37, evolvesTo: 713 }, // Bergmite   → Avalugg
   714:{ evolvesAt: 48, evolvesTo: 715 }, // Noibat     → Noivern
 
+  // --- Gen 7 Starter & Specie ---
+  722:{ evolvesAt: 17, evolvesTo: 723 }, // Rowlet     → Dartrix
+  723:{ evolvesAt: 34, evolvesTo: 724 }, // Dartrix    → Decidueye
+  725:{ evolvesAt: 17, evolvesTo: 726 }, // Litten     → Torracat
+  726:{ evolvesAt: 34, evolvesTo: 727 }, // Torracat   → Incineroar
+  728:{ evolvesAt: 17, evolvesTo: 729 }, // Popplio    → Brionne
+  729:{ evolvesAt: 34, evolvesTo: 730 }, // Brionne    → Primarina
+  731:{ evolvesAt: 14, evolvesTo: 732 }, // Pikipek    → Trumbeak
+  732:{ evolvesAt: 28, evolvesTo: 733 }, // Trumbeak   → Toucannon
+  734:{ evolvesAt: 20, evolvesTo: 735 }, // Yungoos    → Gumshoos
+  736:{ evolvesAt: 20, evolvesTo: 737 }, // Grubbin    → Charjabug
+  737:{ evolvesAt: 36, evolvesTo: 738 }, // Charjabug  → Vikavolt
+  739:{ evolvesAt: 36, evolvesTo: 740 }, // Crabrawler → Crabominable
+  742:{ evolvesAt: 25, evolvesTo: 743 }, // Cutiefly   → Ribombee
+  744:{ evolvesAt: 25, evolvesTo: 745 }, // Rockruff   → Lycanroc
+  746:{ evolvesAt: 20, evolvesTo: 747 }, // Wishiwashi → School Form
+  747:{ evolvesAt: 38, evolvesTo: 748 }, // Mareanie   → Toxapex
+  749:{ evolvesAt: 30, evolvesTo: 750 }, // Mudbray    → Mudsdale
+  751:{ evolvesAt: 22, evolvesTo: 752 }, // Dewpider   → Araquanid
+  753:{ evolvesAt: 34, evolvesTo: 754 }, // Fomantis   → Lurantis
+  755:{ evolvesAt: 24, evolvesTo: 756 }, // Morelull   → Shiinotic
+  757:{ evolvesAt: 33, evolvesTo: 758 }, // Salandit   → Salazzle
+  759:{ evolvesAt: 27, evolvesTo: 760 }, // Stufful    → Bewear
+  761:{ evolvesAt: 18, evolvesTo: 762 }, // Bounsweet  → Steenee
+  762:{ evolvesAt: 28, evolvesTo: 763 }, // Steenee    → Tsareena
+  766:{ evolvesAt: 36, evolvesTo: 767 }, // Passimian  → Oranguru
+  769:{ evolvesAt: 42, evolvesTo: 770 }, // Sandygast  → Palossand
+  782:{ evolvesAt: 35, evolvesTo: 783 }, // Jangmo-o   → Hakamo-o
+  783:{ evolvesAt: 45, evolvesTo: 784 }, // Hakamo-o   → Kommo-o
+
+  // --- Gen 8 Starter & Specie ---
+  810:{ evolvesAt: 16, evolvesTo: 811 }, // Grookey    → Thwackey
+  811:{ evolvesAt: 35, evolvesTo: 812 }, // Thwackey   → Rillaboom
+  813:{ evolvesAt: 16, evolvesTo: 814 }, // Scorbunny  → Raboot
+  814:{ evolvesAt: 35, evolvesTo: 815 }, // Raboot     → Cinderace
+  816:{ evolvesAt: 16, evolvesTo: 817 }, // Sobble     → Drizzile
+  817:{ evolvesAt: 35, evolvesTo: 818 }, // Drizzile   → Inteleon
+  819:{ evolvesAt: 24, evolvesTo: 820 }, // Skwovet    → Greedent
+  821:{ evolvesAt: 18, evolvesTo: 822 }, // Rookidee   → Corvisquire
+  822:{ evolvesAt: 38, evolvesTo: 823 }, // Corvisquire→ Corviknight
+  824:{ evolvesAt: 10, evolvesTo: 825 }, // Blipbug    → Dottler
+  825:{ evolvesAt: 30, evolvesTo: 826 }, // Dottler    → Orbeetle
+  827:{ evolvesAt: 18, evolvesTo: 828 }, // Nickit     → Thievul
+  829:{ evolvesAt: 20, evolvesTo: 830 }, // Gossifleur → Eldegoss
+  831:{ evolvesAt: 24, evolvesTo: 832 }, // Wooloo     → Dubwool
+  833:{ evolvesAt: 22, evolvesTo: 834 }, // Chewtle    → Drednaw
+  835:{ evolvesAt: 25, evolvesTo: 836 }, // Yamper     → Boltund
+  837:{ evolvesAt: 18, evolvesTo: 838 }, // Rolycoly   → Carkol
+  838:{ evolvesAt: 34, evolvesTo: 839 }, // Carkol     → Coalossal
+  840:{ evolvesAt: 30, evolvesTo: 841 }, // Applin     → Flapple
+  843:{ evolvesAt: 36, evolvesTo: 844 }, // Silicobra  → Sandaconda
+  846:{ evolvesAt: 26, evolvesTo: 847 }, // Arrokuda   → Barraskewda
+  848:{ evolvesAt: 30, evolvesTo: 849 }, // Toxel      → Toxtricity
+  850:{ evolvesAt: 28, evolvesTo: 851 }, // Sizzlipede → Centiskorch
+  852:{ evolvesAt: 30, evolvesTo: 853 }, // Clobbopus  → Grapploct
+  856:{ evolvesAt: 32, evolvesTo: 857 }, // Hatenna    → Hattrem
+  857:{ evolvesAt: 42, evolvesTo: 858 }, // Hattrem    → Hatterene
+  859:{ evolvesAt: 32, evolvesTo: 860 }, // Impidimp   → Morgrem
+  860:{ evolvesAt: 42, evolvesTo: 861 }, // Morgrem    → Grimmsnarl
+  868:{ evolvesAt: 30, evolvesTo: 869 }, // Milcery    → Alcremie
+  872:{ evolvesAt: 42, evolvesTo: 873 }, // Snom       → Frosmoth
+  885:{ evolvesAt: 50, evolvesTo: 886 }, // Dreepy     → Drakloak
+  886:{ evolvesAt: 60, evolvesTo: 887 }, // Drakloak   → Dragapult
+
+  // --- Gen 9 Starter & Specie ---
+  906:{ evolvesAt: 16, evolvesTo: 907 }, // Sprigatito → Floragato
+  907:{ evolvesAt: 36, evolvesTo: 908 }, // Floragato  → Meowscarada
+  909:{ evolvesAt: 16, evolvesTo: 910 }, // Fuecoco    → Crocalor
+  910:{ evolvesAt: 36, evolvesTo: 911 }, // Crocalor   → Skeledirge
+  912:{ evolvesAt: 16, evolvesTo: 913 }, // Quaxly     → Quaxwell
+  913:{ evolvesAt: 36, evolvesTo: 914 }, // Quaxwell   → Quaquaval
+  915:{ evolvesAt: 18, evolvesTo: 916 }, // Lechonk    → Oinkologne
+  917:{ evolvesAt: 15, evolvesTo: 918 }, // Tarountula → Spidops
+  919:{ evolvesAt: 24, evolvesTo: 920 }, // Nymble     → Lokix
+  921:{ evolvesAt: 18, evolvesTo: 922 }, // Pawmi      → Pawmo
+  922:{ evolvesAt: 32, evolvesTo: 923 }, // Pawmo      → Pawmot
+  926:{ evolvesAt: 26, evolvesTo: 927 }, // Fidough    → Dachsbun
+  928:{ evolvesAt: 25, evolvesTo: 929 }, // Smoliv     → Dolliv
+  929:{ evolvesAt: 35, evolvesTo: 930 }, // Dolliv     → Arboliva
+  932:{ evolvesAt: 24, evolvesTo: 933 }, // Nacli      → Naclstack
+  933:{ evolvesAt: 38, evolvesTo: 934 }, // Naclstack  → Garganacl
+  935:{ evolvesAt: 30, evolvesTo: 936 }, // Charcadet  → Armarouge
+  938:{ evolvesAt: 30, evolvesTo: 939 }, // Tadbulb    → Bellibolt
+  940:{ evolvesAt: 26, evolvesTo: 941 }, // Wattrel    → Kilowattrel
+  942:{ evolvesAt: 30, evolvesTo: 943 }, // Maschiff   → Mabosstiff
+  944:{ evolvesAt: 28, evolvesTo: 945 }, // Shroodle   → Grafaiai
+  948:{ evolvesAt: 30, evolvesTo: 949 }, // Toedscool  → Toedscruel
+  953:{ evolvesAt: 35, evolvesTo: 954 }, // Rellor     → Rabsca
+  955:{ evolvesAt: 30, evolvesTo: 956 }, // Flittle    → Espathra
+  957:{ evolvesAt: 24, evolvesTo: 958 }, // Tinkatink  → Tinkatuff
+  958:{ evolvesAt: 38, evolvesTo: 959 }, // Tinkatuff  → Tinkaton
+  963:{ evolvesAt: 24, evolvesTo: 964 }, // Finizen    → Palafin
+  968:{ evolvesAt: 40, evolvesTo: 969 }, // Varoom     → Revavroom
+  971:{ evolvesAt: 30, evolvesTo: 972 }, // Greavard   → Houndstone
+  974:{ evolvesAt: 40, evolvesTo: 975 }, // Cetoddle   → Cetitan
+  996:{ evolvesAt: 35, evolvesTo: 997 }, // Frigibax   → Arctibax
+  997:{ evolvesAt: 54, evolvesTo: 998 }, // Arctibax   → Baxcalibur
+
 
 };
 

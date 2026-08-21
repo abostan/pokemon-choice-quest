@@ -428,6 +428,213 @@ export const GENERATIONS = [
 
     legendaries: [716, 717, 718],
   },
+
+  {
+    id: "alola",
+    name: "Alola",
+    starterIds: [722, 725, 728], // Rowlet, Litten, Popplio
+
+    explorationTiers: [
+      {
+        level: 6,
+        grass: [734, 731, 736, 10],
+        fishing: [129, 746, 751],
+        cave: [744, 749, 757],
+        grass2: [753, 755, 759],
+      },
+      {
+        level: 16,
+        grass: [761, 764, 766],
+        fishing: [771, 779, 130],
+        cave: [774, 775, 776],
+        grass2: [777, 778, 782],
+      },
+      {
+        level: 28,
+        grass: [780, 781, 784],
+        fishing: [746, 752, 771],
+        cave: [776, 780, 784],
+        grass2: [778, 782, 783],
+      },
+    ],
+
+    items: {
+      cave: ["Iper Pozione", "Pietra Solare", "Revitalizzante"],
+      grass: ["Pozione", "Miele", "Pallina Esca"],
+    },
+
+    gymLeaders: [
+      { title: "Capitano di tipo Normale", badge: "Cristallo Normale", teamIds: [734, 735], opponentPower: 18 },
+      { title: "Capitano di tipo Acqua", badge: "Cristallo Idrico", teamIds: [746, 752], opponentPower: 26 },
+      { title: "Capitano di tipo Fuoco", badge: "Cristallo Pyros", teamIds: [758, 776], opponentPower: 35 },
+      { title: "Capitano di tipo Erba", badge: "Cristallo Botanico", teamIds: [754, 756], opponentPower: 46 },
+      { title: "Capitano di tipo Elettrico", badge: "Cristallo Electro", teamIds: [777, 738], opponentPower: 58 },
+      { title: "Capitano di tipo Spettro", badge: "Cristallo Spettro", teamIds: [778, 769], opponentPower: 72 },
+      { title: "Capitano di tipo Buio", badge: "Cristallo Tenebra", teamIds: [741, 758], opponentPower: 88 },
+      { title: "Capitano di tipo Drago", badge: "Cristallo Drago", teamIds: [780, 784], opponentPower: 105 },
+    ],
+
+    eliteFour: [
+      { title: "Kahuna — Lotta", teamIds: [739, 759, 760, 297], opponentPower: 120 },
+      { title: "Kahuna — Roccia", teamIds: [745, 743, 299, 774], opponentPower: 132 },
+      { title: "Kahuna — Spettro", teamIds: [778, 769, 426, 781], opponentPower: 144 },
+      { title: "Kahuna — Volante", teamIds: [733, 758, 227, 780], opponentPower: 156 },
+    ],
+
+    champion: {
+      title: "Campione della Lega di Alola",
+      badge: "Titolo di Campione di Alola",
+      teamIds: [745, 763, 768, 778, 784],
+      opponentPower: 175,
+    },
+
+    rival: {
+      title: "Il tuo Rivale",
+      teamIds: [772, 773, 745],
+      opponentPower: 34,
+      afterGymIndex: 2,
+    },
+
+    legendaries: [785, 786, 787, 788, 791, 792, 800],
+  },
+
+  {
+    id: "galar",
+    name: "Galar",
+    starterIds: [810, 813, 816], // Grookey, Scorbunny, Sobble
+
+    explorationTiers: [
+      {
+        level: 6,
+        grass: [819, 821, 824, 827],
+        fishing: [129, 846, 118],
+        cave: [837, 843, 848],
+        grass2: [831, 835, 840],
+      },
+      {
+        level: 16,
+        grass: [850, 852, 856],
+        fishing: [847, 851, 130],
+        cave: [859, 863, 865],
+        grass2: [868, 871, 874],
+      },
+      {
+        level: 28,
+        grass: [875, 877, 884],
+        fishing: [846, 847, 880],
+        cave: [887, 880, 881],
+        grass2: [862, 865, 870],
+      },
+    ],
+
+    items: {
+      cave: ["Iper Pozione", "Pietra Metallica", "Revitalizzante"],
+      grass: ["Pozione", "Miele", "Pallina Esca"],
+    },
+
+    gymLeaders: [
+      { title: "Capopalestra di tipo Erba", badge: "Medaglia Erba", teamIds: [829, 830], opponentPower: 18 },
+      { title: "Capopalestra di tipo Acqua", badge: "Medaglia Acqua", teamIds: [846, 834], opponentPower: 26 },
+      { title: "Capopalestra di tipo Fuoco", badge: "Medaglia Fuoco", teamIds: [850, 851], opponentPower: 35 },
+      { title: "Capopalestra di tipo Lotta", badge: "Medaglia Lotta", teamIds: [852, 853], opponentPower: 46 },
+      { title: "Capopalestra di tipo Folletto", badge: "Medaglia Folletto", teamIds: [858, 859], opponentPower: 58 },
+      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Roccia Galar", teamIds: [874, 875], opponentPower: 72 },
+      { title: "Capopalestra di tipo Buio", badge: "Medaglia Buio", teamIds: [862, 863], opponentPower: 88 },
+      { title: "Capopalestra di tipo Drago", badge: "Medaglia Drago Galar", teamIds: [884, 887], opponentPower: 105 },
+    ],
+
+    eliteFour: [
+      { title: "Torneo — Sfida Erba", teamIds: [830, 829, 832, 850], opponentPower: 120 },
+      { title: "Torneo — Sfida Acqua", teamIds: [834, 847, 851, 861], opponentPower: 132 },
+      { title: "Torneo — Sfida Lotta", teamIds: [853, 865, 870, 887], opponentPower: 144 },
+      { title: "Torneo — Sfida Drago", teamIds: [884, 887, 880, 881], opponentPower: 156 },
+    ],
+
+    champion: {
+      title: "Campione Imbattibile di Galar",
+      badge: "Titolo di Campione di Galar",
+      teamIds: [812, 815, 818, 887, 6],
+      opponentPower: 175,
+    },
+
+    rival: {
+      title: "Il tuo Rivale",
+      teamIds: [819, 822, 810],
+      opponentPower: 34,
+      afterGymIndex: 2,
+    },
+
+    legendaries: [888, 889, 890, 891, 892, 898],
+  },
+
+  {
+    id: "paldea",
+    name: "Paldea",
+    starterIds: [906, 909, 912], // Sprigatito, Fuecoco, Quaxly
+
+    explorationTiers: [
+      {
+        level: 6,
+        grass: [915, 917, 919, 921],
+        fishing: [129, 963, 118],
+        cave: [932, 935, 938],
+        grass2: [926, 928, 940],
+      },
+      {
+        level: 16,
+        grass: [942, 944, 948],
+        fishing: [964, 977, 130],
+        cave: [953, 955, 958],
+        grass2: [968, 971, 974],
+      },
+      {
+        level: 28,
+        grass: [975, 980, 996],
+        fishing: [963, 964, 977],
+        cave: [997, 998, 1000],
+        grass2: [982, 996, 998],
+      },
+    ],
+
+    items: {
+      cave: ["Iper Pozione", "Pietra Brillante", "Revitalizzante"],
+      grass: ["Pozione", "Miele", "Pallina Esca"],
+    },
+
+    gymLeaders: [
+      { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Insetto Paldea", teamIds: [917, 918], opponentPower: 18 },
+      { title: "Capopalestra di tipo Erba", badge: "Medaglia Erba Paldea", teamIds: [928, 929], opponentPower: 26 },
+      { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Volt Paldea", teamIds: [938, 939], opponentPower: 35 },
+      { title: "Capopalestra di tipo Acqua", badge: "Medaglia Acqua Paldea", teamIds: [963, 964], opponentPower: 46 },
+      { title: "Capopalestra di tipo Normale", badge: "Medaglia Normale Paldea", teamIds: [916, 968], opponentPower: 58 },
+      { title: "Capopalestra di tipo Spettro", badge: "Medaglia Spettro Paldea", teamIds: [971, 972], opponentPower: 72 },
+      { title: "Capopalestra di tipo Psico", badge: "Medaglia Psiche Paldea", teamIds: [955, 956], opponentPower: 88 },
+      { title: "Capopalestra di tipo Ghiaccio", badge: "Medaglia Ghiaccio Paldea", teamIds: [974, 975], opponentPower: 105 },
+    ],
+
+    eliteFour: [
+      { title: "Superquattro — Terra", teamIds: [948, 949, 934, 980], opponentPower: 120 },
+      { title: "Superquattro — Acciaio", teamIds: [958, 959, 968, 970], opponentPower: 132 },
+      { title: "Superquattro — Volante", teamIds: [941, 962, 977, 982], opponentPower: 144 },
+      { title: "Superquattro — Drago", teamIds: [996, 997, 998, 1000], opponentPower: 156 },
+    ],
+
+    champion: {
+      title: "Prima Campionessa di Paldea",
+      badge: "Titolo di Campione di Paldea",
+      teamIds: [953, 954, 970, 980, 998, 1000],
+      opponentPower: 175,
+    },
+
+    rival: {
+      title: "La tua Rivale",
+      teamIds: [921, 935, 906],
+      opponentPower: 34,
+      afterGymIndex: 2,
+    },
+
+    legendaries: [1001, 1002, 1003, 1004, 1007, 1008, 1024],
+  },
 ];
 
 export function getGeneration(id) {

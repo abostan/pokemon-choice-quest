@@ -106,15 +106,28 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] Quando si batte la Lega e si passa alla regione successiva, l'intera squadra precedente viene trasferita e conservata nel **PC Box**.
 - [x] Il giocatore inizia la nuova regione solo con il **nuovo starter locale a Lv 5**, mantenendo la possibilità di ritirare i vecchi campioni dal Box in qualsiasi momento.
 
+### Versione 5.5 — 9 Generazioni Giocabili (Alola, Galar, Paldea) & Pokédex 1025 Specie (attuale)
+
+#### 🗺️ 9 Generazioni Giocabili
+- [x] **Alola (Gen 7)**: Rowlet, Litten, Popplio | Prove dei Capitani, Kahuna e Campione Kukui.
+- [x] **Galar (Gen 8)**: Grookey, Scorbunny, Sobble | Palestre negli stadi, Torneo della Lega e Campione Dandel (Leon).
+- [x] **Paldea (Gen 9)**: Sprigatito, Fuecoco, Quaxly | Capipalestra dell'Accademia, Superquattro (Rika, Poppy, Larry, Hassel) e Prima Campionessa Alisma (Geeta).
+- [x] Leggendari unici per ciascuna nuova regione: Solgaleo, Lunala, Necrozma, Zacian, Zamazenta, Eternatus, Koraidon, Miraidon, Terapagos.
+
+#### 📖 Pokédex Nazionale Completo (1025 Specie)
+- [x] Estensione del Pokédex a **tutti i 1025 slot** (#1 Bulbasaur fino a #1025 Pecharunt).
+- [x] Nuovi tab di navigazione rapida per regione: **Alola (722-809)**, **Galar (810-905)** e **Paldea (906-1025)**.
+- [x] Vista Griglia Album e Lista Dettagliata per tutte le 1025 specie.
+- [x] Mappatura evoluzioni completa per Gen 7, 8 e 9 in `evolutions.js`.
+
 ---
 
 ## 🔮 Prossimi Sviluppi & Idee Future (v6.0)
 
-- [ ] **Altre Generazioni**: Alola (Gen 7), Galar (Gen 8), Paldea (Gen 9).
-- [ ] **Sistema di Mosse e Tipi Reali**: efficacia dei tipi (Super Efficace / Non Molto Efficace) durante le battaglie.
-- [ ] **Eventi Narrativi Avanzati**: battaglie contro i Capo Team (Giovanni / Cyrus / Ghetsis / Lysandre).
-- [ ] **Effetti Sonori Web Audio API**: piccoli effetti audio rétro 8-bit per cattura, vittoria ed evoluzione.
-- [ ] **Modalità Sfida / Nuzlocke**: regole speciali con permadeath dei Pokémon esausti.
+- [ ] **Effetti Sonori & Audio 8-bit (Web Audio API)**: piccoli jingle retro per cattura, vittoria, evoluzione ed incontri Shiny.
+- [ ] **Sistema di Mosse e Tipi Reali**: bonus/malus di efficacia del tipo durante le battaglie (Super Efficace / Non Molto Efficace).
+- [ ] **Eventi Narrativi Avanzati**: sfide storia con i Capo Team (Giovanni / Cyrus / Ghetsis / Lysandre / Guzma / Rose).
+- [ ] **Modalità Sfida / Nuzlocke**: regole speciali con permadeath dei Pokémon esausti nel PC Box.
 
 
 
