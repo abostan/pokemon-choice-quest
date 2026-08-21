@@ -29,11 +29,13 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa versione (v6.0)
+## Cosa contiene questa versione (v6.5)
 
+- **⚔️ Torneo dei Campioni della Lega (Post-Game)**: Grande evento ad eliminazione diretta sbloccato nel Post-Game per sfidare i 5 Campioni leggendari (Rosso, Rocco Petri, Camilla, Dandel ed Alisma) con potenze scalate fino a 260!
+- **🎵 Effetti Sonori & Audio 8-bit Retro (Web Audio API)**: Sintetizzatore audio nativo in Vanilla JS che riproduce jingle stile Game Boy per cattura, evoluzione, vittorie, Master Ball, Megaevoluzione ed incontri Shiny ✨ con toggle `🔊 Audio ON / 🔇 Audio OFF` nell'header!
 - **🏆 Sala della Fama & Hall of Fame Storica**: Registro permanente consultabile dall'header (`🏆 Sala della Fama`) che conserva la storia di tutte le squadre incoronate Campioni della Lega nelle 9 generazioni!
 - **🔮 Sistema di Megaevoluzione / Gigamax**: Trasformazione speciale attiva nelle sfide decisive contro Capipalestra, Capo Team e Lega Pokémon per ottenere un **+30% di potenza squadra immediato**!
-- **💀 Modalità Sfida Hardcore / Nuzlocke**: Regole ad alta sfida attivabili all'inizio della partita con **Permadeath (morte permanente)** dei Pokémon svenuti nel PC Box (`isFainted: true`) ed un solo tentativo di cattura!
+- **💀 Modalità Sfida Hardcore / Nuzlocke**: Regole ad alta sfida attivabili all'inizio della partita con **Permadeath (morte permanente)** dei Pokémon svenuti nel PC Box (`isFainted: true`), blocco battaglie se la squadra è vuota e schermata di Game Over automatica!
 - **⚡ Sistema di Efficacia dei Tipi**: Calcolo automatico dei vantaggi/svantaggi di tipo per tutti i 18 tipi ufficiali! Bonus di **+15% alla potenza della squadra** per gli attacchi Super Efficaci e svantaggio del **-10%** se vulnerabili, con badge visivo in `BattleScene`.
 - **🕵️ Battaglie Boss Narrative contro i Capo Team**: Scontri boss unici per ciascuna delle 9 generazioni (Giovanni, Archer, Max/Archie, Cyrus, Ghetsis, Lysandre, Guzma, Rose, Eri/Cassiopea) dopo la 4ª palestra.
 - **🟣 Strumento Master Ball**: Ricompensa epica per aver sconfitto i Capo Team. Consente una **cattura al 100% garantita** per qualsiasi incontro selvatico o leggendario!
@@ -48,7 +50,7 @@ dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 - **👤 Avatar Avversario in Battaglia**: Scheda avatar visiva con icona, titolo e potenza stimata del Capopalestra o rivale prima dello scontro.
 - **💾 Salvataggio Multi-Slot & Backup JSON**: 3 slot di salvataggio indipendenti con data/ora e supporto completo ad esportazione/importazione di file JSON.
 - **Evoluzioni & Blocco Tasto B**: evoluzioni automatiche al livello soglia con opzione visiva per annullare/bloccare l'evoluzione di ogni specie (mappate per tutte le 9 Gen).
-- **Modalità Infinita Post-Game & Leggendari**: esplorazione infinita a difficoltà crescente dopo Paldea, con probabilità di incontrare Pokémon leggendari unici.a difficoltà crescente dopo Paldea, con probabilità di incontrare Pokémon leggendari unici.
+- **Modalità Infinita Post-Game & Leggendari**: esplorazione infinita a difficoltà crescente dopo Paldea, con probabilità di incontrare Pokémon leggendari unici.
 
 ## Struttura del progetto
 

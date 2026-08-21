@@ -1,6 +1,6 @@
-# Manuale Tecnico — Pokémon: Scegli il Cammino (v6.0)
+# Manuale Tecnico — Pokémon: Scegli il Cammino (v6.5)
 
-> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v6.0 (Sala della Fama & Hall of Fame Storica, Megaevoluzione / Gigamax, Modalità Nuzlocke Hardcore, Efficacia Tipi, Boss Narrative & Master Ball).
+> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v6.5 (Torneo dei Campioni della Lega Post-Game, Effetti Sonori & Audio 8-bit Web Audio API, Sala della Fama & Hall of Fame Storica, Megaevoluzione / Gigamax, Modalità Nuzlocke Hardcore, Efficacia Tipi, Boss Narrative & Master Ball).
 
 ---
 

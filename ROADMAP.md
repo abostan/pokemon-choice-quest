@@ -173,13 +173,21 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] **📖 Modale `HallOfFameModal.js`**: Tema dorato stile champagne con carte celebrate per ogni trionfo e sprite visivi pixel di tutti i Pokémon campioni.
 - [x] **🔘 Pulsante Header (`🏆 Sala della Fama`)**: Accesso rapido consultabile in qualsiasi momento nell'header della app accanto al Pokédex.
 
+### Versione 6.5 — Torneo dei Campioni della Lega Post-Game (attuale)
+
+#### ⚔️ Torneo dei Campioni della Lega (Post-Game)
+- [x] Sblocco speciale del Torneo nel Post-Game per sfidare i 5 Campioni leggendari in duello ad eliminazione diretta.
+- [x] **Round 1**: 🔴 *Campione Rosso (Kanto)* — Pikachu, Charizard, Blastoise, Venusaur (Potenza 180).
+- [x] **Round 2**: 🪨 *Campione Rocco Petri (Hoenn)* — Metagross, Skarmory, Aggron, Armaldo (Potenza 195).
+- [x] **Round 3**: 🌸 *Campionessa Camilla (Sinnoh)* — Garchomp, Lucario, Milotic, Spiritomb (Potenza 215).
+- [x] **Round 4**: 🐉 *Campione Imbattibile Dandel (Galar)* — Charizard, Dragapult, Aegislash (Potenza 235).
+- [x] **Grand Finale**: 👑 *Prima Campionessa Alisma (Paldea)* — Glimmora, Kingambit, Espathra (Potenza 260).
+- [x] **🏆 Tabellone del Torneo (`TournamentScene.js`)**: Schermata del tabellone ad eliminazione diretta con stato per ogni sfida.
+- [x] **👑 Iscrizione nella Sala della Fama**: Titolo supremo `👑 RE DEI CAMPIONI POKÉMON` e boost +5 livelli per l'intera squadra dopo la vittoria finale.
+
 ---
 
-## 🔮 Prossimi Sviluppi & Idee Future (v6.5)
+## 🔮 Prossimi Sviluppi & Idee Future (v7.0)
 
-- [ ] **Effetti Sonori & Audio 8-bit (Web Audio API)**: piccoli jingle retro per cattura, vittoria, evoluzione ed incontri Shiny.
-- [ ] **⚔️ Torneo dei Campioni della Lega**: evento post-game ad eliminazione diretta contro i Campioni storici (Rosso, Camilla, Rocco, Dandel).
-
-
-
-
+- [ ] **🌟 Sistema Abilità Passive dei Pokémon**: Prepotenza, Nuotavelox, Rovescetto per bonus strategici in battaglia.
+- [ ] **🏆 Classifica Punteggio & Grado di Vittoria**: Punteggio finale basato su tempo, percentuale Pokédex e KO (Grado S/A/B/C).

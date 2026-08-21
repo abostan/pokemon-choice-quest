@@ -14,7 +14,9 @@ import { EvolutionNotice } from "./components/EvolutionNotice.js";
 import { BoxModal } from "./components/BoxModal.js";
 import { HallOfFameModal } from "./components/HallOfFameModal.js";
 import { NuzlockeGameOverScreen } from "./components/NuzlockeGameOverScreen.js";
+import { TournamentScene } from "./components/TournamentScene.js";
 import { getGeneration, getExplorationTier, getNextGeneration } from "./data/generations.js";
+import { CHAMPIONS_TOURNAMENT } from "./data/championsTournament.js";
 import { checkEvolution } from "./data/evolutions.js";
 import { addHallOfFameEntry } from "./engine/hallOfFame.js";
 import {
@@ -64,10 +66,11 @@ function initialState() {
     pendingEncounterIsLegendary: false,
     pendingTrainer: null,
 
-    // --- Multi-generazione e post-game ---
+    // --- Multi-generazione, torneo e post-game ---
     multiGenRun: false,
     completedGensCount: 0,
     postgameRound: 0,
+    tournamentRound: 0,
 
     // --- Modalità Nuzlocke ---
     isNuzlocke: false,
@@ -453,6 +456,51 @@ export default function App() {
       lastGenName: generation?.name ?? "Pokémon",
       team: state.team,
       onStart: () => goTo("postgameExplore", { postgameRound: 0 }),
+      onStartTournament: () => goTo("championsTournament", { tournamentRound: 0 }),
+    });
+
+  } else if (state.phase === "championsTournament") {
+    content = e(TournamentScene, {
+      currentRound: state.tournamentRound,
+      onStartMatch: () => goTo("tournamentBattle"),
+      onExit: () => goTo("postgame"),
+    });
+
+  } else if (state.phase === "tournamentBattle") {
+    const champ = CHAMPIONS_TOURNAMENT[state.tournamentRound] || CHAMPIONS_TOURNAMENT[0];
+    const scaledPower = getScaledPower(champ.opponentPower);
+    content = e(BattleScene, {
+      key: `tournament-${champ.id}`,
+      title: `${champ.title} — Round ${state.tournamentRound + 1}/5`,
+      text: champ.text,
+      opponentTitle: champ.title,
+      opponentTeamIds: champ.teamIds,
+      opponentPower: scaledPower,
+      opponentType: champ.type,
+      team: state.team,
+      items: state.items,
+      rewardBadge: null,
+      isNuzlocke: state.isNuzlocke,
+      onUseItem: useItem,
+      onOpenBox: () => update({ boxModalOpen: true }),
+      onResolved: ({ won }) => {
+        if (won) {
+          resolveBattleWin(null);
+          const nextRound = state.tournamentRound + 1;
+          if (nextRound >= CHAMPIONS_TOURNAMENT.length) {
+            addHallOfFameEntry({
+              genName: "Torneo dei Campioni",
+              team: state.team,
+              isNuzlocke: state.isNuzlocke,
+            });
+            boostTeam(5);
+          }
+          update({ tournamentRound: nextRound, phase: "championsTournament" });
+        } else {
+          handleNuzlockeLoss();
+          update({ phase: "championsTournament" });
+        }
+      },
     });
 
   } else if (state.phase === "postgameExplore") {

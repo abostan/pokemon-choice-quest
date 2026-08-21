@@ -1,8 +1,8 @@
-# Pokémon: Scegli il Cammino — Spec v6.0
+# Pokémon: Scegli il Cammino — Spec v6.5
 
 Documento di lavoro e specifica tecnica delle funzionalità del progetto.
 
-**Stato:** ✅ Tutte le specifiche (Gen 1-9, 1025 Pokedex, Sala della Fama Storica, Megaevoluzione / Gigamax, Modalità Nuzlocke, Sistema Efficacia Tipi, Villain Bosses, Master Ball, Rogue-Lite Bivi, Item Tooltips, Multi-Save, Shiny, Oggetti, Visual Badges) sono state interamente implementate e verificate.
+**Stato:** ✅ Tutte le specifiche (Gen 1-9, 1025 Pokedex, Torneo dei Campioni Post-Game, Effetti Sonori 8-Bit Web Audio API, Sala della Fama Storica, Megaevoluzione / Gigamax, Modalità Nuzlocke, Sistema Efficacia Tipi, Villain Bosses, Master Ball, Rogue-Lite Bivi, Item Tooltips, Multi-Save, Shiny, Oggetti, Visual Badges) sono state interamente implementate e verificate.
 
 ---
 

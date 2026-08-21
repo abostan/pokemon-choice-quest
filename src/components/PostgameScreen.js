@@ -12,7 +12,7 @@ const e = React.createElement;
  *  - team (Array<{id,level}>): squadra attuale
  *  - onStart(): callback per iniziare la modalità infinita
  */
-export function PostgameScreen({ lastGenName, team, onStart }) {
+export function PostgameScreen({ lastGenName, team, onStart, onStartTournament }) {
   return e(
     "div",
     { className: "panel postgame-screen" },
@@ -38,12 +38,31 @@ export function PostgameScreen({ lastGenName, team, onStart }) {
     e(
       "p",
       { className: "scene-text", style: { marginTop: "16px" } },
-      `Da ora in poi potrai esplorare liberamente, catturare Pokémon sempre più forti, e — se sei fortunato — incontrare qualche leggendario...`
+      `Da ora in poi potrai esplorare liberamente, catturare Pokémon sempre più forti e sfidare i Campioni storici nel Grande Torneo!`
     ),
     e(
-      "button",
-      { className: "continue-btn next-gen-btn", onClick: onStart },
-      "Continua l'avventura infinita →"
+      "div",
+      { style: { display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginTop: "20px" } },
+      e(
+        "button",
+        {
+          className: "continue-btn",
+          style: {
+            background: "linear-gradient(135deg, #d97706, #b45309)",
+            color: "#fff",
+            border: "1px solid #f59e0b",
+            fontWeight: "bold",
+            padding: "12px 24px",
+          },
+          onClick: onStartTournament,
+        },
+        "⚔️ TORNEO DEI CAMPIONI DELLA LEGA"
+      ),
+      e(
+        "button",
+        { className: "continue-btn next-gen-btn", onClick: onStart },
+        "Continua l'avventura infinita →"
+      )
     )
   );
 }
