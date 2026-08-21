@@ -15,6 +15,7 @@ import { BoxModal } from "./components/BoxModal.js";
 import { HallOfFameModal } from "./components/HallOfFameModal.js";
 import { NuzlockeGameOverScreen } from "./components/NuzlockeGameOverScreen.js";
 import { TournamentScene } from "./components/TournamentScene.js";
+import { PokeCenterScene } from "./components/PokeCenterScene.js";
 import { getGeneration, getExplorationTier, getNextGeneration } from "./data/generations.js";
 import { CHAMPIONS_TOURNAMENT } from "./data/championsTournament.js";
 import { checkEvolution } from "./data/evolutions.js";
@@ -54,11 +55,12 @@ function initialState() {
     rivalDone: false,
     villainBossDone: false,
 
-    // --- Squadra e inventario ---
+    // --- Squadra, inventario e monete ---
     team: [],
     box: [],
     badges: [],
     items: [],
+    coins: 5,
 
     // --- Stato transiente della scena ---
     pendingEncounterPool: null,
@@ -294,6 +296,7 @@ export default function App() {
   function resolveBattleWin(badge) {
     addBadge(badge);
     boostTeam(WIN_LEVEL_BOOST);
+    setState((prev) => ({ ...prev, coins: (prev.coins || 0) + 4 }));
   }
 
   function handleNuzlockeLoss() {
@@ -449,6 +452,25 @@ export default function App() {
           badges: [],
           multiGenRun: true,
         }),
+    });
+
+  } else if (state.phase === "pokecenter") {
+    content = e(PokeCenterScene, {
+      coins: state.coins || 0,
+      team: state.team,
+      items: state.items,
+      onHealTeam: () => {
+        const updatedTeam = state.team.map((p) => ({
+          ...p,
+          isFainted: false,
+        }));
+        update({ team: updatedTeam });
+      },
+      onBuyItem: (itemName, price) => {
+        addItem(itemName);
+        update({ coins: Math.max(0, (state.coins || 0) - price) });
+      },
+      onLeave: () => goTo("gymBattle"),
     });
 
   } else if (state.phase === "postgame") {
@@ -798,6 +820,13 @@ export default function App() {
             },
           });
         },
+      },
+      {
+        id: "pokecenterMarket",
+        weight: 0.22,
+        label: "🏥 Centro Pokémon & Mercatino di Città",
+        hint: "Cura i Pokémon feriti e acquista strumenti utili con i Pokédollari!",
+        onSelect: () => goTo("pokecenter"),
       },
       {
         id: "searchItems",
@@ -1225,6 +1254,7 @@ export default function App() {
           box: state.box,
           badges: state.badges,
           items: state.items,
+          coins: state.coins || 0,
           isNuzlocke: state.isNuzlocke,
           onOpenBox: () => update({ boxModalOpen: true }),
         })

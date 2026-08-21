@@ -29,11 +29,12 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa versione (v7.0)
+## Cosa contiene questa versione (v7.5)
 
+- **🏥 Centro Pokémon & Mercatino PokéMart**: Nuova tappa di esplorazione tra le palestre per curare la squadra con trillo audio a 8-bit (`playHealJingle()`), accumulare Pokédollari e acquistare Pozioni, Caramelle Rare e Master Ball!
 - **🌟 Sistema Abilità Passive dei Pokémon**: Abilità passive strategiche assegnate alle varie specie (Prepotenza, Pressione, Levitazione, Nuotavelox, Acceleratore, Leggiadria) che applicano bonus visibili a potenza, probabilità di successo e cattura!
 - **⚔️ Torneo dei Campioni della Lega (Post-Game)**: Grande evento ad eliminazione diretta sbloccato nel Post-Game per sfidare i 5 Campioni leggendari (Rosso, Rocco Petri, Camilla, Dandel ed Alisma) con potenze scalate fino a 260!
-- **🎵 Effetti Sonori & Audio 8-bit Retro (Web Audio API)**: Sintetizzatore audio nativo in Vanilla JS che riproduce jingle stile Game Boy per cattura, evoluzione, vittorie, Master Ball, Megaevoluzione ed incontri Shiny ✨ con toggle `🔊 Audio ON / 🔇 Audio OFF` nell'header!
+- **🎵 Effetti Sonori & Audio 8-bit Retro (Web Audio API)**: Sintetizzatore audio nativo in Vanilla JS che riproduce jingle stile Game Boy per cattura, cura, evoluzione, vittorie, Master Ball, Megaevoluzione ed incontri Shiny ✨ con toggle `🔊 Audio ON / 🔇 Audio OFF` nell'header!
 - **🏆 Sala della Fama & Hall of Fame Storica**: Registro permanente consultabile dall'header (`🏆 Sala della Fama`) che conserva la storia di tutte le squadre incoronate Campioni della Lega nelle 9 generazioni!
 - **🔮 Sistema di Megaevoluzione / Gigamax**: Trasformazione speciale attiva nelle sfide decisive contro Capipalestra, Capo Team e Lega Pokémon per ottenere un **+30% di potenza squadra immediato**!
 - **💀 Modalità Sfida Hardcore / Nuzlocke**: Regole ad alta sfida attivabili all'inizio della partita con **Permadeath (morte permanente)** dei Pokémon svenuti nel PC Box (`isFainted: true`), blocco battaglie se la squadra è vuota e schermata di Game Over automatica!
@@ -43,7 +44,7 @@ dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 - **🍬 Caramella Rara**: Aumenta istantaneamente il livello di tutti i Pokémon della squadra di **+3 Livelli**.
 - **🗺️ 9 Generazioni Giocabili**: Kanto (Gen 1), Johto (Gen 2), Hoenn (Gen 3), Sinnoh (Gen 4), Unova (Gen 5), Kalos (Gen 6), **Alola (Gen 7)**, **Galar (Gen 8)** e **Paldea (Gen 9)**.
 - **📖 Pokédex Nazionale Completo (1025 specie)**: Modale Pokédex esteso con la **Vista Griglia Album (⬛)** a figurine con anteprime pixel e silhouette `? Ignoto` per tutti i 1025 slot dal #1 Bulbasaur al #1025 Pecharunt, con tab per regione (Kanto..Paldea) e ricerca per `#ID`.
-- **🎲 Bivi Casuali (Rogue-Lite)**: Ad ogni tappa tra le palestre vengono generate **3-4 scelte casuali** (2 base + 1-2 eventi speciali pesati come Leggendari ⭐, Uova 🐣, Vulcano 🌋, Foresta 👻, Dojo 🥊, Team Nemico 🕵️‍♂️).
+- **🎲 Bivi Casuali (Rogue-Lite)**: Ad ogni tappa tra le palestre vengono generate **3-4 scelte casuali** (2 base + 1-2 eventi speciali pesati come Leggendari ⭐, Uova 🐣, Centro Pokémon 🏥, Vulcano 🌋, Foresta 👻, Dojo 🥊, Team Nemico 🕵️‍♂️).
 - **📦 Transizione Team nel PC Box tra Generazioni**: Quando si batte la Lega e si passa alla regione successiva, la squadra precedente viene salvata nel **PC Box** per ripartire solo col nuovo starter locale a Lv 5!
 - **🎒 Tooltip Descrizioni Oggetti**: Descrizioni dettagliate su hover al passaggio del mouse su ciascun elemento dello Zaino (`TeamPanel`) ed in `BattleScene`.
 - **✨ Sistema Pokémon Shiny**: Probabilità 1/500 di incontrare uno Shiny selvatico (1/20 per i leggendari), con badge dorato ✨ e sprite Shiny dedicato.

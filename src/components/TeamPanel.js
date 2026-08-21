@@ -46,12 +46,32 @@ function BadgeItem({ name }) {
  *  - items: Array<string>
  *  - onOpenBox(): callback per aprire il BoxModal
  */
-export function TeamPanel({ team, box, badges, items, isNuzlocke = false, onOpenBox }) {
+export function TeamPanel({ team, box, badges, items, coins = 0, isNuzlocke = false, onOpenBox }) {
   const abilities = computeTeamAbilities(team);
 
   return e(
     "div",
     { className: "panel side-panel" },
+    e(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "8px",
+          background: "rgba(251, 191, 36, 0.12)",
+          border: "1px solid rgba(251, 191, 36, 0.3)",
+          padding: "4px 10px",
+          borderRadius: "6px",
+          fontSize: "0.85rem",
+          fontWeight: "bold",
+          color: "#fef08a",
+        },
+      },
+      e("span", null, "💰 Pokédollari:"),
+      e("span", null, `${coins} 💰`)
+    ),
     isNuzlocke && e(
       "div",
       {
