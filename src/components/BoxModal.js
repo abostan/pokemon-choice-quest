@@ -18,6 +18,7 @@ export function BoxModal({ team, box, onSwap, onClose }) {
   const [selectedTeam, setSelectedTeam] = useState(null); // indice nel team selezionato
 
   function handleBoxClick(idx) {
+    if (box[idx]?.isFainted) return; // Morte permanente Nuzlocke!
     if (selectedTeam !== null) {
       // Ho già selezionato un membro della squadra → esegui swap
       onSwap(selectedTeam, idx);
@@ -30,6 +31,7 @@ export function BoxModal({ team, box, onSwap, onClose }) {
 
   function handleTeamClick(idx) {
     if (selectedBox !== null) {
+      if (box[selectedBox]?.isFainted) return;
       // Ho già selezionato un Pokémon dal box → esegui swap
       onSwap(idx, selectedBox);
       setSelectedTeam(null);
@@ -101,10 +103,12 @@ export function BoxModal({ team, box, onSwap, onClose }) {
                   "div",
                   {
                     key: `box-${p.id}-${idx}`,
-                    className: `box-slot ${selectedBox === idx ? "selected" : ""}`,
+                    className: `box-slot ${selectedBox === idx ? "selected" : ""} ${p.isFainted ? "fainted-slot" : ""}`,
+                    style: p.isFainted ? { opacity: 0.5, border: "1px dashed #ef4444", cursor: "not-allowed" } : {},
                     onClick: () => handleBoxClick(idx),
                   },
-                  e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny })
+                  e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny }),
+                  p.isFainted && e("span", { style: { fontSize: "0.72rem", color: "#f87171", fontWeight: "bold" } }, "⚰️ Esausto")
                 )
               )
         )

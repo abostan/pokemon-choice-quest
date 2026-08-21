@@ -1,6 +1,6 @@
-# Manuale Tecnico — Pokémon: Scegli il Cammino (v5.7)
+# Manuale Tecnico — Pokémon: Scegli il Cammino (v5.8)
 
-> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v5.7 (Sistema Efficacia dei Tipi, Boss Narrative & Master Ball).
+> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v5.8 (Modalità Nuzlocke Hardcore, Sistema Efficacia dei Tipi, Boss Narrative & Master Ball).
 
 ---
 

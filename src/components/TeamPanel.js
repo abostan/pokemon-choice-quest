@@ -45,10 +45,29 @@ function BadgeItem({ name }) {
  *  - items: Array<string>
  *  - onOpenBox(): callback per aprire il BoxModal
  */
-export function TeamPanel({ team, box, badges, items, onOpenBox }) {
+export function TeamPanel({ team, box, badges, items, isNuzlocke = false, onOpenBox }) {
   return e(
     "div",
     { className: "panel side-panel" },
+    isNuzlocke && e(
+      "div",
+      {
+        className: "nuzlocke-badge-panel",
+        style: {
+          padding: "4px 8px",
+          marginBottom: "10px",
+          borderRadius: "6px",
+          background: "linear-gradient(135deg, #be123c, #881337)",
+          color: "#fff",
+          fontSize: "0.75rem",
+          fontWeight: "bold",
+          textAlign: "center",
+          letterSpacing: "0.5px",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+        },
+      },
+      "💀 NUZLOCKE HARDCORE MODE"
+    ),
     e("h2", null, `La tua squadra (${team.length}/6)`),
     team.length === 0
       ? e("p", { className: "empty-hint" }, "Non hai ancora nessun Pokémon.")

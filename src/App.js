@@ -65,6 +65,9 @@ function initialState() {
     completedGensCount: 0,
     postgameRound: 0,
 
+    // --- Modalità Nuzlocke ---
+    isNuzlocke: false,
+
     // --- Pokédex ---
     pokedexRun: {},
     pokedexOpen: false,
@@ -275,6 +278,20 @@ export default function App() {
     boostTeam(WIN_LEVEL_BOOST);
   }
 
+  function handleNuzlockeLoss() {
+    if (!state.isNuzlocke || state.team.length === 0) return;
+    setState((prev) => {
+      if (!prev.isNuzlocke || prev.team.length === 0) return prev;
+      const fainted = { ...prev.team[prev.team.length - 1], isFainted: true };
+      const nextTeam = prev.team.slice(0, prev.team.length - 1);
+      return {
+        ...prev,
+        team: nextTeam,
+        box: [...prev.box, fainted],
+      };
+    });
+  }
+
   function advanceAfterGymBattle() {
     const finishedGymIndex = state.gymIndex;
     const nextGymIndex = finishedGymIndex + 1;
@@ -360,20 +377,27 @@ export default function App() {
       starterIds: generation.starterIds,
       generationName: generation.name,
       continueTeam: state.multiGenRun ? state.team : null,
-      onChooseStarter: (id) => {
+      onChooseStarter: (id, nuzlockeMode) => {
         markCaught(id, false); // Auto-registra lo starter scelto nel Pokédex!
+        const isNuz = nuzlockeMode || state.isNuzlocke;
         if (state.multiGenRun && state.team.length > 0) {
           // Sposta la squadra precedente nel Box PC per iniziare la regione solo col nuovo starter
           setState((prev) => ({
             ...prev,
+            isNuzlocke: isNuz,
             box: [...prev.box, ...prev.team],
             team: [{ id, level: 5 }],
             phase: "explore",
             gymIndex: 0,
           }));
         } else {
-          addToTeam({ id, level: 5 });
-          goTo("explore", { gymIndex: 0 });
+          setState((prev) => ({
+            ...prev,
+            isNuzlocke: isNuz,
+            team: [{ id, level: 5 }],
+            phase: "explore",
+            gymIndex: 0,
+          }));
         }
       },
     });
@@ -831,6 +855,7 @@ export default function App() {
       onUseItem: useItem,
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(gym.badge);
+        else handleNuzlockeLoss();
         advanceAfterGymBattle();
       },
     });
@@ -851,6 +876,7 @@ export default function App() {
       onUseItem: useItem,
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(null);
+        else handleNuzlockeLoss();
         update({ rivalDone: true, phase: "explore" });
       },
     });
@@ -876,6 +902,8 @@ export default function App() {
           if (boss.rewardItem === "Caramella Rara") {
             boostTeam(3);
           }
+        } else {
+          handleNuzlockeLoss();
         }
         update({ villainBossDone: true, phase: "explore" });
       },
@@ -897,6 +925,7 @@ export default function App() {
       onUseItem: useItem,
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(null);
+        else handleNuzlockeLoss();
         const nextEliteIndex = state.eliteIndex + 1;
         if (nextEliteIndex >= generation.eliteFour.length) {
           goTo("championBattle");
@@ -922,6 +951,7 @@ export default function App() {
       onUseItem: useItem,
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(champion.badge);
+        else handleNuzlockeLoss();
         checkNextGeneration();
       },
     });
@@ -1070,6 +1100,7 @@ export default function App() {
           box: state.box,
           badges: state.badges,
           items: state.items,
+          isNuzlocke: state.isNuzlocke,
           onOpenBox: () => update({ boxModalOpen: true }),
         })
     ),

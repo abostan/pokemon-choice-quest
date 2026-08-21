@@ -29,8 +29,9 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa versione (v5.7)
+## Cosa contiene questa versione (v5.8)
 
+- **💀 Modalità Sfida Hardcore / Nuzlocke**: Regole ad alta sfida attivabili all'inizio della partita con **Permadeath (morte permanente)** dei Pokémon svenuti nel PC Box (`isFainted: true`) ed un solo tentativo di cattura!
 - **⚡ Sistema di Efficacia dei Tipi**: Calcolo automatico dei vantaggi/svantaggi di tipo per tutti i 18 tipi ufficiali! Bonus di **+15% alla potenza della squadra** per gli attacchi Super Efficaci e svantaggio del **-10%** se vulnerabili, con badge visivo in `BattleScene`.
 - **🕵️ Battaglie Boss Narrative contro i Capo Team**: Scontri boss unici per ciascuna delle 9 generazioni (Giovanni, Archer, Max/Archie, Cyrus, Ghetsis, Lysandre, Guzma, Rose, Eri/Cassiopea) dopo la 4ª palestra.
 - **🟣 Strumento Master Ball**: Ricompensa epica per aver sconfitto i Capo Team. Consente una **cattura al 100% garantita** per qualsiasi incontro selvatico o leggendario!

@@ -149,12 +149,20 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] **⚠️ Poco Efficace (-10% Potenza Squadra)**: Se la squadra è vulnerabile al tipo di palestra.
 - [x] **📊 Badge Visivo in `BattleScene`**: Indicatore cromatico verde/rosso prima della battaglia con spiegazione del bonus o svantaggio di tipo.
 
+### Versione 5.8 — Modalità Sfida Hardcore / Nuzlocke (attuale)
+
+#### 💀 Modalità Nuzlocke Hardcore
+- [x] Toggle attivabile nella schermata iniziale di selezione starter (`StartScreen.js`).
+- [x] **⚰️ Permadeath (Morte Permanente)**: I Pokémon svenuti in battaglia finiscono nel Box PC contrassegnati come `isFainted: true` (Esausti) e non possono più essere curati o rimessi in squadra.
+- [x] **📦 Blocco Scambio Box**: `BoxModal` impedisce il reinserimento in squadra dei Pokémon svenuti con indicatore visivo `⚰️ Esausto`.
+- [x] **🏷️ Badge Visivo UI**: Badge rosso `💀 NUZLOCKE HARDCORE MODE` nel pannello laterale della squadra (`TeamPanel`).
+
 ---
 
 ## 🔮 Prossimi Sviluppi & Idee Future (v6.0)
 
 - [ ] **Effetti Sonori & Audio 8-bit (Web Audio API)**: piccoli jingle retro per cattura, vittoria, evoluzione ed incontri Shiny.
-- [ ] **Modalità Sfida / Nuzlocke**: regole speciali con permadeath dei Pokémon esausti nel PC Box.
+- [ ] **Sistema di Megaevoluzione / Gigamax**: attivazione temporanea della forma potenziata per lo starter durante le sfide boss.
 
 
 
