@@ -29,37 +29,47 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa prima versione (MVP)
+## Cosa contiene questa versione (v2)
 
-- Scelta dello starter (Bulbasaur / Charmander / Squirtle)
-- Un bivio iniziale: erba alta, pesca al fiume, oppure andare dritto alla
-  palestra
-- Un incontro con un Pokémon selvatico dove scegli il metodo di cattura
-  (Poké Ball, cibo, oppure ignorare)
-- Una battaglia di palestra dove scegli una tattica (attacco diretto,
-  bilanciata, difensiva) invece di subire un esito casuale
-- Un secondo bivio (grotta / erba alta più avanti / allenamento) con oggetti
-  trovabili nello zaino
-- Una battaglia finale contro un Rivale
+- Scelta della regione/generazione (Kanto o Johto), poi dello starter di
+  quella generazione
+- Un bivio prima di ogni palestra: erba alta, pesca, grotta (con possibilità
+  di trovare un oggetto) oppure allenamento
+- Incontri con Pokémon selvatici dove scegli il metodo di cattura (Poké
+  Ball, cibo, oppure ignorare), con Pokémon e livelli che diventano via via
+  più forti
+- **8 palestre** in sequenza, fedeli per tipo/ordine ai giochi originali,
+  ciascuna con una propria tattica di battaglia da scegliere (attacco
+  diretto, bilanciata, difensiva)
+- Una battaglia a sorpresa contro il Rivale a metà avventura
+- **Alto Comando (4 membri)** e infine il **Campione**, come nei giochi
 - Schermata finale con squadra, medaglie e zaino, e pulsante "Gioca di nuovo"
+
+Non ancora incluso (prossimi blocchi, vedi `SPEC.md`): continuare nella
+generazione successiva mantenendo la squadra dopo aver battuto una Lega,
+modalità infinita post-generazioni, e il Pokédex (run + storico).
 
 ## Struttura del progetto
 
 ```
 index.html              punto di ingresso, import map per React via CDN
+SPEC.md                 backlog/decisioni di design per le prossime funzioni
 src/
   main.js               monta l'app React nel DOM
-  App.js                stato di gioco e transizioni tra le fasi
+  App.js                stato di gioco e transizioni tra le fasi (generazione, palestre, Alto Comando, Campione)
   styles.css
   data/
-    pools.js             ID Pokémon usati nelle varie fasi, squadre avversarie, oggetti
+    generations.js       dati di ogni generazione: starter, zone, palestre, Alto Comando, Campione, Rivale
+    pools.js              (superato da generations.js, non più usato — puoi eliminarlo)
   engine/
     battleLogic.js        logica pura (probabilità di cattura, calcolo battaglie) — senza React, facile da testare
   hooks/
     usePokemon.js          fetch + cache dei dati/sprite da PokeAPI
   components/
-    StartScreen.js, ChoiceScene.js, EncounterScene.js, BattleScene.js,
-    EndScreen.js, TeamPanel.js, PokemonSprite.js
+    GenerationSelectScreen.js, StartScreen.js, ChoiceScene.js, EncounterScene.js,
+    BattleScene.js, EndScreen.js, TeamPanel.js, PokemonSprite.js
+scripts/
+  simulate-flow.mjs       piccolo script Node per verificare la sequenza di gioco (nessuna palestra/indice mancante) senza aprire il browser
 ```
 
 I componenti sono scritti con `React.createElement` (qui abbreviato `e`)
@@ -71,16 +81,18 @@ pronta e la conversione è quasi meccanica.
 
 ## Idee per continuare a svilupparla
 
-Alcune direzioni naturali per le prossime versioni, da quello che ci siamo
-detti:
+Le prossime funzioni concordate sono in `SPEC.md` (cambio generazione con
+squadra/box che resta, modalità infinita post-generazioni, Pokédex run +
+storico). Altre idee più a lungo termine:
 
-- Aggiungere altre fasi dell'originale in versione "a scelta" (Alto Comando,
-  leggendari, uova misteriose, scambi, Team Rocket, evoluzioni, shiny)
+- Altre fasi dell'originale in versione "a scelta" (leggendari, uova
+  misteriose, scambi, Team Rocket, evoluzioni, shiny)
 - Un sistema di battaglia con mosse e tipi reali, se in futuro vuoi più
   profondità delle "tattiche narrative" attuali
-- Salvataggio della partita (localStorage per iniziare, account cloud in
-  seguito)
+- Salvataggio della partita in corso (non solo il Pokédex storico)
 - Multiplayer/sfide o classifiche tra amici
+- Bilanciare meglio i numeri di potenza delle palestre/Alto Comando/Campione
+  una volta provato con mano come si gioca
 
 ## Crediti
 

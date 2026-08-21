@@ -5,23 +5,34 @@ import { computeCaptureChance, rollCapture } from "../engine/battleLogic.js";
 const e = React.createElement;
 
 /**
- * Scena di incontro con un Pokémon selvatico. Il giocatore sceglie il
- * metodo con cui provare a catturarlo (o decide di ignorarlo), invece che
- * lasciare l'esito a una ruota casuale.
+ * Scena di incontro con un Pokémon selvatico.
  *
  * props:
  *  - title, text: testo di intro
- *  - pool: array di id tra cui pescare (a caso, una volta sola) il Pokémon incontrato
+ *  - pool: array di id tra cui pescare il Pokémon incontrato
  *  - level: livello assegnato al Pokémon se catturato
+ *  - isLegendary: bool — se true, restringe le opzioni e abbassa il tasso
+ *  - onSeen(id): chiamata quando il Pokémon è rivelato (per il Pokédex)
+ *  - onCaught(id): chiamata quando il Pokémon è catturato (per il Pokédex)
  *  - onResolved({ caught, pokemon }): chiamata quando la scena finisce
  */
-export function EncounterScene({ title, text, pool, level = 4, onResolved }) {
-  const wildId = useMemo(() => pool[Math.floor(Math.random() * pool.length)], [pool]);
+export function EncounterScene({ title, text, pool, level = 4, isLegendary = false, onSeen, onCaught, onResolved }) {
+  const wildId = useMemo(() => {
+    const id = pool[Math.floor(Math.random() * pool.length)];
+    // Notifica Pokédex: visto
+    if (onSeen) onSeen(id);
+    return id;
+  }, [pool]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [result, setResult] = useState(null); // { method, success } | null
 
+  // I leggendari hanno un tasso base ridotto e non accettano cibo
+  const baseRate = isLegendary ? 0.10 : 0.55;
+
   function attemptCapture(method) {
-    const chance = computeCaptureChance(method, 0.55);
+    const chance = computeCaptureChance(method, baseRate);
     const success = rollCapture(chance);
+    if (success && onCaught) onCaught(wildId);
     setResult({ method, success, chance });
   }
 
@@ -35,9 +46,14 @@ export function EncounterScene({ title, text, pool, level = 4, onResolved }) {
 
   return e(
     "div",
-    { className: "panel" },
+    { className: `panel ${isLegendary ? "encounter-legendary" : ""}` },
     e("h2", { className: "scene-title" }, title),
     e("p", { className: "scene-text" }, text),
+    isLegendary && e(
+      "div",
+      { className: "legendary-badge" },
+      "⭐ Incontro leggendario — probabilità di cattura ridotta!"
+    ),
     e(PokemonPreview, { id: wildId }),
     !result &&
       e(
@@ -47,9 +63,13 @@ export function EncounterScene({ title, text, pool, level = 4, onResolved }) {
           "button",
           { className: "choice-btn", onClick: () => attemptCapture("ball") },
           e("span", null, "Lancia una Poké Ball"),
-          e("span", { className: "choice-hint" }, "Metodo affidabile, probabilità nella media")
+          e("span", { className: "choice-hint" },
+            isLegendary
+              ? "Solo il 10% di probabilità — i leggendari non si arrendono facilmente"
+              : "Metodo affidabile, probabilità nella media"
+          )
         ),
-        e(
+        !isLegendary && e(
           "button",
           { className: "choice-btn", onClick: () => attemptCapture("food") },
           e("span", null, "Prova ad addolcirlo con del cibo"),
@@ -67,7 +87,11 @@ export function EncounterScene({ title, text, pool, level = 4, onResolved }) {
         "div",
         { className: `outcome-box ${result.success ? "" : "fail"}` },
         result.success
-          ? "Cattura riuscita! Il Pokémon si unisce alla tua squadra."
+          ? isLegendary
+            ? "🌟 Incredibile! Hai catturato il leggendario!"
+            : "Cattura riuscita! Il Pokémon si unisce alla tua squadra."
+          : isLegendary
+          ? "Il leggendario è fuggito nell'oscurità..."
           : "Il Pokémon è riuscito a scappare!",
         e(
           "div",

@@ -11,7 +11,7 @@ export function EndScreen({ team, badges, onRestart }) {
     e(
       "p",
       { className: "scene-text" },
-      "Questa è la fine della demo. Hai completato il tuo percorso fatto di scelte invece che di ruote della fortuna."
+      "Hai completato il tuo percorso fatto di scelte invece che di ruote della fortuna."
     ),
     e("h3", null, "La tua squadra finale"),
     e(
