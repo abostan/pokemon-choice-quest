@@ -541,177 +541,219 @@ export default function App() {
       kalos: [677, 704, 714], // Espurr, Goomy, Noibat
     };
 
+    // Costruisce la lista di tutte le opzioni speciali disponibili
+    const allSpecialOptions = [
+      {
+        id: "legendary",
+        weight: 0.10,
+        label: "⭐ Santuario Antico (Incontro Leggendario)",
+        hint: "Segui antichi segni per scovare un Pokémon Leggendario della regione!",
+        onSelect: () => {
+          const legendaries = generation.legendaries || [150];
+          const uncaptured = legendaries.filter((id) => !state.caughtLegendaries.includes(id));
+          const selectedId = uncaptured.length > 0
+            ? uncaptured[Math.floor(Math.random() * uncaptured.length)]
+            : legendaries[Math.floor(Math.random() * legendaries.length)];
+          
+          goTo("legendaryEncounter", {
+            pendingEncounterPool: [selectedId],
+            pendingEncounterLevel: Math.min(100, 35 + state.gymIndex * 5),
+            pendingEncounterIsLegendary: true,
+          });
+        },
+      },
+      {
+        id: "fireZone",
+        weight: 0.20,
+        label: "🌋 Vulcano & Centrale Elettrica",
+        hint: "Pokémon selvatici di tipo Fuoco, Elettrico ed Acciaio",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: firePools[state.generationId] || [37, 58, 100],
+            pendingEncounterLevel: tier.level,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "ghostZone",
+        weight: 0.20,
+        label: "👻 Foresta Stregata & Rovine Antiche",
+        hint: "Pokémon selvatici di tipo Spettro, Psico, Buio e Fata",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: ghostPools[state.generationId] || [92, 63, 35],
+            pendingEncounterLevel: tier.level,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "iceZone",
+        weight: 0.15,
+        label: "❄️ Vetta Innevata & Ghiacciaio",
+        hint: "Pokémon selvatici di tipo Ghiaccio, Acciaio e Volante",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: icePools[state.generationId] || [124, 131, 220],
+            pendingEncounterLevel: tier.level,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "fightingZone",
+        weight: 0.20,
+        label: "🥊 Dojo dei Combattenti & Arena",
+        hint: "Pokémon selvatici di tipo Lotta e Normale",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: fightingPools[state.generationId] || [66, 56, 106],
+            pendingEncounterLevel: tier.level,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "fish",
+        weight: 0.30,
+        label: "🎣 Vai a pescare sul fiume",
+        hint: "Pokémon d'acqua e acquatici rari",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: tier.fishing,
+            pendingEncounterLevel: tier.level,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "cave",
+        weight: 0.30,
+        label: "🦇 Esplora una grotta misteriosa",
+        hint: "Pokémon di tipo Roccia, Terra e Buio + minerale regalo",
+        onSelect: () => {
+          const pool = generation.items.cave;
+          addItem(pool[Math.floor(Math.random() * pool.length)]);
+          goTo("encounter", {
+            pendingEncounterPool: tier.cave,
+            pendingEncounterLevel: tier.level,
+            pendingEncounterIsLegendary: false,
+          });
+        },
+      },
+      {
+        id: "enemyTeam",
+        weight: 0.20,
+        label: "🕵️‍♂️ Incursione del Team Nemico",
+        hint: "Sconfiggi le reclute del Team malvagio per liberare la strada e vincere un premio",
+        onSelect: () => {
+          const oppPower = getScaledPower(18 + state.gymIndex * 8);
+          goTo("trainerBattle", {
+            pendingTrainer: {
+              title: "Recluta del Team Nemico",
+              teamIds: [tier.grass[0], tier.cave[0] || tier.grass[1]],
+              power: oppPower,
+            },
+          });
+        },
+      },
+      {
+        id: "mysteryEgg",
+        weight: 0.12,
+        label: "🐣 Cova un Uovo Misterioso",
+        hint: "Ricevi un uovo raro che si schiuderà in un nuovo Pokémon a Lv 5",
+        onSelect: () => {
+          const pool = eggPools[state.generationId] || [133, 175, 447];
+          const eggId = pool[Math.floor(Math.random() * pool.length)];
+          markCaught(eggId, false);
+          addToTeam({ id: eggId, level: 5 });
+          addItem("Super Pozione");
+          goTo("gymBattle");
+        },
+      },
+      {
+        id: "trainer",
+        weight: 0.25,
+        label: "⚔️ Sfida un Allenatore del percorso",
+        hint: "Battaglia rapida per XP della squadra ed un premio",
+        onSelect: () => {
+          const oppPower = getScaledPower(12 + state.gymIndex * 7);
+          goTo("trainerBattle", {
+            pendingTrainer: {
+              title: "Allenatore del percorso",
+              teamIds: [tier.grass[0], tier.cave[0] || tier.grass[1]],
+              power: oppPower,
+            },
+          });
+        },
+      },
+      {
+        id: "searchItems",
+        weight: 0.25,
+        label: "🔍 Cercatore di Strumenti & Bacche",
+        hint: "Esplora per trovare bacche, pozioni o pietre evolutive",
+        onSelect: () => {
+          const pool = [...generation.items.cave, ...generation.items.grass];
+          const foundItem = pool[Math.floor(Math.random() * pool.length)];
+          addItem(foundItem);
+          boostTeam(1);
+          goTo("gymBattle");
+        },
+      },
+    ];
+
+    // Estrae casualmente 2 eventi speciali tra quelli disponibili
+    const rolledSpecials = [];
+    const shuffled = [...allSpecialOptions].sort(() => Math.random() - 0.5);
+    for (const opt of shuffled) {
+      if (Math.random() < opt.weight) {
+        rolledSpecials.push(opt);
+        if (rolledSpecials.length >= 2) break;
+      }
+    }
+    // Fallback se il tiro di dado non ha estratto abbastanza eventi
+    if (rolledSpecials.length < 2) {
+      for (const opt of shuffled) {
+        if (!rolledSpecials.some((o) => o.id === opt.id)) {
+          rolledSpecials.push(opt);
+          if (rolledSpecials.length >= 2) break;
+        }
+      }
+    }
+
+    // Le 2 opzioni standard sempre garantite
+    const baseGrassChoice = {
+      id: "grass",
+      label: useAltGrass ? "🌿 Esplora un nuovo sentiero erboso" : "🌿 Addentrati nell'erba alta",
+      hint: "Incontra Pokémon selvatici locali (Erba, Volante, Coleottero)",
+      onSelect: () =>
+        goTo("encounter", {
+          pendingEncounterPool: useAltGrass ? tier.grass2 : tier.grass,
+          pendingEncounterLevel: tier.level,
+          pendingEncounterIsLegendary: false,
+        }),
+    };
+
+    const baseTrainChoice = {
+      id: "train",
+      label: "🏋️‍♂️ Allenamento intensivo",
+      hint: "Nessun Pokémon selvatico, ma la squadra guadagna +2 Livelli",
+      onSelect: () => {
+        boostTeam(2);
+        goTo("gymBattle");
+      },
+    };
+
+    const exploreChoices = [
+      baseGrassChoice,
+      ...rolledSpecials,
+      baseTrainChoice,
+    ];
+
     content = e(ChoiceScene, {
       key: `explore-${state.gymIndex}`,
       title: state.gymIndex === 0 ? "Il primo bivio" : "Verso la prossima palestra",
       text:
         state.gymIndex === 0
-          ? "Lasci il laboratorio del Professore. Davanti a te la strada si divide: puoi esplorare vari habitat selvaggi, cercare un leggendario o prepararti."
-          : `Ti lasci alle spalle l'ultima palestra. Prima di affrontare "${nextGymTitle}", quale habitat vuoi esplorare?`,
-      choices: [
-        {
-          id: "legendary",
-          label: "⭐ Santuario Antico (Incontro Leggendario)",
-          hint: "Segui antichi segni per scovare un Pokémon Leggendario della regione!",
-          onSelect: () => {
-            const legendaries = generation.legendaries || [150];
-            const uncaptured = legendaries.filter((id) => !state.caughtLegendaries.includes(id));
-            const selectedId = uncaptured.length > 0
-              ? uncaptured[Math.floor(Math.random() * uncaptured.length)]
-              : legendaries[Math.floor(Math.random() * legendaries.length)];
-            
-            goTo("legendaryEncounter", {
-              pendingEncounterPool: [selectedId],
-              pendingEncounterLevel: Math.min(100, 35 + state.gymIndex * 5),
-              pendingEncounterIsLegendary: true,
-            });
-          },
-        },
-        {
-          id: "fireZone",
-          label: "🌋 Vulcano & Centrale Elettrica",
-          hint: "Pokémon selvatici di tipo Fuoco, Elettrico ed Acciaio",
-          onSelect: () =>
-            goTo("encounter", {
-              pendingEncounterPool: firePools[state.generationId] || [37, 58, 100],
-              pendingEncounterLevel: tier.level,
-              pendingEncounterIsLegendary: false,
-            }),
-        },
-        {
-          id: "ghostZone",
-          label: "👻 Foresta Stregata & Rovine Antiche",
-          hint: "Pokémon selvatici di tipo Spettro, Psico, Buio e Fata",
-          onSelect: () =>
-            goTo("encounter", {
-              pendingEncounterPool: ghostPools[state.generationId] || [92, 63, 35],
-              pendingEncounterLevel: tier.level,
-              pendingEncounterIsLegendary: false,
-            }),
-        },
-        {
-          id: "iceZone",
-          label: "❄️ Vetta Innevata & Ghiacciaio",
-          hint: "Pokémon selvatici di tipo Ghiaccio, Acciaio e Volante",
-          onSelect: () =>
-            goTo("encounter", {
-              pendingEncounterPool: icePools[state.generationId] || [124, 131, 220],
-              pendingEncounterLevel: tier.level,
-              pendingEncounterIsLegendary: false,
-            }),
-        },
-        {
-          id: "fightingZone",
-          label: "🥊 Dojo dei Combattenti & Arena",
-          hint: "Pokémon selvatici di tipo Lotta e Normale",
-          onSelect: () =>
-            goTo("encounter", {
-              pendingEncounterPool: fightingPools[state.generationId] || [66, 56, 106],
-              pendingEncounterLevel: tier.level,
-              pendingEncounterIsLegendary: false,
-            }),
-        },
-        {
-          id: "grass",
-          label: useAltGrass ? "🌿 Esplora un nuovo sentiero erboso" : "🌿 Addentrati nell'erba alta",
-          hint: "Incontra Pokémon selvatici locali (Erba, Volante, Coleottero)",
-          onSelect: () =>
-            goTo("encounter", {
-              pendingEncounterPool: useAltGrass ? tier.grass2 : tier.grass,
-              pendingEncounterLevel: tier.level,
-              pendingEncounterIsLegendary: false,
-            }),
-        },
-        {
-          id: "fish",
-          label: "🎣 Vai a pescare sul fiume",
-          hint: "Pokémon d'acqua e acquatici rari",
-          onSelect: () =>
-            goTo("encounter", {
-              pendingEncounterPool: tier.fishing,
-              pendingEncounterLevel: tier.level,
-              pendingEncounterIsLegendary: false,
-            }),
-        },
-        {
-          id: "cave",
-          label: "🦇 Esplora una grotta misteriosa",
-          hint: "Pokémon di tipo Roccia, Terra e Buio + minerale regalo",
-          onSelect: () => {
-            const pool = generation.items.cave;
-            addItem(pool[Math.floor(Math.random() * pool.length)]);
-            goTo("encounter", {
-              pendingEncounterPool: tier.cave,
-              pendingEncounterLevel: tier.level,
-              pendingEncounterIsLegendary: false,
-            });
-          },
-        },
-        {
-          id: "enemyTeam",
-          label: "🕵️‍♂️ Incursione del Team Nemico",
-          hint: "Sconfiggi le reclute del Team malvagio per liberare la strada e vincere un premio",
-          onSelect: () => {
-            const oppPower = getScaledPower(18 + state.gymIndex * 8);
-            goTo("trainerBattle", {
-              pendingTrainer: {
-                title: "Recluta del Team Nemico",
-                teamIds: [tier.grass[0], tier.cave[0] || tier.grass[1]],
-                power: oppPower,
-              },
-            });
-          },
-        },
-        {
-          id: "mysteryEgg",
-          label: "🐣 Cova un Uovo Misterioso",
-          hint: "Ricevi un uovo raro che si schiuderà in un nuovo Pokémon a Lv 5",
-          onSelect: () => {
-            const pool = eggPools[state.generationId] || [133, 175, 447];
-            const eggId = pool[Math.floor(Math.random() * pool.length)];
-            markCaught(eggId, false);
-            addToTeam({ id: eggId, level: 5 });
-            addItem("Super Pozione");
-            goTo("gymBattle");
-          },
-        },
-        {
-          id: "trainer",
-          label: "⚔️ Sfida un Allenatore del percorso",
-          hint: "Battaglia rapida per XP della squadra ed un premio",
-          onSelect: () => {
-            const oppPower = getScaledPower(12 + state.gymIndex * 7);
-            goTo("trainerBattle", {
-              pendingTrainer: {
-                title: "Allenatore del percorso",
-                teamIds: [tier.grass[0], tier.cave[0] || tier.grass[1]],
-                power: oppPower,
-              },
-            });
-          },
-        },
-        {
-          id: "searchItems",
-          label: "🔍 Cercatore di Strumenti & Bacche",
-          hint: "Esplora per trovare bacche, pozioni o pietre evolutive",
-          onSelect: () => {
-            const pool = [...generation.items.cave, ...generation.items.grass];
-            const foundItem = pool[Math.floor(Math.random() * pool.length)];
-            addItem(foundItem);
-            boostTeam(1);
-            goTo("gymBattle");
-          },
-        },
-        {
-          id: "train",
-          label: "🏋️‍♂️ Allenamento intensivo",
-          hint: "Nessun Pokémon selvatico, ma la squadra guadagna +2 Livelli",
-          onSelect: () => {
-            boostTeam(2);
-            goTo("gymBattle");
-          },
-        },
-      ],
+          ? "Lasci il laboratorio del Professore. Le strade intorno si biforcano in modi inaspettati..."
+          : `Ti lasci alle spalle l'ultima palestra. Quali opportunità ti riserva il percorso verso "${nextGymTitle}"?`,
+      choices: exploreChoices,
     });
 
   } else if (state.phase === "trainerBattle") {

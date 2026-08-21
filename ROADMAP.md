@@ -78,27 +78,33 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] Riprogettazione di `ResumeScreen` con schede interattive, date e riassunti per ogni slot.
 - [x] Funzionalità di **Esportazione Backup JSON** e **Importazione Backup JSON** da file locale.
 
-### Versione 5.0 — Pokédex Nazionale 721 Specie, Allenatori di Percorso & UI Polishing (attuale)
+### Versione 5.0 — Pokédex Album Grid 721 Specie, Habitat Tematici, Tooltip & PC Box Transition (attuale)
 
-#### 📖 Pokédex Nazionale Completo (Gen 1-6)
+#### 📖 Pokédex Album Grid (721 Specie) & Filtri per Regione
 - [x] Estensione del Pokédex a **tutti i 721 slot** delle prime 6 generazioni.
-- [x] Visualizzazione delle specie non ancora scoperte con carte dedicate (`? Ignoto`, `#025 — ???`).
-- [x] Nuovi filtri rapidi nella barra Pokédex (`Tutti`, `Scoperti`, `Catturati`, `Ignoti`).
-- [x] Barra di ricerca dinamica per `#ID` numerico con auto-padding (es. `25` o `025`).
-- [x] Statistiche numeriche in tempo reale su specie viste e catturate su 721.
+- [x] Nuova vista **Griglia Album (⬛)** a schede di figurine con anteprime pixel e silhouette `? Ignoto`.
+- [x] Tab di navigazione rapida per regione: **Kanto (1-151)**, **Johto (152-251)**, **Hoenn (252-386)**, **Sinnoh (387-493)**, **Unova (494-649)** e **Kalos (650-721)**.
+- [x] Toggle per alternare in qualsiasi momento tra la **Griglia Album (⬛)** e la **Lista Dettagliata (☰)**.
+- [x] Correzione registrazione evoluzioni: le forme evolute accettate vengono ora salvate automaticamente nel Pokédex della run e dello storico.
 
-#### ⚔️ Allenatori di Percorso & Nuove Opzioni di Bivio
-- [x] Nuova scelta narrativa `Sfida un Allenatore` nei bivi tra una palestra e l'altra.
-- [x] Sfida rapida per accumulare XP della squadra e strumenti bonus (es. `Super Pozione`).
-- [x] Nuova azione `Cercatore di Strumenti` per raccogliere pozioni, bacche e pietre evolutive nel percorso.
+#### 🎒 Tooltip & Descrizioni degli Oggetti
+- [x] Modulo `src/data/items.js` con le descrizioni dettagliate di tutti gli strumenti (Pozioni, Pietre evolutive, Rimedi, Esche, Biscotti).
+- [x] Tooltip informativi al passaggio del mouse su ciascun elemento dello Zaino nella barra laterale (`TeamPanel`).
+- [x] Tooltip descrittivi sui pulsanti degli strumenti prima delle battaglie in `BattleScene`.
 
-#### 🏅 Medaglie Grafiche & Card Avatar Avversario
-- [x] Rendering delle medaglie nel `TeamPanel` con chip grafici (`BadgeItem`) e icone tematiche dedicate per ogni tipo di palestra (🪨, 💧, ⚡, 🌿, ☠️, 🔮, 🔥, 🏔️, 🦅, 🥛, 🥊, 🗡️, ❄️, 🐉, 🧚, 👑).
-- [x] Card Avatar dell'Avversario (`BattleScene`) con icona rappresentativa, titolo ufficiale e indicatore di potenza della squadra nemica.
+#### 🗺️ Nuovi Bivi Narrative ed Habitat per Tutti i Tipi
+- [x] ⭐ **Santuario Antico (Leggendari)**: cerca e affronta i Pokémon Leggendari della regione (Articuno, Lugia, Rayquaza, Dialga, Reshiram, Xerneas, ecc.).
+- [x] 🌋 **Vulcano & Centrale Elettrica**: habitat per Pokémon di tipo **Fuoco**, **Elettrico** ed **Acciaio**.
+- [x] 👻 **Foresta Stregata & Rovine**: habitat per Pokémon di tipo **Spettro**, **Psico**, **Buio** e **Fata**.
+- [x] ❄️ **Vetta Innevata & Ghiacciaio**: habitat per Pokémon di tipo **Ghiaccio**, **Acciaio** e **Volante**.
+- [x] 🥊 **Dojo dei Combattenti**: habitat per Pokémon di tipo **Lotta** e **Normale**.
+- [x] 🐣 **Cova un Uovo Misterioso**: ricevi ed alletta un uovo di Pokémon raro/baby (Eevee, Togepi, Riolu, Zorua, Goomy, Dratini) a Lv 5.
+- [x] 🕵️‍♂️ **Incursione del Team Nemico**: sfida la recluta del Team Rocket / Flare / Plasma per sbloccare la via e guadagnare premi.
+- [x] ⚔️ **Allenatori del Percorso** e 🔍 **Cercatore di Strumenti & Bacche**.
 
-#### ⚖️ Scaling della Difficoltà & Cap Livello 100
-- [x] Algoritmo `getScaledPower` per la progressione dinamica della difficoltà della squadra avversaria nelle run multi-generazione successive.
-- [x] Cap massimo di livello fissato a 100 (`clampLevel` & `MAX_LEVEL = 100`) per prevenire overflow nei conteggi di potenza.
+#### 📦 Transizione del Team nel PC Box ad Ogni Cambio Regione
+- [x] Quando si batte la Lega e si passa alla regione successiva, l'intera squadra precedente viene trasferita e conservata nel **PC Box**.
+- [x] Il giocatore inizia la nuova regione solo con il **nuovo starter locale a Lv 5**, mantenendo la possibilità di ritirare i vecchi campioni dal Box in qualsiasi momento.
 
 ---
 
@@ -106,9 +112,10 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 
 - [ ] **Altre Generazioni**: Alola (Gen 7), Galar (Gen 8), Paldea (Gen 9).
 - [ ] **Sistema di Mosse e Tipi Reali**: efficacia dei tipi (Super Efficace / Non Molto Efficace) durante le battaglie.
-- [ ] **Eventi Narrativi Speciali**: sfide storia con i team nemici (Team Rocket / Team Plasma / Team Flare / Team Galactic).
+- [ ] **Eventi Narrativi Avanzati**: battaglie contro i Capo Team (Giovanni / Cyrus / Ghetsis / Lysandre).
 - [ ] **Effetti Sonori Web Audio API**: piccoli effetti audio rétro 8-bit per cattura, vittoria ed evoluzione.
 - [ ] **Modalità Sfida / Nuzlocke**: regole speciali con permadeath dei Pokémon esausti.
+
 
 
 

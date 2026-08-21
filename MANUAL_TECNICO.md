@@ -14,7 +14,7 @@
 |---|---|
 | **React 18** (via CDN `esm.sh`) | UI e gestione dello stato globale |
 | **Vanilla JS (ES Modules)** | Logica pura, dati e motori di gioco — zero build step |
-| **Vanilla CSS** | Design system completo (dark mode, modali, Shiny glow, medaglie grafiche, multi-slot cards) |
+| **Vanilla CSS** | Design system completo (dark mode, modali, Shiny glow, medaglie grafiche, multi-slot cards, Pokédex Grid) |
 | **PokeAPI** (`pokeapi.co`) | Fetch in tempo reale di sprite normali e Shiny, nomi e tipi |
 | **`localStorage` & JSON API** | Persistenza multi-slot (3 slot), esportazione/importazione backup JSON e Pokédex storico |
 
@@ -37,11 +37,12 @@ pokemon-choice-quest/
 │   └── simulate-flow.mjs   # Script Node.js per testare a secco le 6 generazioni
 └── src/
     ├── main.js             # Punto d'ingresso React: monta <App /> nel DOM
-    ├── App.js              # Stato globale, macchina a stati e opzioni di bivio (trainerBattle, searchItems)
-    ├── styles.css          # Design system CSS unico (variabili, modali, Shiny, visual badges, avatar card)
+    ├── App.js              # Stato globale, macchina a stati e opzioni di bivio tematiche (13 percorsi)
+    ├── styles.css          # Design system CSS unico (variabili, modali, Shiny, visual badges, avatar card, tooltips)
     ├── data/
     │   ├── generations.js  # Dati delle 6 generazioni (Kanto, Johto, Hoenn, Sinnoh, Unova, Kalos)
-    │   └── evolutions.js   # Mappa completa delle evoluzioni (300+ specie)
+    │   ├── evolutions.js   # Mappa completa delle evoluzioni (300+ specie)
+    │   └── items.js        # Modulo descrizioni e helper per gli strumenti dello zaino
     ├── engine/
     │   ├── battleLogic.js  # Logica pura per cattura, cap Lv100 (clampLevel) e battaglie
     │   └── saveGame.js     # Modulo di salvataggio multi-slot (1..3), export/import JSON e Pokédex
@@ -50,15 +51,15 @@ pokemon-choice-quest/
     └── components/
         ├── GenerationSelectScreen.js  # Schermata di selezione della regione iniziale
         ├── StartScreen.js             # Selezione dello starter della generazione
-        ├── ChoiceScene.js             # Scena generica a bivio (esplorazione, allenatori, oggetti)
+        ├── ChoiceScene.js             # Scena generica a bivio (13 percorsi ed habitat tematici)
         ├── EncounterScene.js          # Scena incontro con Pokémon selvatico / leggendario / Shiny
-        ├── BattleScene.js             # Scena battaglia (con card avatar avversario e strumenti)
+        ├── BattleScene.js             # Scena battaglia (con card avatar avversario, strumenti e descrizioni)
         ├── EndScreen.js               # Schermata di conclusione della run
-        ├── TeamPanel.js               # Sidebar per squadra, box, medaglie visuali (BadgeItem) e zaino
+        ├── TeamPanel.js               # Sidebar per squadra, box, medaglie visuali (BadgeItem) e zaino (con tooltips)
         ├── PokemonSprite.js           # Componenti PokemonChip e PokemonPreview (supporto Shiny)
-        ├── NextGenerationScreen.js    # Schermata passaggio a nuova generazione post-Lega
+        ├── NextGenerationScreen.js    # Transizione alla nuova regione con trasferimento squadra nel PC Box
         ├── PostgameScreen.js          # Schermata intro alla modalità infinita
-        ├── PokedexModal.js            # Modale Pokédex (721 slot, specie ignote "?", filtri e ricerca #ID)
+        ├── PokedexModal.js            # Pokédex Album Grid (721 slot, specie ignote "?", tab Kanto..Kalos, filtri e ricerca)
         ├── ResumeScreen.js            # Schermata di gestione dei 3 Slot e backup JSON
         ├── EvolutionNotice.js         # Overlay animato evoluzioni con opzione Tasto B (annulla)
         └── BoxModal.js                # Modale gestione Box e swap Pokémon
