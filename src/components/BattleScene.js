@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
 import { computeTeamPower, computeWinChance, rollBattle } from "../engine/battleLogic.js";
 import { getItemDescription } from "../data/items.js";
+import { computeTypeEffectiveness } from "../engine/typeMatchup.js";
 
 const e = React.createElement;
 
@@ -65,7 +66,7 @@ function TrainerAvatar({ title, opponentPower }) {
 }
 
 /**
- * Scena di battaglia con Avatar dell'Allenatore e uso oggetti dallo zaino.
+ * Scena di battaglia con Avatar dell'Allenatore, efficacia di tipo ed uso oggetti dallo zaino.
  */
 export function BattleScene({
   title,
@@ -73,6 +74,7 @@ export function BattleScene({
   opponentTitle,
   opponentTeamIds,
   opponentPower,
+  opponentType = "",
   team,
   items = [],
   rewardBadge,
@@ -82,9 +84,14 @@ export function BattleScene({
   const [result, setResult] = useState(null); // { tactic, won, winChance } | null
   const [usedItem, setUsedItem] = useState(null); // { name, boost } | null
 
+  // Estrae il tipo avversario dal titolo se non passato esplicitamente (es. "Capopalestra di tipo Roccia")
+  const detectedType = opponentType || (opponentTitle.match(/tipo ([A-Za-z]+)/)?.[1] ?? "");
+  const typeEff = computeTypeEffectiveness(team, detectedType);
+
   const baseTeamPower = computeTeamPower(team);
   const itemBoost = usedItem ? usedItem.boost : 0;
-  const totalTeamPower = baseTeamPower + itemBoost;
+  const rawTeamPower = baseTeamPower + itemBoost;
+  const totalTeamPower = Math.round(rawTeamPower * typeEff.multiplier);
 
   function handleUseItem(itemIdx) {
     if (usedItem) return;
@@ -116,6 +123,25 @@ export function BattleScene({
 
     // Avatar dell'Allenatore Avversario
     e(TrainerAvatar, { title: opponentTitle, opponentPower }),
+
+    // Badge Efficacia dei Tipi
+    typeEff.message && e(
+      "div",
+      {
+        className: `type-advantage-badge ${typeEff.status}`,
+        style: {
+          margin: "10px 0",
+          padding: "8px 12px",
+          borderRadius: "8px",
+          fontSize: "0.88rem",
+          fontWeight: "600",
+          background: typeEff.status === "super" ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)",
+          border: typeEff.status === "super" ? "1px solid #22c55e" : "1px solid #ef4444",
+          color: typeEff.status === "super" ? "#4ade80" : "#f87171",
+        },
+      },
+      typeEff.message
+    ),
 
     // Squadra Avversario
     e(

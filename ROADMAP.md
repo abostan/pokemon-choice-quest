@@ -140,12 +140,20 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] Consumo ed eliminazione della Master Ball dallo zaino a seguito dell'uso.
 - [x] **Caramella Rara**: Incremento immediato di **+3 Livelli** per tutta la squadra a seguito della vittoria del boss.
 
+### Versione 5.7 — Sistema di Efficacia dei Tipi (Type Matchups) (attuale)
+
+#### ⚡ Sistema Efficacia dei Tipi
+- [x] Mappatura dei 18 tipi primari Pokémon in `src/data/types.js` (Fuoco, Acqua, Erba, Elettrico, Lotta, Spettro, Psico, Buio, Ghiaccio, Drago, Acciaio, Folletto, Roccia, Terra, Volante, Coleottero, Veleno, Normale).
+- [x] Modulo `src/engine/typeMatchup.js` per il calcolo delle relazioni tra i 18 tipi.
+- [x] **⚡ Super Efficace (+15% Potenza Squadra)**: Se la squadra possiede Pokémon avvantaggiati rispetto al tipo del Capopalestra/Boss.
+- [x] **⚠️ Poco Efficace (-10% Potenza Squadra)**: Se la squadra è vulnerabile al tipo di palestra.
+- [x] **📊 Badge Visivo in `BattleScene`**: Indicatore cromatico verde/rosso prima della battaglia con spiegazione del bonus o svantaggio di tipo.
+
 ---
 
 ## 🔮 Prossimi Sviluppi & Idee Future (v6.0)
 
 - [ ] **Effetti Sonori & Audio 8-bit (Web Audio API)**: piccoli jingle retro per cattura, vittoria, evoluzione ed incontri Shiny.
-- [ ] **Sistema di Mosse e Tipi Reali**: bonus/malus di efficacia del tipo durante le battaglie (Super Efficace / Non Molto Efficace).
 - [ ] **Modalità Sfida / Nuzlocke**: regole speciali con permadeath dei Pokémon esausti nel PC Box.
 
 
