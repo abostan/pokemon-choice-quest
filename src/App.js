@@ -14,12 +14,20 @@ import { EvolutionNotice } from "./components/EvolutionNotice.js";
 import { BoxModal } from "./components/BoxModal.js";
 import { getGeneration, getExplorationTier, getNextGeneration } from "./data/generations.js";
 import { checkEvolution } from "./data/evolutions.js";
-import { saveGame, loadGame, hasSave, deleteSave, updateHistoricPokedex } from "./engine/saveGame.js";
+import {
+  saveGame,
+  loadGame,
+  hasSave,
+  deleteSave,
+  loadAllSlots,
+  exportSlotJSON,
+  importSlotJSON,
+  updateHistoricPokedex,
+} from "./engine/saveGame.js";
 
 const e = React.createElement;
 
-// Quanti livelli guadagna l'intera squadra dopo aver vinto una battaglia
-// importante (palestra, Rivale, Alto Comando, Campione).
+// Quanti livelli guadagna l'intera squadra dopo aver vinto una battaglia importante
 const WIN_LEVEL_BOOST = 3;
 
 // Limite massimo di Pokémon nella squadra attiva
@@ -59,7 +67,7 @@ function initialState() {
     // --- Evoluzioni in attesa di notifica ---
     pendingEvolutions: [],
 
-    // --- Leggendari catturati (non rispawnano) ---
+    // --- Leggendari catturati ---
     caughtLegendaries: [],
 
     // --- UI ---
@@ -68,31 +76,36 @@ function initialState() {
 }
 
 export default function App() {
-  // Controlla se esiste un salvataggio all'avvio
-  const [saveData] = useState(() => loadGame());
+  const [activeSlotId, setActiveSlotId] = useState(1);
+  const [slotsData, setSlotsData] = useState(() => loadAllSlots());
+
   const [state, setState] = useState(() => {
-    // Se c'è un salvataggio, mostra prima la ResumeScreen
-    if (loadGame()) {
+    // Se esiste qualsiasi salvataggio, mostra la ResumeScreen
+    if (hasSave()) {
       return { ...initialState(), phase: "resume" };
     }
     return initialState();
   });
 
-  // Auto-save: salva ogni volta che lo stato cambia (con debounce 600ms)
+  function refreshSlots() {
+    setSlotsData(loadAllSlots());
+  }
+
+  // Auto-save su activeSlotId ogni volta che lo stato cambia (debounce 600ms)
   const saveTimerRef = useRef(null);
   useEffect(() => {
-    // Non salvare nelle fasi di scelta iniziale o nel menu resume
     if (state.phase === "generationSelect" || state.phase === "resume") return;
 
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      saveGame(state);
+      saveGame(state, activeSlotId);
+      refreshSlots();
     }, 600);
 
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [state]);
+  }, [state, activeSlotId]);
 
   // -------------------------------------------------------
   // Funzioni di mutazione stato
@@ -121,9 +134,16 @@ export default function App() {
     setState((prev) => ({ ...prev, items: [...prev.items, item] }));
   }
 
+  function useItem(itemIndex) {
+    setState((prev) => {
+      const nextItems = [...prev.items];
+      nextItems.splice(itemIndex, 1);
+      return { ...prev, items: nextItems };
+    });
+  }
+
   /**
    * Aumenta il livello di tutti i Pokémon del team e controlla le evoluzioni.
-   * Se ci sono evoluzioni, le accumula in pendingEvolutions per mostrarle.
    */
   function boostTeam(amount) {
     setState((prev) => {
@@ -132,7 +152,6 @@ export default function App() {
         return checkEvolution(boosted);
       });
       const evolutions = newTeam.filter((p) => p.evolvedFrom != null);
-      // Pulisci il flag evolvedFrom dopo averlo registrato
       const cleanTeam = newTeam.map(({ evolvedFrom, ...rest }) => rest);
       return {
         ...prev,
@@ -158,28 +177,78 @@ export default function App() {
   }
 
   // Pokédex callbacks
-  function markSeen(id) {
+  function markSeen(id, isShiny = false) {
     setState((prev) => {
-      if (prev.pokedexRun[id]) return prev; // già registrato
-      updateHistoricPokedex(id, false);
-      return {
-        ...prev,
-        pokedexRun: { ...prev.pokedexRun, [id]: { seen: true, caught: false } },
-      };
-    });
-  }
-
-  function markCaught(id) {
-    setState((prev) => {
-      updateHistoricPokedex(id, true);
+      const existing = prev.pokedexRun[id] || {};
+      updateHistoricPokedex(id, false, isShiny);
       return {
         ...prev,
         pokedexRun: {
           ...prev.pokedexRun,
-          [id]: { seen: true, caught: true },
+          [id]: { seen: true, caught: existing.caught || false, shiny: isShiny || existing.shiny || false },
         },
       };
     });
+  }
+
+  function markCaught(id, isShiny = false) {
+    setState((prev) => {
+      const existing = prev.pokedexRun[id] || {};
+      updateHistoricPokedex(id, true, isShiny);
+      return {
+        ...prev,
+        pokedexRun: {
+          ...prev.pokedexRun,
+          [id]: { seen: true, caught: true, shiny: isShiny || existing.shiny || false },
+        },
+      };
+    });
+  }
+
+  // -------------------------------------------------------
+  // Slot management handlers
+  // -------------------------------------------------------
+
+  function handleResumeSlot(slotId) {
+    const loaded = loadGame(slotId);
+    if (loaded) {
+      setActiveSlotId(slotId);
+      setState({ ...initialState(), ...loaded.state, pokedexOpen: false, boxModalOpen: false });
+    }
+  }
+
+  function handleNewGameSlot(slotId) {
+    deleteSave(slotId);
+    setActiveSlotId(slotId);
+    refreshSlots();
+    setState({ ...initialState(), phase: "generationSelect" });
+  }
+
+  function handleDeleteSlot(slotId) {
+    deleteSave(slotId);
+    refreshSlots();
+  }
+
+  function handleExportSlot(slotId) {
+    const jsonStr = exportSlotJSON(slotId);
+    if (!jsonStr) return;
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pokemon_choice_quest_slot${slotId}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleImportSlot(slotId, jsonContent) {
+    const ok = importSlotJSON(slotId, jsonContent);
+    if (ok) {
+      refreshSlots();
+      handleResumeSlot(slotId);
+    } else {
+      alert("Impossibile importare il salvataggio: file JSON non valido.");
+    }
   }
 
   // -------------------------------------------------------
@@ -214,10 +283,6 @@ export default function App() {
     goTo("explore", { gymIndex: nextGymIndex });
   }
 
-  /**
-   * Chiamata dopo aver sconfitto il Campione.
-   * Decide se passare alla generazione successiva, alla modalità infinita, o alla fine.
-   */
   function checkNextGeneration() {
     const nextGen = getNextGeneration(state.generationId);
     if (nextGen) {
@@ -227,10 +292,6 @@ export default function App() {
     }
   }
 
-  /**
-   * Gestisce un round di esplorazione post-game.
-   * 5% di probabilità di incontro con un leggendario non ancora catturato.
-   */
   function startPostgameExplore() {
     const lastGen = generation || getGeneration(state.generationId);
     const availableLegendaries = (lastGen?.legendaries || []).filter(
@@ -255,22 +316,15 @@ export default function App() {
   let content;
 
   if (state.phase === "resume") {
-    const saved = loadGame();
     content = e(ResumeScreen, {
-      savedAt: saved?.savedAt ?? new Date().toISOString(),
-      savedState: saved?.state ?? {},
-      onResume: () => {
-        const loaded = loadGame();
-        if (loaded) {
-          setState({ ...initialState(), ...loaded.state, pokedexOpen: false, boxModalOpen: false });
-        } else {
-          setState(initialState());
-        }
-      },
-      onNewGame: () => {
-        deleteSave();
-        setState(initialState());
-      },
+      slots: slotsData,
+      selectedSlotId: activeSlotId,
+      onSelectSlot: setActiveSlotId,
+      onResume: handleResumeSlot,
+      onNewGame: handleNewGameSlot,
+      onDeleteSlot: handleDeleteSlot,
+      onExportSlot: handleExportSlot,
+      onImportSlot: handleImportSlot,
     });
 
   } else if (state.phase === "generationSelect") {
@@ -302,7 +356,7 @@ export default function App() {
           gymIndex: 0,
           eliteIndex: 0,
           rivalDone: false,
-          badges: [],         // medaglie azzerate per la nuova regione
+          badges: [],
           multiGenRun: true,
         }),
     });
@@ -485,7 +539,9 @@ export default function App() {
       opponentTeamIds: gym.teamIds,
       opponentPower: gym.opponentPower,
       team: state.team,
+      items: state.items,
       rewardBadge: gym.badge,
+      onUseItem: useItem,
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(gym.badge);
         advanceAfterGymBattle();
@@ -502,7 +558,9 @@ export default function App() {
       opponentTeamIds: rival.teamIds,
       opponentPower: rival.opponentPower,
       team: state.team,
+      items: state.items,
       rewardBadge: null,
+      onUseItem: useItem,
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(null);
         update({ rivalDone: true, phase: "explore" });
@@ -519,7 +577,9 @@ export default function App() {
       opponentTeamIds: member.teamIds,
       opponentPower: member.opponentPower,
       team: state.team,
+      items: state.items,
       rewardBadge: null,
+      onUseItem: useItem,
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(null);
         const nextEliteIndex = state.eliteIndex + 1;
@@ -541,7 +601,9 @@ export default function App() {
       opponentTeamIds: champion.teamIds,
       opponentPower: champion.opponentPower,
       team: state.team,
+      items: state.items,
       rewardBadge: champion.badge,
+      onUseItem: useItem,
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(champion.badge);
         checkNextGeneration();
@@ -553,7 +615,7 @@ export default function App() {
       team: state.team,
       badges: state.badges,
       onRestart: () => {
-        deleteSave();
+        deleteSave(activeSlotId);
         setState(initialState());
       },
     });
@@ -649,7 +711,7 @@ export default function App() {
             ? `${generation.name} — guidato dalle tue scelte`
             : "Ispirato a Pokemon Roulette, ma guidato dalle tue scelte"
         ),
-        // Pulsante Pokédex (visibile durante il gioco)
+        // Pulsante Pokédex
         state.phase !== "generationSelect" && state.phase !== "resume" &&
           e(
             "button",

@@ -54,27 +54,37 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 
 ---
 
-## 🔮 Prossimi Sviluppi & TODO List (v4.0)
+### Versione 4.0 — Shiny, Oggetti in Battaglia, Unova, Kalos & Multi-Save (v4.0 attuale)
 
-### 1. ✨ Sistema Pokémon Shiny
-- [ ] Logica 1/500 di probabilità Shiny negli incontri selvatici.
-- [ ] Salvataggio flag `isShiny: true` su team, box e Pokédex.
-- [ ] Rendering dello sprite Shiny (`spriteShiny` da `usePokemon.js`).
-- [ ] Badge stella / animazione di luccichio CSS nelle schede.
+#### ✨ Sistema Pokémon Shiny
+- [x] Logica 1/500 di probabilità Shiny negli incontri selvatici (1/20 per i leggendari).
+- [x] Salvataggio del flag `isShiny: true` in squadra, box e Pokédex.
+- [x] Rendering dello sprite Shiny tramite `spriteShiny` PokeAPI.
+- [x] Badge stella ✨, titolo dorato e bagliore animato CSS.
 
-### 2. 🎒 Oggetti & Strumenti in Battaglia
-- [ ] Utilizzo pozioni e strumenti dallo zaino prima della scelta della tattica in `BattleScene`.
-- [ ] Effetto di cura o bonus temporaneo di potenza durante i boss.
-- [ ] Consumo e gestione inventario dello zaino.
+#### 🎒 Oggetti & Strumenti in Battaglia
+- [x] Selezione ed utilizzo degli strumenti dello zaino prima di scegliere la tattica in `BattleScene`.
+- [x] Incremento temporaneo della potenza della squadra (+10/+18).
+- [x] Consumo ed eliminazione dell'oggetto dallo zaino a seguito dell'uso.
 
-### 3. 🗺️ Generazioni 5 (Unova) & 6 (Kalos)
-- [ ] Aggiunta di **Unova (Gen 5)** (Snivy, Tepig, Oshawott) a `generations.js`.
-- [ ] Aggiunta di **Kalos (Gen 6)** (Chespin, Fennekin, Froakie) a `generations.js`.
-- [ ] Mappatura evoluzioni Gen 5 & Gen 6 in `evolutions.js`.
-- [ ] Aggiornamento simulatore `scripts/simulate-flow.mjs`.
+#### 🗺️ 6 Generazioni Giocabili
+- [x] Aggiunta di **Unova (Gen 5)**: Snivy, Tepig, Oshawott, 8 Palestre, Alto Comando e Leggendari (Reshiram, Zekrom, Kyurem, Cobalion, ecc.).
+- [x] Aggiunta di **Kalos (Gen 6)**: Chespin, Fennekin, Froakie, 8 Palestre, Alto Comando e Leggendari (Xerneas, Yveltal, Zygarde).
+- [x] 300+ evoluzioni mappate in `evolutions.js`.
+- [x] Simulazione validata per tutte le 6 generazioni (22 passi ciascuna).
 
-### 4. 💾 Slot di Salvataggio Multipli & Backup
-- [ ] Gestione fino a 3 slot di salvataggio in `saveGame.js`.
-- [ ] Selettore slot nella `ResumeScreen` con info dettagliate per ciascuna partita.
-- [ ] Esportazione / importazione del salvataggio in formato JSON per il backup.
+#### 💾 Slot di Salvataggio Multipli & Backup JSON
+- [x] Supporto per 3 slot di salvataggio indipendenti (`Slot 1`, `Slot 2`, `Slot 3`) su `localStorage`.
+- [x] Riprogettazione di `ResumeScreen` con schede interattive, date e riassunti per ogni slot.
+- [x] Funzionalità di **Esportazione Backup JSON** e **Importazione Backup JSON** da file locale.
+
+---
+
+## 🔮 Prossimi Sviluppi & Idee Future (v5.0)
+
+- [ ] **Altre Generazioni**: Alola (Gen 7), Galar (Gen 8), Paldea (Gen 9).
+- [ ] **Sistema di Mosse e Tipi Reali**: efficacia dei tipi (Super Efficace / Non Molto Efficace) durante le battaglie.
+- [ ] **Eventi Narrativi Speciali**: sfide storia con i team nemici (Team Rocket / Team Plasma / Team Flare).
+- [ ] **Effetti Sonori Web Audio API**: piccoli effetti audio rétro 8-bit per cattura, vittoria ed evoluzione.
+
 

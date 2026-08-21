@@ -23,7 +23,7 @@ export function TeamPanel({ team, box, badges, items, onOpenBox }) {
       : e(
           "div",
           { className: "team-list" },
-          team.map((p, idx) => e(PokemonChip, { key: `${p.id}-${idx}`, id: p.id, level: p.level }))
+          team.map((p, idx) => e(PokemonChip, { key: `${p.id}-${idx}`, id: p.id, level: p.level, isShiny: p.isShiny }))
         ),
 
     // Sezione Box
@@ -43,7 +43,7 @@ export function TeamPanel({ team, box, badges, items, onOpenBox }) {
       : e(
           "div",
           { className: "team-list" },
-          box.slice(0, 3).map((p, idx) => e(PokemonChip, { key: `box-${p.id}-${idx}`, id: p.id, level: p.level }))
+          box.slice(0, 3).map((p, idx) => e(PokemonChip, { key: `box-${p.id}-${idx}`, id: p.id, level: p.level, isShiny: p.isShiny }))
         ),
     box && box.length > 3 &&
       e("p", { className: "empty-hint", style: { fontSize: "0.75rem" } }, `...e altri ${box.length - 3} nel box`),

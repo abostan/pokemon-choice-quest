@@ -735,6 +735,194 @@ body {
 }
 
 /* ------------------------------------------------------------------
+   Shiny Pokémon Effects & Badges
+   ------------------------------------------------------------------ */
+.shiny-chip {
+  border: 1px solid #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.shiny-preview {
+  border: 1px solid #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  animation: shinyGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes shinyGlow {
+  from { box-shadow: 0 0 15px rgba(255, 215, 0, 0.25); }
+  to   { box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+}
+
+.shiny-badge {
+  background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.6);
+  letter-spacing: 1px;
+}
+
+.shiny-sparkle-inline {
+  color: #ffd700;
+}
+
+.encounter-shiny {
+  border: 1px solid #ffd700;
+}
+
+/* ------------------------------------------------------------------
+   Oggetti in Battaglia
+   ------------------------------------------------------------------ */
+.battle-item-section {
+  background: var(--panel-alt);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.battle-item-label {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.battle-item-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.battle-item-btn {
+  background: #1f3348;
+  border: 1px solid var(--accent-2);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.battle-item-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: #2b4562;
+}
+.battle-item-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.battle-item-notice {
+  background: #1a3224;
+  border-left: 4px solid var(--success);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+}
+
+/* ------------------------------------------------------------------
+   Multi-slot ResumeScreen
+   ------------------------------------------------------------------ */
+.resume-screen-multi { text-align: center; }
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+@media (min-width: 760px) {
+  .slots-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.slot-card {
+  background: var(--panel-alt);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.slot-card:hover { border-color: var(--accent-2); }
+.slot-card.selected {
+  border-color: var(--accent);
+  background: #1d3023;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+.slot-card.empty {
+  opacity: 0.75;
+}
+
+.slot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.slot-title {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.slot-date {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.slot-empty-tag {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  background: var(--panel);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.slot-details { flex: 1; }
+
+.slot-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.slot-action-btn {
+  background: var(--panel);
+  border: 1px solid var(--text-dim);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  text-align: center;
+  transition: all 0.15s;
+}
+.slot-action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.slot-action-btn.danger:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ------------------------------------------------------------------
    Type pill colori (i tipi più comuni — fallback su accent-2)
    ------------------------------------------------------------------ */
 .type-pill.type-fire    { background: #c44209; }
@@ -754,3 +942,4 @@ body {
 .type-pill.type-flying  { background: #2e5a9a; }
 .type-pill.type-bug     { background: #3a6010; }
 .type-pill.type-steel   { background: #4a5870; }
+

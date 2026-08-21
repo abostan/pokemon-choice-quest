@@ -7,14 +7,14 @@ const e = React.createElement;
 // -------------------------------------------------------------------
 // Componente singola riga Pokédex
 // -------------------------------------------------------------------
-function PokedexEntry({ pokemonId, status }) {
+function PokedexEntry({ pokemonId, status, hasShiny }) {
   const { data, loading } = usePokemon(pokemonId);
   const name = loading ? "..." : (data?.name ?? `#${pokemonId}`);
-  const sprite = data?.sprite ?? "";
+  const sprite = hasShiny ? (data?.spriteShiny || data?.sprite) : (data?.sprite ?? "");
 
   return e(
     "div",
-    { className: `pokedex-entry ${status}` },
+    { className: `pokedex-entry ${status} ${hasShiny ? "pokedex-shiny" : ""}` },
     e(
       "div",
       { className: "pokedex-sprite" },
@@ -25,7 +25,7 @@ function PokedexEntry({ pokemonId, status }) {
     e(
       "div",
       { className: "pokedex-info" },
-      e("span", { className: "pokedex-name" }, name),
+      e("span", { className: "pokedex-name" }, hasShiny ? `✨ ${name}` : name),
       data?.types
         ? e(
             "div",
@@ -37,7 +37,11 @@ function PokedexEntry({ pokemonId, status }) {
     e(
       "span",
       { className: `pokedex-status-badge ${status}` },
-      status === "caught" ? "✓ Catturato" : "👁 Visto"
+      status === "caught"
+        ? hasShiny
+          ? "✨ Catturato Shiny"
+          : "✓ Catturato"
+        : "👁 Visto"
     )
   );
 }
@@ -49,7 +53,7 @@ function PokedexEntry({ pokemonId, status }) {
  * Modale Pokédex con due viste: run corrente e storico.
  *
  * props:
- *  - pokedexRun: { [id]: { seen: true, caught: bool } }
+ *  - pokedexRun: { [id]: { seen: true, caught: bool, shiny: bool } }
  *  - onClose(): callback per chiudere il modale
  */
 export function PokedexModal({ pokedexRun, onClose }) {
@@ -68,10 +72,12 @@ export function PokedexModal({ pokedexRun, onClose }) {
       ? Object.entries(pokedexRun).map(([id, info]) => ({
           id: Number(id),
           status: info.caught ? "caught" : "seen",
+          hasShiny: !!info.shiny,
         }))
       : Object.entries(historic).map(([id, info]) => ({
           id: Number(id),
           status: info.caught ? "caught" : "seen",
+          hasShiny: !!info.shiny,
         }));
 
   // Ordina per ID numerico
@@ -135,7 +141,7 @@ export function PokedexModal({ pokedexRun, onClose }) {
         : e(
             "div",
             { className: "pokedex-list" },
-            entries.map((en) => e(PokedexEntry, { key: en.id, pokemonId: en.id, status: en.status }))
+            entries.map((en) => e(PokedexEntry, { key: en.id, pokemonId: en.id, status: en.status, hasShiny: en.hasShiny }))
           )
     )
   );

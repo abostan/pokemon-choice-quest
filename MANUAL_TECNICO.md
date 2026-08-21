@@ -1,12 +1,12 @@
-# Manuale Tecnico — Pokémon: Scegli il Cammino (v3+)
+# Manuale Tecnico — Pokémon: Scegli il Cammino (v4.0)
 
-> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata.
+> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v4.0.
 
 ---
 
 ## 1. Panoramica del Progetto
 
-**Pokémon: Scegli il Cammino** è un'avventura Pokémon interattiva per browser basata su scelte narrative e strategiche. A differenza dei giochi ufficiali o di simulatori casuali, l'esito delle catture e delle battaglie viene calcolato in base alla potenza complessiva della squadra, alle decisioni tattiche e a tiri di dado pesati su formule matematiche deterministiche.
+**Pokémon: Scegli il Cammino** è un'avventura Pokémon interattiva per browser basata su scelte narrative e strategiche. A differenza dei giochi ufficiali o di simulatori casuali, l'esito delle catture e delle battaglie viene calcolato in base alla potenza complessiva della squadra, alle decisioni tattiche, all'uso degli strumenti dallo zaino e a tiri di dado pesati su formule matematiche deterministiche.
 
 ### Stack Tecnologico
 
@@ -14,9 +14,9 @@
 |---|---|
 | **React 18** (via CDN `esm.sh`) | UI e gestione dello stato globale |
 | **Vanilla JS (ES Modules)** | Logica pura, dati e motori di gioco — zero build step |
-| **Vanilla CSS** | Design system completo (dark mode, modali, glassmorphism, glowing animation) |
-| **PokeAPI** (`pokeapi.co`) | Fetch in tempo reale di sprite, nomi e tipi dei Pokémon |
-| **`localStorage` API** | Persistenza del salvataggio di gioco e del Pokédex storico |
+| **Vanilla CSS** | Design system completo (dark mode, modali, Shiny glow, multi-slot cards) |
+| **PokeAPI** (`pokeapi.co`) | Fetch in tempo reale di sprite normali e Shiny, nomi e tipi |
+| **`localStorage` & JSON API** | Persistenza multi-slot (3 slot), esportazione/importazione backup JSON e Pokédex storico |
 
 > [!IMPORTANT]
 > **Nessun passo di build.** Il progetto non richiede Node/npm/Vite per eseguire la app nel browser. React viene importato direttamente tramite `importmap` dentro `index.html` e i componenti React sono scritti con `React.createElement` (alias `e`) per evitare di dipendere da compilatori JSX/Babel.
@@ -34,32 +34,32 @@ pokemon-choice-quest/
 ├── MANUAL_TECNICO.md       # Manuale tecnico completo del progetto (questo file)
 ├── SPEC.md                 # Documento di specifica e backlog
 ├── scripts/
-│   └── simulate-flow.mjs   # Script Node.js per testare a secco le 4 generazioni
+│   └── simulate-flow.mjs   # Script Node.js per testare a secco le 6 generazioni
 └── src/
     ├── main.js             # Punto d'ingresso React: monta <App /> nel DOM
-    ├── App.js              # Stato globale e macchina a stati (fasi di gioco)
-    ├── styles.css          # Design system CSS unico (variabili, modali, animazioni)
+    ├── App.js              # Stato globale e macchina a stati (fasi di gioco, activeSlotId)
+    ├── styles.css          # Design system CSS unico (variabili, modali, Shiny, slot cards)
     ├── data/
-    │   ├── generations.js  # Dati delle 4 generazioni (Kanto, Johto, Hoenn, Sinnoh)
-    │   └── evolutions.js   # Mappa completa delle evoluzioni (soglie di livello)
+    │   ├── generations.js  # Dati delle 6 generazioni (Kanto, Johto, Hoenn, Sinnoh, Unova, Kalos)
+    │   └── evolutions.js   # Mappa completa delle evoluzioni (300+ specie)
     ├── engine/
     │   ├── battleLogic.js  # Logica pura per cattura e battaglie (formule matematiche)
-    │   └── saveGame.js     # Modulo di persistenza localStorage (save state & Pokédex storico)
+    │   └── saveGame.js     # Modulo di salvataggio multi-slot (1..3), export/import JSON e Pokédex
     ├── hooks/
-    │   └── usePokemon.js   # Hook React con cache in memoria per PokeAPI
+    │   └── usePokemon.js   # Hook React con cache in memoria per PokeAPI (sprite standard + Shiny)
     └── components/
         ├── GenerationSelectScreen.js  # Schermata di selezione della regione iniziale
         ├── StartScreen.js             # Selezione dello starter della generazione
         ├── ChoiceScene.js             # Scena generica a bivio (esplorazione/allenamento)
-        ├── EncounterScene.js          # Scena incontro con Pokémon selvatico / leggendario
-        ├── BattleScene.js             # Scena battaglia (Palestra, Rivale, Alto Comando, Campione)
+        ├── EncounterScene.js          # Scena incontro con Pokémon selvatico / leggendario / Shiny
+        ├── BattleScene.js             # Scena battaglia (con uso strumenti dallo zaino)
         ├── EndScreen.js               # Schermata di conclusione della run
         ├── TeamPanel.js               # Sidebar per squadra, box, medaglie e zaino
-        ├── PokemonSprite.js           # Componenti PokemonChip e PokemonPreview
+        ├── PokemonSprite.js           # Componenti PokemonChip e PokemonPreview (supporto Shiny)
         ├── NextGenerationScreen.js    # Schermata passaggio a nuova generazione post-Lega
         ├── PostgameScreen.js          # Schermata intro alla modalità infinita
-        ├── PokedexModal.js            # Modale Pokédex (vista Run & vista Storico)
-        ├── ResumeScreen.js            # Schermata di ripresa della partita salvata
+        ├── PokedexModal.js            # Modale Pokédex (vista Run & vista Storico, badge Shiny)
+        ├── ResumeScreen.js            # Schermata di gestione dei 3 Slot e backup JSON
         ├── EvolutionNotice.js         # Overlay animato evoluzioni con opzione Tasto B (annulla)
         └── BoxModal.js                # Modale gestione Box e swap Pokémon
 ```

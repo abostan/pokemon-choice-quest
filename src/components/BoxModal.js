@@ -81,7 +81,7 @@ export function BoxModal({ team, box, onSwap, onClose }) {
                     className: `box-slot ${selectedTeam === idx ? "selected" : ""}`,
                     onClick: () => handleTeamClick(idx),
                   },
-                  e(PokemonChip, { id: p.id, level: p.level })
+                  e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny })
                 )
               )
         ),
@@ -104,7 +104,7 @@ export function BoxModal({ team, box, onSwap, onClose }) {
                     className: `box-slot ${selectedBox === idx ? "selected" : ""}`,
                     onClick: () => handleBoxClick(idx),
                   },
-                  e(PokemonChip, { id: p.id, level: p.level })
+                  e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny })
                 )
               )
         )

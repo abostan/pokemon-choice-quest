@@ -290,6 +290,144 @@ export const GENERATIONS = [
 
     legendaries: [480, 481, 482, 483, 484, 485, 486, 487],
   },
+
+  {
+    id: "unova",
+    name: "Unova",
+    starterIds: [495, 498, 501], // Snivy, Tepig, Oshawott
+
+    explorationTiers: [
+      {
+        level: 6,
+        grass: [504, 506, 509, 519],
+        fishing: [129, 550, 118],
+        cave: [524, 527, 529],
+        grass2: [511, 513, 515],
+      },
+      {
+        level: 16,
+        grass: [522, 540, 543],
+        fishing: [592, 594, 550],
+        cave: [532, 535, 551],
+        grass2: [546, 548, 554],
+      },
+      {
+        level: 28,
+        grass: [559, 562, 570],
+        fishing: [580, 593, 618],
+        cave: [597, 607, 633],
+        grass2: [572, 577, 582],
+      },
+    ],
+
+    items: {
+      cave: ["Iper Pozione", "Pietra Idrica", "Revitalizzante"],
+      grass: ["Pozione", "Dolceofelia", "Pallina Esca"],
+    },
+
+    gymLeaders: [
+      { title: "Capopalestra di tipo Elementale", badge: "Medaglia Tris", teamIds: [506, 512], opponentPower: 14 },
+      { title: "Capopalestra di tipo Normale", badge: "Medaglia Base", teamIds: [504, 505], opponentPower: 20 },
+      { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Maggiolino", teamIds: [544, 556, 542], opponentPower: 27 },
+      { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Volt", teamIds: [587, 587, 523], opponentPower: 35 },
+      { title: "Capopalestra di tipo Terra", badge: "Medaglia Sisma", teamIds: [552, 536, 530], opponentPower: 44 },
+      { title: "Capopalestra di tipo Volante", badge: "Medaglia Jet", teamIds: [528, 561, 581], opponentPower: 54 },
+      { title: "Capopalestra di tipo Ghiaccio", badge: "Medaglia Glacia", teamIds: [583, 614, 615], opponentPower: 65 },
+      { title: "Capopalestra di tipo Drago", badge: "Medaglia Leggenda", teamIds: [621, 611, 635], opponentPower: 77 },
+    ],
+
+    eliteFour: [
+      { title: "Alto Comando — Spettro", teamIds: [563, 593, 623, 609], opponentPower: 88 },
+      { title: "Alto Comando — Buio", teamIds: [510, 553, 625, 630], opponentPower: 96 },
+      { title: "Alto Comando — Psico", teamIds: [518, 561, 576, 579], opponentPower: 104 },
+      { title: "Alto Comando — Lotta", teamIds: [538, 539, 534, 620], opponentPower: 112 },
+    ],
+
+    champion: {
+      title: "Campione della Lega",
+      badge: "Titolo di Campione di Unova",
+      teamIds: [635, 621, 612, 567, 604, 637],
+      opponentPower: 125,
+    },
+
+    rival: {
+      title: "Il tuo Rivale",
+      teamIds: [507, 519, 499],
+      opponentPower: 26,
+      afterGymIndex: 2,
+    },
+
+    legendaries: [638, 639, 640, 641, 642, 643, 644, 645, 646],
+  },
+
+  {
+    id: "kalos",
+    name: "Kalos",
+    starterIds: [650, 653, 656], // Chespin, Fennekin, Froakie
+
+    explorationTiers: [
+      {
+        level: 6,
+        grass: [659, 661, 664, 667],
+        fishing: [129, 688, 118],
+        cave: [677, 679, 682],
+        grass2: [669, 672, 674],
+      },
+      {
+        level: 16,
+        grass: [670, 684, 686],
+        fishing: [690, 692, 130],
+        cave: [696, 698, 704],
+        grass2: [701, 708, 710],
+      },
+      {
+        level: 28,
+        grass: [676, 680, 702],
+        fishing: [691, 693, 370],
+        cave: [705, 714, 712],
+        grass2: [683, 685, 707],
+      },
+    ],
+
+    items: {
+      cave: ["Iper Pozione", "Pietra Folletto", "Revitalizzante"],
+      grass: ["Pozione", "Galletta di Yantar", "Pallina Esca"],
+    },
+
+    gymLeaders: [
+      { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Insetto", teamIds: [283, 665], opponentPower: 14 },
+      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Muro", teamIds: [696, 698], opponentPower: 20 },
+      { title: "Capopalestra di tipo Lotta", badge: "Medaglia Scontro", teamIds: [301, 112, 448], opponentPower: 27 },
+      { title: "Capopalestra di tipo Erba", badge: "Medaglia Pianta", teamIds: [188, 673, 675], opponentPower: 35 },
+      { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Volt", teamIds: [587, 695, 487], opponentPower: 44 },
+      { title: "Capopalestra di tipo Folletto", badge: "Medaglia Fata", teamIds: [303, 122, 700], opponentPower: 54 },
+      { title: "Capopalestra di tipo Psico", badge: "Medaglia Psiche", teamIds: [678, 678, 681], opponentPower: 65 },
+      { title: "Capopalestra di tipo Ghiaccio", badge: "Medaglia Iceberg", teamIds: [583, 713, 713], opponentPower: 77 },
+    ],
+
+    eliteFour: [
+      { title: "Alto Comando — Fuoco", teamIds: [59, 323, 668, 637], opponentPower: 88 },
+      { title: "Alto Comando — Acqua", teamIds: [321, 693, 121, 689], opponentPower: 96 },
+      { title: "Alto Comando — Acciaio", teamIds: [227, 437, 681, 479], opponentPower: 104 },
+      { title: "Alto Comando — Drago", teamIds: [334, 621, 697, 635], opponentPower: 112 },
+    ],
+
+    champion: {
+      title: "Campione della Lega",
+      badge: "Titolo di Campione di Kalos",
+      teamIds: [701, 697, 699, 706, 282, 658],
+      opponentPower: 125,
+    },
+
+    rival: {
+      title: "Il tuo Rivale",
+      teamIds: [662, 678, 654],
+      opponentPower: 26,
+      afterGymIndex: 2,
+    },
+
+    legendaries: [716, 717, 718],
+  },
 ];
 
 export function getGeneration(id) {

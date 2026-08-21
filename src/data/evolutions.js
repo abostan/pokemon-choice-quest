@@ -258,6 +258,123 @@ export const EVOLUTIONS = {
   459:{ evolvesAt: 40, evolvesTo: 460 }, // Snover     → Abomasnow
   356:{ evolvesAt: 42, evolvesTo: 477 }, // Dusclops   → Dusknoir
 
+  // --- Gen 5 Starter ---
+  495:{ evolvesAt: 17, evolvesTo: 496 }, // Snivy      → Servine
+  496:{ evolvesAt: 36, evolvesTo: 497 }, // Servine    → Serperior
+  498:{ evolvesAt: 17, evolvesTo: 499 }, // Tepig      → Pignite
+  499:{ evolvesAt: 36, evolvesTo: 500 }, // Pignite    → Emboar
+  501:{ evolvesAt: 17, evolvesTo: 502 }, // Oshawott   → Dewott
+  502:{ evolvesAt: 36, evolvesTo: 503 }, // Dewott     → Samurott
+
+  // --- Gen 5 selvatici/avversari ---
+  504:{ evolvesAt: 20, evolvesTo: 505 }, // Patrat     → Watchog
+  506:{ evolvesAt: 16, evolvesTo: 507 }, // Lillipup   → Herdier
+  507:{ evolvesAt: 32, evolvesTo: 508 }, // Herdier    → Stoutland
+  509:{ evolvesAt: 20, evolvesTo: 510 }, // Purrloin   → Liepard
+  511:{ evolvesAt: 36, evolvesTo: 512 }, // Pansage    → Simisage
+  513:{ evolvesAt: 36, evolvesTo: 514 }, // Pansear    → Simisear
+  515:{ evolvesAt: 36, evolvesTo: 516 }, // Panpour    → Simipour
+  517:{ evolvesAt: 36, evolvesTo: 518 }, // Munna      → Musharna
+  519:{ evolvesAt: 21, evolvesTo: 520 }, // Pidove     → Tranquill
+  520:{ evolvesAt: 32, evolvesTo: 521 }, // Tranquill  → Unfezant
+  522:{ evolvesAt: 27, evolvesTo: 523 }, // Blitzle    → Zebstrika
+  524:{ evolvesAt: 25, evolvesTo: 525 }, // Roggenrola → Boldore
+  525:{ evolvesAt: 36, evolvesTo: 526 }, // Boldore    → Gigalith
+  527:{ evolvesAt: 20, evolvesTo: 528 }, // Woobat     → Swoobat
+  529:{ evolvesAt: 31, evolvesTo: 530 }, // Drilbur    → Excadrill
+  532:{ evolvesAt: 25, evolvesTo: 533 }, // Timburr    → Gurdurr
+  533:{ evolvesAt: 36, evolvesTo: 534 }, // Gurdurr    → Conkeldurr
+  535:{ evolvesAt: 25, evolvesTo: 536 }, // Tympole    → Palpitoad
+  536:{ evolvesAt: 36, evolvesTo: 537 }, // Palpitoad  → Seismitoad
+  540:{ evolvesAt: 20, evolvesTo: 541 }, // Sewaddle   → Swadloon
+  541:{ evolvesAt: 30, evolvesTo: 542 }, // Swadloon   → Leavanny
+  543:{ evolvesAt: 22, evolvesTo: 544 }, // Venipede   → Whirlipede
+  544:{ evolvesAt: 30, evolvesTo: 545 }, // Whirlipede → Scolipede
+  546:{ evolvesAt: 36, evolvesTo: 547 }, // Cottonee   → Whimsicott
+  548:{ evolvesAt: 36, evolvesTo: 549 }, // Petilil    → Lilligant
+  551:{ evolvesAt: 29, evolvesTo: 552 }, // Sandile    → Krokorok
+  552:{ evolvesAt: 40, evolvesTo: 553 }, // Krokorok   → Krookodile
+  554:{ evolvesAt: 35, evolvesTo: 555 }, // Darumaka   → Darmanitan
+  557:{ evolvesAt: 34, evolvesTo: 558 }, // Dwebble    → Crustle
+  559:{ evolvesAt: 39, evolvesTo: 560 }, // Scraggy    → Scrafty
+  562:{ evolvesAt: 34, evolvesTo: 563 }, // Yamask     → Cofagrigus
+  564:{ evolvesAt: 37, evolvesTo: 565 }, // Tirtouga   → Carracosta
+  566:{ evolvesAt: 37, evolvesTo: 567 }, // Archen     → Archeops
+  568:{ evolvesAt: 36, evolvesTo: 569 }, // Trubbish   → Garbodor
+  570:{ evolvesAt: 30, evolvesTo: 571 }, // Zorua      → Zoroark
+  572:{ evolvesAt: 36, evolvesTo: 573 }, // Minccino   → Cinccino
+  574:{ evolvesAt: 32, evolvesTo: 575 }, // Gothita    → Gothorita
+  575:{ evolvesAt: 41, evolvesTo: 576 }, // Gothorita  → Gothitelle
+  577:{ evolvesAt: 32, evolvesTo: 578 }, // Solosis    → Duosion
+  578:{ evolvesAt: 41, evolvesTo: 579 }, // Duosion    → Reuniclus
+  580:{ evolvesAt: 35, evolvesTo: 581 }, // Ducklett   → Swanna
+  582:{ evolvesAt: 35, evolvesTo: 583 }, // Vanillite  → Vanillish
+  583:{ evolvesAt: 47, evolvesTo: 584 }, // Vanillish  → Vanilluxe
+  585:{ evolvesAt: 34, evolvesTo: 586 }, // Deerling   → Sawsbuck
+  588:{ evolvesAt: 36, evolvesTo: 589 }, // Karrablast → Escavalier
+  590:{ evolvesAt: 39, evolvesTo: 591 }, // Foongus    → Amoonguss
+  592:{ evolvesAt: 40, evolvesTo: 593 }, // Frillish   → Jellicent
+  595:{ evolvesAt: 36, evolvesTo: 596 }, // Joltik     → Galvantula
+  597:{ evolvesAt: 40, evolvesTo: 598 }, // Ferroseed  → Ferrothorn
+  599:{ evolvesAt: 38, evolvesTo: 600 }, // Klink      → Klang
+  600:{ evolvesAt: 49, evolvesTo: 601 }, // Klang      → Klinklang
+  602:{ evolvesAt: 39, evolvesTo: 603 }, // Tynamo     → Eelektrik
+  603:{ evolvesAt: 48, evolvesTo: 604 }, // Eelektrik  → Eelektross
+  605:{ evolvesAt: 42, evolvesTo: 606 }, // Elgyem     → Beheeyem
+  607:{ evolvesAt: 41, evolvesTo: 608 }, // Litwick    → Lampent
+  608:{ evolvesAt: 50, evolvesTo: 609 }, // Lampent    → Chandelure
+  610:{ evolvesAt: 38, evolvesTo: 611 }, // Axew       → Fraxure
+  611:{ evolvesAt: 48, evolvesTo: 612 }, // Fraxure    → Haxorus
+  613:{ evolvesAt: 37, evolvesTo: 614 }, // Cubchoo    → Beartic
+  616:{ evolvesAt: 36, evolvesTo: 617 }, // Shelmet    → Accelgor
+  619:{ evolvesAt: 50, evolvesTo: 620 }, // Mienfoo    → Mienshao
+  622:{ evolvesAt: 43, evolvesTo: 623 }, // Golett     → Golurk
+  624:{ evolvesAt: 52, evolvesTo: 625 }, // Pawniard   → Bisharp
+  627:{ evolvesAt: 54, evolvesTo: 628 }, // Rufflet    → Braviary
+  629:{ evolvesAt: 54, evolvesTo: 630 }, // Vullaby    → Mandibuzz
+  633:{ evolvesAt: 50, evolvesTo: 634 }, // Deino      → Zweilous
+  634:{ evolvesAt: 64, evolvesTo: 635 }, // Zweilous   → Hydreigon
+  636:{ evolvesAt: 59, evolvesTo: 637 }, // Larvesta   → Volcarona
+
+  // --- Gen 6 Starter ---
+  650:{ evolvesAt: 16, evolvesTo: 651 }, // Chespin    → Quilladin
+  651:{ evolvesAt: 36, evolvesTo: 652 }, // Quilladin  → Chesnaught
+  653:{ evolvesAt: 16, evolvesTo: 654 }, // Fennekin   → Braixen
+  654:{ evolvesAt: 36, evolvesTo: 655 }, // Braixen    → Delphox
+  656:{ evolvesAt: 16, evolvesTo: 657 }, // Froakie    → Frogadier
+  657:{ evolvesAt: 36, evolvesTo: 658 }, // Frogadier  → Greninja
+
+  // --- Gen 6 selvatici/avversari ---
+  659:{ evolvesAt: 20, evolvesTo: 660 }, // Bunnelby   → Diggersby
+  661:{ evolvesAt: 17, evolvesTo: 662 }, // Fletchling → Fletchinder
+  662:{ evolvesAt: 35, evolvesTo: 663 }, // Fletchinder→ Talonflame
+  664:{ evolvesAt: 9,  evolvesTo: 665 }, // Scatterbug → Spewpa
+  665:{ evolvesAt: 12, evolvesTo: 666 }, // Spewpa     → Vivillon
+  667:{ evolvesAt: 35, evolvesTo: 668 }, // Litleo     → Pyroar
+  669:{ evolvesAt: 19, evolvesTo: 670 }, // Flabébé    → Floette
+  670:{ evolvesAt: 36, evolvesTo: 671 }, // Floette    → Florges
+  672:{ evolvesAt: 32, evolvesTo: 673 }, // Skiddo     → Gogoat
+  674:{ evolvesAt: 32, evolvesTo: 675 }, // Pancham    → Pangoro
+  677:{ evolvesAt: 25, evolvesTo: 678 }, // Espurr     → Meowstic
+  679:{ evolvesAt: 35, evolvesTo: 680 }, // Honedge    → Doublade
+  680:{ evolvesAt: 45, evolvesTo: 681 }, // Doublade   → Aegislash
+  682:{ evolvesAt: 36, evolvesTo: 683 }, // Spritzee   → Aromatisse
+  684:{ evolvesAt: 36, evolvesTo: 685 }, // Swirlix    → Slurpuff
+  686:{ evolvesAt: 30, evolvesTo: 687 }, // Inkay      → Malamar
+  688:{ evolvesAt: 39, evolvesTo: 689 }, // Binacle    → Barbaracle
+  690:{ evolvesAt: 48, evolvesTo: 691 }, // Skrelp     → Dragalge
+  692:{ evolvesAt: 37, evolvesTo: 693 }, // Clauncher  → Clawitzer
+  694:{ evolvesAt: 36, evolvesTo: 695 }, // Helioptile → Heliolisk
+  696:{ evolvesAt: 39, evolvesTo: 697 }, // Tyrunt     → Tyrantrum
+  698:{ evolvesAt: 39, evolvesTo: 699 }, // Amaura     → Aurorus
+  704:{ evolvesAt: 40, evolvesTo: 705 }, // Goomy      → Sliggoo
+  705:{ evolvesAt: 50, evolvesTo: 706 }, // Sliggoo    → Goodra
+  708:{ evolvesAt: 36, evolvesTo: 709 }, // Phantump   → Trevenant
+  710:{ evolvesAt: 36, evolvesTo: 711 }, // Pumpkaboo  → Gourgeist
+  712:{ evolvesAt: 37, evolvesTo: 713 }, // Bergmite   → Avalugg
+  714:{ evolvesAt: 48, evolvesTo: 715 }, // Noibat     → Noivern
+
+
 };
 
 /**
