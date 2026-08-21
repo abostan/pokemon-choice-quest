@@ -120,13 +120,32 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] Vista Griglia Album e Lista Dettagliata per tutte le 1025 specie.
 - [x] Mappatura evoluzioni completa per Gen 7, 8 e 9 in `evolutions.js`.
 
+### Versione 5.6 — Battaglie Boss Narrative contro i Capo Team & Master Ball (attuale)
+
+#### 🕵️ Battaglie Boss Narrative contro i Capo Team
+- [x] **Scontri Boss Unici per Ciascuna delle 9 Generazioni**:
+  - Kanto (Gen 1): Giovanni (Team Rocket) — *Master Ball* 🟣
+  - Johto (Gen 2): Archer (Team Rocket) — *Caramella Rara (+3 Livelli)* 🍬
+  - Hoenn (Gen 3): Max / Archie (Team Magma/Aqua) — *Master Ball* 🟣
+  - Sinnoh (Gen 4): Cyrus (Team Galassia) — *Master Ball* 🟣
+  - Unova (Gen 5): Ghetsis (Team Plasma) — *Caramella Rara (+3 Livelli)* 🍬
+  - Kalos (Gen 6): Lysandre (Team Flare) — *Master Ball* 🟣
+  - Alola (Gen 7): Guzma (Team Skull) — *Caramella Rara (+3 Livelli)* 🍬
+  - Galar (Gen 8): Presidente Rose (Macro Cosmos) — *Master Ball* 🟣
+  - Paldea (Gen 9): Eri & Cassiopea (Team Star) — *Caramella Rara (+3 Livelli)* 🍬
+- [x] Attivazione automatica dello scontro boss a metà percorso dopo la 4ª palestra (`afterGymIndex: 3`).
+
+#### 🟣 Strumento Master Ball & Caramella Rara
+- [x] **Master Ball**: Pulsante speciale `🟣 Lancia una MASTER BALL!` durante gli incontri selvatici o leggendari con **cattura garantita al 100%**.
+- [x] Consumo ed eliminazione della Master Ball dallo zaino a seguito dell'uso.
+- [x] **Caramella Rara**: Incremento immediato di **+3 Livelli** per tutta la squadra a seguito della vittoria del boss.
+
 ---
 
 ## 🔮 Prossimi Sviluppi & Idee Future (v6.0)
 
 - [ ] **Effetti Sonori & Audio 8-bit (Web Audio API)**: piccoli jingle retro per cattura, vittoria, evoluzione ed incontri Shiny.
 - [ ] **Sistema di Mosse e Tipi Reali**: bonus/malus di efficacia del tipo durante le battaglie (Super Efficace / Non Molto Efficace).
-- [ ] **Eventi Narrativi Avanzati**: sfide storia con i Capo Team (Giovanni / Cyrus / Ghetsis / Lysandre / Guzma / Rose).
 - [ ] **Modalità Sfida / Nuzlocke**: regole speciali con permadeath dei Pokémon esausti nel PC Box.
 
 

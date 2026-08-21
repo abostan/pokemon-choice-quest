@@ -1,6 +1,6 @@
-# Manuale Tecnico — Pokémon: Scegli il Cammino (v5.5)
+# Manuale Tecnico — Pokémon: Scegli il Cammino (v5.6)
 
-> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v5.5 (9 Generazioni & 1025 Specie).
+> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v5.6 (Villain Bosses & Master Ball).
 
 ---
 

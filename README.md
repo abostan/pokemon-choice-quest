@@ -29,8 +29,11 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa versione (v5.5)
+## Cosa contiene questa versione (v5.6)
 
+- **🕵️ Battaglie Boss Narrative contro i Capo Team**: Scontri boss unici per ciascuna delle 9 generazioni (Giovanni, Archer, Max/Archie, Cyrus, Ghetsis, Lysandre, Guzma, Rose, Eri/Cassiopea) dopo la 4ª palestra.
+- **🟣 Strumento Master Ball**: Ricompensa epica per aver sconfitto i Capo Team. Consente una **cattura al 100% garantita** per qualsiasi incontro selvatico o leggendario!
+- **🍬 Caramella Rara**: Aumenta istantaneamente il livello di tutti i Pokémon della squadra di **+3 Livelli**.
 - **🗺️ 9 Generazioni Giocabili**: Kanto (Gen 1), Johto (Gen 2), Hoenn (Gen 3), Sinnoh (Gen 4), Unova (Gen 5), Kalos (Gen 6), **Alola (Gen 7)**, **Galar (Gen 8)** e **Paldea (Gen 9)**.
 - **📖 Pokédex Nazionale Completo (1025 specie)**: Modale Pokédex esteso con la **Vista Griglia Album (⬛)** a figurine con anteprime pixel e silhouette `? Ignoto` per tutti i 1025 slot dal #1 Bulbasaur al #1025 Pecharunt, con tab per regione (Kanto..Paldea) e ricerca per `#ID`.
 - **🎲 Bivi Casuali (Rogue-Lite)**: Ad ogni tappa tra le palestre vengono generate **3-4 scelte casuali** (2 base + 1-2 eventi speciali pesati come Leggendari ⭐, Uova 🐣, Vulcano 🌋, Foresta 👻, Dojo 🥊, Team Nemico 🕵️‍♂️).
