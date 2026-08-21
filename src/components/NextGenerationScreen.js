@@ -13,7 +13,7 @@ const e = React.createElement;
  *  - team (Array<{id,level}>): squadra attuale
  *  - onContinue(): callback per procedere alla scelta del nuovo starter
  */
-export function NextGenerationScreen({ currentGenName, nextGenName, team, onContinue }) {
+export function NextGenerationScreen({ currentGenName, nextGenName, team, onContinue, onHome }) {
   return e(
     "div",
     { className: "panel next-gen-screen" },
@@ -42,9 +42,28 @@ export function NextGenerationScreen({ currentGenName, nextGenName, team, onCont
       `I tuoi campioni si riposeranno nel Box. Inizierai a ${nextGenName} solo con il tuo nuovo starter, e potrai recuperare i tuoi vecchi Pokémon dal Box in qualsiasi momento.`
     ),
     e(
-      "button",
-      { className: "continue-btn next-gen-btn", onClick: onContinue },
-      `Esplora ${nextGenName} →`
+      "div",
+      { style: { display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginTop: "16px" } },
+      e(
+        "button",
+        { className: "continue-btn next-gen-btn", onClick: onContinue },
+        `Esplora ${nextGenName} →`
+      ),
+      onHome &&
+        e(
+          "button",
+          {
+            className: "continue-btn",
+            style: {
+              background: "linear-gradient(135deg, #4b5563, #374151)",
+              color: "#fff",
+              border: "1px solid #6b7280",
+              padding: "12px 24px",
+            },
+            onClick: onHome,
+          },
+          "🏠 Menu Principale"
+        )
     )
   );
 }

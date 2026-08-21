@@ -64,9 +64,19 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] **🏪 Mercatino PokéMart**: Acquisto di Pozioni (1 💰), Super Pozioni (2 💰), Iper Pozioni (3 💰), Caramelle Rare (5 💰) e Master Ball (10 💰).
 - [x] **🏷️ Display Pokédollari**: Indicatore del saldo Pokédollari integrato nel pannello laterale della squadra (`TeamPanel.js`).
 
+### Versione 8.0 — Classifica Punteggio & Grado di Vittoria (attuale)
+
+#### 🏆 Classifica Punteggio & Grado di Vittoria (Grado S / A / B / C)
+- [x] Modulo `src/engine/scoreLogic.js` per il calcolo matematico del punteggio di vittoria e del grado d'onore.
+- [x] **🏆 Grado S — Maestro Pokémon Supremo** (>= 25.000 pt)
+- [x] **🥇 Grado A — Allenatore d'Élite** (15.000 - 24.999 pt)
+- [x] **🥈 Grado B — Veterano della Lega** (8.000 - 14.999 pt)
+- [x] **🥉 Grado C — Allenatore Promettente** (< 8.000 pt)
+- [x] **📊 Componente `ScoreCardModal.js`**: Scheda d'onore celebrativa con trofeo visivo animato, riepilogo dettagliato punti (Medaglie, Livelli Squadra, Specie Pokédex, Bonus Shiny e Moltiplicatore Nuzlocke x1.5) e record personale salvato in `localStorage`.
+- [x] **🔘 Pulsante Header (`📊 Punteggio`)**: Accesso rapido consultabile in qualsiasi momento nell'header della app.
+
 ---
 
-## 🔮 Prossimi Sviluppi & Idee Future (v8.0)
+## 🔮 Prossimi Sviluppi & Idee Future (v8.5)
 
-- [ ] **🏆 Classifica Punteggio & Grado di Vittoria**: Punteggio finale basato su tempo, percentuale Pokédex e KO con assegnazione del Grado (S / A / B / C).
-- [ ] **🎨 Temi Visivi Personalizzabili**: Selettore di temi per l'interfaccia (Dark Synthwave, Retro GameBoy Green, Classic Emerald).
+- [ ] **🎨 Temi Visivi Personalizzabili**: Selettore di temi per l'interfaccia (Dark Synthwave, Retro GameBoy Green, Classic Emerald, Cyberpunk).

@@ -16,6 +16,7 @@ import { HallOfFameModal } from "./components/HallOfFameModal.js";
 import { NuzlockeGameOverScreen } from "./components/NuzlockeGameOverScreen.js";
 import { TournamentScene } from "./components/TournamentScene.js";
 import { PokeCenterScene } from "./components/PokeCenterScene.js";
+import { ScoreCardModal } from "./components/ScoreCardModal.js";
 import { getGeneration, getExplorationTier, getNextGeneration } from "./data/generations.js";
 import { CHAMPIONS_TOURNAMENT } from "./data/championsTournament.js";
 import { checkEvolution } from "./data/evolutions.js";
@@ -90,7 +91,47 @@ function initialState() {
     // --- UI ---
     boxModalOpen: false,
     hallOfFameOpen: false,
+    scoreModalOpen: false,
   };
+}
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("[ErrorBoundary] Error caught:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return e(
+        "div",
+        { className: "panel", style: { textAlign: "center", margin: "40px auto", maxWidth: "500px" } },
+        e("h2", { style: { color: "var(--danger)" } }, "⚠️ Si è verificato un errore"),
+        e("p", { className: "scene-text" }, "La schermata ha riscontrato un problema imprevisto."),
+        e(
+          "button",
+          {
+            className: "continue-btn",
+            style: { background: "var(--accent)", color: "#1a1a1a" },
+            onClick: () => {
+              this.setState({ hasError: false });
+              if (this.props.onReset) this.props.onReset();
+            },
+          },
+          "🏠 Torna alla Homepage"
+        )
+      );
+    }
+    return this.props.children;
+  }
 }
 
 export default function App() {
@@ -115,7 +156,7 @@ export default function App() {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
 
     saveTimerRef.current = setTimeout(() => {
-      saveGame(activeSlotId, { state });
+      saveGame(state, activeSlotId);
       refreshSlots();
     }, 600);
 
@@ -286,8 +327,13 @@ export default function App() {
 
   const generation = state.generationId ? getGeneration(state.generationId) : null;
 
-  // Moltiplicatore di difficoltà basato sul numero di generazioni completate
-  const difficultyMult = 1 + (state.completedGensCount || 0) * 0.35;
+  // Determina se siamo in modalità post-game infinita (generazioni completate o gymIndex completati)
+  const isPostgame =
+    (state.completedGensCount || 0) >= 8 ||
+    (generation && state.gymIndex >= generation.gymLeaders.length) ||
+    (state.phase && state.phase.startsWith("postgame")) ||
+    (state.phase && state.phase.startsWith("champions")) ||
+    (state.phase && state.phase.startsWith("tournament"));
 
   function getScaledPower(basePower) {
     return Math.round(basePower * difficultyMult);
@@ -440,8 +486,8 @@ export default function App() {
   } else if (state.phase === "nextGenSelect") {
     const nextGen = getGeneration(state.nextGenId);
     content = e(NextGenerationScreen, {
-      currentGenName: generation.name,
-      nextGenName: nextGen.name,
+      currentGenName: generation?.name ?? "Pokémon",
+      nextGenName: nextGen?.name ?? "Prossima Regione",
       team: state.team,
       onContinue: () =>
         goTo("starterSelect", {
@@ -452,6 +498,7 @@ export default function App() {
           badges: [],
           multiGenRun: true,
         }),
+      onHome: () => goTo("resume"),
     });
 
   } else if (state.phase === "pokecenter") {
@@ -470,7 +517,10 @@ export default function App() {
         addItem(itemName);
         update({ coins: Math.max(0, (state.coins || 0) - price) });
       },
-      onLeave: () => goTo("gymBattle"),
+      onLeave: () => {
+        if (isPostgame) goTo("postgameExplore");
+        else goTo("gymBattle");
+      },
     });
 
   } else if (state.phase === "postgame") {
@@ -479,6 +529,7 @@ export default function App() {
       team: state.team,
       onStart: () => goTo("postgameExplore", { postgameRound: 0 }),
       onStartTournament: () => goTo("championsTournament", { tournamentRound: 0 }),
+      onHome: () => goTo("resume"),
     });
 
   } else if (state.phase === "championsTournament") {
@@ -919,7 +970,11 @@ export default function App() {
           boostTeam(2);
           addItem("Super Pozione");
         }
-        goTo("gymBattle");
+        if (isPostgame) {
+          update({ postgameRound: (state.postgameRound || 0) + 1, phase: "postgameExplore" });
+        } else {
+          goTo("gymBattle");
+        }
       },
     });
 
@@ -941,144 +996,184 @@ export default function App() {
           if (mbIdx !== -1) useItem(mbIdx);
         }
         if (caught) addToTeam(pokemon);
-        goTo("gymBattle");
+        if (isPostgame) {
+          update({ postgameRound: (state.postgameRound || 0) + 1, phase: "postgameExplore" });
+        } else {
+          goTo("gymBattle");
+        }
       },
     });
 
   } else if (state.phase === "gymBattle") {
-    const gym = generation.gymLeaders[state.gymIndex];
-    const scaledPower = getScaledPower(gym.opponentPower);
-    content = e(BattleScene, {
-      key: `gym-${state.gymIndex}`,
-      title: `Palestra ${state.gymIndex + 1} di ${generation.gymLeaders.length}`,
-      text: `Entri nella palestra. ${gym.title} ti sfida a duello.`,
-      opponentTitle: gym.title,
-      opponentTeamIds: gym.teamIds,
-      opponentPower: scaledPower,
-      team: state.team,
-      items: state.items,
-      rewardBadge: gym.badge,
-      isNuzlocke: state.isNuzlocke,
-      onUseItem: useItem,
-      onOpenBox: () => update({ boxModalOpen: true }),
-      onResolved: ({ won }) => {
-        if (won) resolveBattleWin(gym.badge);
-        else handleNuzlockeLoss();
-        advanceAfterGymBattle();
-      },
-    });
+    const gym = generation?.gymLeaders?.[state.gymIndex];
+    if (!gym) {
+      content = e(
+        "div",
+        { className: "panel", style: { textAlign: "center", padding: "24px" } },
+        e("h2", { className: "scene-title" }, "Tutte le palestre completate!"),
+        e("p", { className: "scene-text" }, "Hai superato tutte le palestre di questa regione."),
+        e(
+          "button",
+          {
+            className: "continue-btn",
+            onClick: () => {
+              if (isPostgame) goTo("postgameExplore");
+              else goTo("eliteBattle", { eliteIndex: 0 });
+            },
+          },
+          isPostgame ? "Continua Post-Game →" : "Sfida l'Alto Comando →"
+        )
+      );
+    } else {
+      const scaledPower = getScaledPower(gym.opponentPower);
+      content = e(BattleScene, {
+        key: `gym-${state.gymIndex}`,
+        title: `Palestra ${state.gymIndex + 1} di ${generation.gymLeaders.length}`,
+        text: `Entri nella palestra. ${gym.title} ti sfida a duello.`,
+        opponentTitle: gym.title,
+        opponentTeamIds: gym.teamIds,
+        opponentPower: scaledPower,
+        team: state.team,
+        items: state.items,
+        rewardBadge: gym.badge,
+        isNuzlocke: state.isNuzlocke,
+        onUseItem: useItem,
+        onOpenBox: () => update({ boxModalOpen: true }),
+        onResolved: ({ won }) => {
+          if (won) resolveBattleWin(gym.badge);
+          else handleNuzlockeLoss();
+          advanceAfterGymBattle();
+        },
+      });
+    }
 
   } else if (state.phase === "rivalBattle") {
-    const rival = generation.rival;
-    const scaledPower = getScaledPower(rival.opponentPower);
-    content = e(BattleScene, {
-      key: "rival",
-      title: "Sfida a sorpresa",
-      text: `${rival.title} ti blocca la strada per una battaglia improvvisata.`,
-      opponentTitle: rival.title,
-      opponentTeamIds: rival.teamIds,
-      opponentPower: scaledPower,
-      team: state.team,
-      items: state.items,
-      rewardBadge: null,
-      isNuzlocke: state.isNuzlocke,
-      onUseItem: useItem,
-      onOpenBox: () => update({ boxModalOpen: true }),
-      onResolved: ({ won }) => {
-        if (won) resolveBattleWin(null);
-        else handleNuzlockeLoss();
-        update({ rivalDone: true, phase: "explore" });
-      },
-    });
+    const rival = generation?.rival;
+    if (!rival) {
+      update({ rivalDone: true, phase: "explore" });
+    } else {
+      const scaledPower = getScaledPower(rival.opponentPower);
+      content = e(BattleScene, {
+        key: "rival",
+        title: "Sfida a sorpresa",
+        text: `${rival.title} ti blocca la strada per una battaglia improvvisata.`,
+        opponentTitle: rival.title,
+        opponentTeamIds: rival.teamIds,
+        opponentPower: scaledPower,
+        team: state.team,
+        items: state.items,
+        rewardBadge: null,
+        isNuzlocke: state.isNuzlocke,
+        onUseItem: useItem,
+        onOpenBox: () => update({ boxModalOpen: true }),
+        onResolved: ({ won }) => {
+          if (won) resolveBattleWin(null);
+          else handleNuzlockeLoss();
+          update({ rivalDone: true, phase: "explore" });
+        },
+      });
+    }
 
   } else if (state.phase === "villainBossBattle") {
-    const boss = generation.villainBoss;
-    const scaledPower = getScaledPower(boss.opponentPower);
-    content = e(BattleScene, {
-      key: "villain-boss",
-      title: "🕵️ Scontro Boss Narrativo!",
-      text: `${boss.title} tenta di ostacolare il tuo cammino! Sconfiggilo per salvare la regione ed ottenere la ricompensa: ${boss.rewardItem}!`,
-      opponentTitle: boss.title,
-      opponentTeamIds: boss.teamIds,
-      opponentPower: scaledPower,
-      team: state.team,
-      items: state.items,
-      rewardBadge: null,
-      isNuzlocke: state.isNuzlocke,
-      onUseItem: useItem,
-      onOpenBox: () => update({ boxModalOpen: true }),
-      onResolved: ({ won }) => {
-        if (won) {
-          resolveBattleWin(null);
-          addItem(boss.rewardItem);
-          if (boss.rewardItem === "Caramella Rara") {
-            boostTeam(3);
+    const boss = generation?.villainBoss;
+    if (!boss) {
+      update({ villainBossDone: true, phase: "explore" });
+    } else {
+      const scaledPower = getScaledPower(boss.opponentPower);
+      content = e(BattleScene, {
+        key: "villain-boss",
+        title: "🕵️ Scontro Boss Narrativo!",
+        text: `${boss.title} tenta di ostacolare il tuo cammino! Sconfiggilo per salvare la regione ed ottenere la ricompensa: ${boss.rewardItem}!`,
+        opponentTitle: boss.title,
+        opponentTeamIds: boss.teamIds,
+        opponentPower: scaledPower,
+        team: state.team,
+        items: state.items,
+        rewardBadge: null,
+        isNuzlocke: state.isNuzlocke,
+        onUseItem: useItem,
+        onOpenBox: () => update({ boxModalOpen: true }),
+        onResolved: ({ won }) => {
+          if (won) {
+            resolveBattleWin(null);
+            addItem(boss.rewardItem);
+            if (boss.rewardItem === "Caramella Rara") {
+              boostTeam(3);
+            }
+          } else {
+            handleNuzlockeLoss();
           }
-        } else {
-          handleNuzlockeLoss();
-        }
-        update({ villainBossDone: true, phase: "explore" });
-      },
-    });
+          update({ villainBossDone: true, phase: "explore" });
+        },
+      });
+    }
 
   } else if (state.phase === "eliteBattle") {
-    const member = generation.eliteFour[state.eliteIndex];
-    const scaledPower = getScaledPower(member.opponentPower);
-    content = e(BattleScene, {
-      key: `elite-${state.eliteIndex}`,
-      title: `${member.title} (${state.eliteIndex + 1}/${generation.eliteFour.length})`,
-      text: "Sei entrato nella sala dell'Alto Comando. Un membro dopo l'altro, senza tregua.",
-      opponentTitle: member.title,
-      opponentTeamIds: member.teamIds,
-      opponentPower: scaledPower,
-      team: state.team,
-      items: state.items,
-      rewardBadge: null,
-      isNuzlocke: state.isNuzlocke,
-      onUseItem: useItem,
-      onOpenBox: () => update({ boxModalOpen: true }),
-      onResolved: ({ won }) => {
-        if (won) resolveBattleWin(null);
-        else handleNuzlockeLoss();
-        const nextEliteIndex = state.eliteIndex + 1;
-        if (nextEliteIndex >= generation.eliteFour.length) {
-          goTo("championBattle");
-        } else {
-          goTo("eliteBattle", { eliteIndex: nextEliteIndex });
-        }
-      },
-    });
+    const member = generation?.eliteFour?.[state.eliteIndex];
+    if (!member) {
+      goTo("championBattle");
+    } else {
+      const scaledPower = getScaledPower(member.opponentPower);
+      content = e(BattleScene, {
+        key: `elite-${state.eliteIndex}`,
+        title: `${member.title} (${state.eliteIndex + 1}/${generation.eliteFour.length})`,
+        text: "Sei entrato nella sala dell'Alto Comando. Un membro dopo l'altro, senza tregua.",
+        opponentTitle: member.title,
+        opponentTeamIds: member.teamIds,
+        opponentPower: scaledPower,
+        team: state.team,
+        items: state.items,
+        rewardBadge: null,
+        isNuzlocke: state.isNuzlocke,
+        onUseItem: useItem,
+        onOpenBox: () => update({ boxModalOpen: true }),
+        onResolved: ({ won }) => {
+          if (won) resolveBattleWin(null);
+          else handleNuzlockeLoss();
+          const nextEliteIndex = state.eliteIndex + 1;
+          if (nextEliteIndex >= generation.eliteFour.length) {
+            goTo("championBattle");
+          } else {
+            goTo("eliteBattle", { eliteIndex: nextEliteIndex });
+          }
+        },
+      });
+    }
 
   } else if (state.phase === "championBattle") {
-    const champion = generation.champion;
-    const scaledPower = getScaledPower(champion.opponentPower);
-    content = e(BattleScene, {
-      key: "champion",
-      title: "Sfida finale: il Campione",
-      text: `Davanti a te, l'ultimo ostacolo: ${champion.title}.`,
-      opponentTitle: champion.title,
-      opponentTeamIds: champion.teamIds,
-      opponentPower: scaledPower,
-      team: state.team,
-      items: state.items,
-      rewardBadge: champion.badge,
-      isNuzlocke: state.isNuzlocke,
-      onUseItem: useItem,
-      onOpenBox: () => update({ boxModalOpen: true }),
-      onResolved: ({ won }) => {
-        if (won) {
-          resolveBattleWin(champion.badge);
-          addHallOfFameEntry({
-            genName: generation.name,
-            team: state.team,
-            isNuzlocke: state.isNuzlocke,
-          });
-        } else {
-          handleNuzlockeLoss();
-        }
-        checkNextGeneration();
-      },
-    });
+    const champion = generation?.champion;
+    if (!champion) {
+      checkNextGeneration();
+    } else {
+      const scaledPower = getScaledPower(champion.opponentPower);
+      content = e(BattleScene, {
+        key: "champion",
+        title: "Sfida finale: il Campione",
+        text: `Davanti a te, l'ultimo ostacolo: ${champion.title}.`,
+        opponentTitle: champion.title,
+        opponentTeamIds: champion.teamIds,
+        opponentPower: scaledPower,
+        team: state.team,
+        items: state.items,
+        rewardBadge: champion.badge,
+        isNuzlocke: state.isNuzlocke,
+        onUseItem: useItem,
+        onOpenBox: () => update({ boxModalOpen: true }),
+        onResolved: ({ won }) => {
+          if (won) {
+            resolveBattleWin(champion.badge);
+            addHallOfFameEntry({
+              genName: generation.name,
+              team: state.team,
+              isNuzlocke: state.isNuzlocke,
+            });
+          } else {
+            handleNuzlockeLoss();
+          }
+          checkNextGeneration();
+        },
+      });
+    }
 
   } else if (state.phase === "nuzlockeGameOver") {
     content = e(NuzlockeGameOverScreen, {
@@ -1099,6 +1194,37 @@ export default function App() {
         setState(initialState());
       },
     });
+  } else {
+    content = e(
+      "div",
+      { className: "panel", style: { textAlign: "center", padding: "30px" } },
+      e("h2", { className: "scene-title" }, "Avventura Pokémon"),
+      e("p", { className: "scene-text" }, "Scegli la tua prossima azione per continuare."),
+      e(
+        "div",
+        { style: { display: "flex", gap: "10px", justifyContent: "center", marginTop: "16px" } },
+        e(
+          "button",
+          {
+            className: "continue-btn",
+            onClick: () => {
+              if (isPostgame) goTo("postgameExplore");
+              else goTo("explore");
+            },
+          },
+          "Esplora →"
+        ),
+        e(
+          "button",
+          {
+            className: "continue-btn",
+            style: { background: "#4b5563", color: "#fff" },
+            onClick: () => goTo("resume"),
+          },
+          "🏠 Home"
+        )
+      )
+    );
   }
 
   // -------------------------------------------------------
@@ -1197,6 +1323,13 @@ export default function App() {
         onClose: () => update({ hallOfFameOpen: false }),
       }),
 
+    // Scheda Punteggio & Grado modale
+    state.scoreModalOpen &&
+      e(ScoreCardModal, {
+        gameState: state,
+        onClose: () => update({ scoreModalOpen: false }),
+      }),
+
     // Header
     e(
       "header",
@@ -1212,11 +1345,21 @@ export default function App() {
             ? `${generation.name} — guidato dalle tue scelte`
             : "Ispirato a Pokemon Roulette, ma guidato dalle tue scelte"
         ),
-        // Pulsanti Header: Pokédex e Sala della Fama
+        // Pulsanti Header: Home, Pokédex, Sala della Fama e Punteggio
         state.phase !== "generationSelect" && state.phase !== "resume" &&
           e(
             "div",
             { style: { display: "flex", gap: "8px" } },
+            e(
+              "button",
+              {
+                className: "pokedex-header-btn",
+                style: { background: "linear-gradient(135deg, #4b5563, #374151)", border: "1px solid #6b7280" },
+                onClick: () => goTo("resume"),
+                title: "Torna al Menu Principale / Homepage",
+              },
+              "🏠 Home"
+            ),
             e(
               "button",
               {
@@ -1235,6 +1378,16 @@ export default function App() {
                 title: "Apri la Sala della Fama",
               },
               "🏆 Sala della Fama"
+            ),
+            e(
+              "button",
+              {
+                className: "pokedex-header-btn",
+                style: { background: "linear-gradient(135deg, #0284c7, #0369a1)", border: "1px solid #38bdf8" },
+                onClick: () => update({ scoreModalOpen: true }),
+                title: "Vedi Punteggio & Grado",
+              },
+              "📊 Punteggio"
             )
           )
       )
@@ -1247,7 +1400,7 @@ export default function App() {
     e(
       "div",
       { className: showSidebar ? "layout" : "layout layout-full" },
-      content,
+      e(ErrorBoundary, { onReset: () => setState({ ...initialState(), phase: "resume" }) }, content),
       showSidebar &&
         e(TeamPanel, {
           team: state.team,

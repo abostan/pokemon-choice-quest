@@ -12,7 +12,7 @@ const e = React.createElement;
  *  - team (Array<{id,level}>): squadra attuale
  *  - onStart(): callback per iniziare la modalità infinita
  */
-export function PostgameScreen({ lastGenName, team, onStart, onStartTournament }) {
+export function PostgameScreen({ lastGenName, team, onStart, onStartTournament, onHome }) {
   return e(
     "div",
     { className: "panel postgame-screen" },
@@ -62,7 +62,22 @@ export function PostgameScreen({ lastGenName, team, onStart, onStartTournament }
         "button",
         { className: "continue-btn next-gen-btn", onClick: onStart },
         "Continua l'avventura infinita →"
-      )
+      ),
+      onHome &&
+        e(
+          "button",
+          {
+            className: "continue-btn",
+            style: {
+              background: "linear-gradient(135deg, #4b5563, #374151)",
+              color: "#fff",
+              border: "1px solid #6b7280",
+              padding: "12px 24px",
+            },
+            onClick: onHome,
+          },
+          "🏠 Torna al Menu Principale"
+        )
     )
   );
 }

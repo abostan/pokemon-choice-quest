@@ -29,8 +29,9 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa versione (v7.5)
+## Cosa contiene questa versione (v8.0)
 
+- **🏆 Classifica Punteggio & Grado di Vittoria (Grado S / A / B / C)**: Calcolo automatico delle prestazioni di gioco con scheda d'onore (`ScoreCardModal`), trofei visivi (🏆 Maestro, 🥇 Élite, 🥈 Veterano, 🥉 Promettente) e salvataggio del Record Personale!
 - **🏥 Centro Pokémon & Mercatino PokéMart**: Nuova tappa di esplorazione tra le palestre per curare la squadra con trillo audio a 8-bit (`playHealJingle()`), accumulare Pokédollari e acquistare Pozioni, Caramelle Rare e Master Ball!
 - **🌟 Sistema Abilità Passive dei Pokémon**: Abilità passive strategiche assegnate alle varie specie (Prepotenza, Pressione, Levitazione, Nuotavelox, Acceleratore, Leggiadria) che applicano bonus visibili a potenza, probabilità di successo e cattura!
 - **⚔️ Torneo dei Campioni della Lega (Post-Game)**: Grande evento ad eliminazione diretta sbloccato nel Post-Game per sfidare i 5 Campioni leggendari (Rosso, Rocco Petri, Camilla, Dandel ed Alisma) con potenze scalate fino a 260!

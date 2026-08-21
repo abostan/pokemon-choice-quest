@@ -62,6 +62,12 @@ export function computeTeamPower(team) {
   return totalLevels + countBonus;
 }
 
+export const TACTICS = [
+  { id: "aggressive", label: "⚔️ Attacco Aggressivo", hint: "+15% potenza attacco, ma aumenta il rischio" },
+  { id: "balanced", label: "⚖️ Tattica Bilanciata", hint: "Equilibrio standard tra attacco e difesa" },
+  { id: "defensive", label: "🛡️ Difesa Prudente", hint: "-10% potenza attacco, ma riduce i danni subiti dall'avversario" },
+];
+
 const TACTIC_MODIFIERS = {
   aggressive: { teamMult: 1.15, opponentMult: 1.05 },
   balanced: { teamMult: 1.0, opponentMult: 1.0 },
