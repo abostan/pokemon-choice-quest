@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { PokemonPreview } from "./PokemonSprite.js";
 import { computeCaptureChance, rollCapture } from "../engine/battleLogic.js";
+import { computeTeamAbilities } from "../data/abilities.js";
+import { playShinySound, playCaptureSound, playMasterBallSound } from "../engine/soundEngine.js";
 
 const e = React.createElement;
 
@@ -12,16 +14,23 @@ const e = React.createElement;
  *  - pool: array di id tra cui pescare il Pokémon incontrato
  *  - level: livello assegnato al Pokémon se catturato
  *  - isLegendary: bool — se true, restringe le opzioni e abbassa il tasso
+ *  - team: Array delle specie in squadra
  *  - onSeen(id, isShiny): chiamata quando il Pokémon è rivelato (per il Pokédex)
  *  - onCaught(id, isShiny): chiamata quando il Pokémon è catturato (per il Pokédex)
  *  - onResolved({ caught, pokemon }): chiamata quando la scena finisce
  */
-export function EncounterScene({ title, text, pool, level = 4, isLegendary = false, hasMasterBall = false, onSeen, onCaught, onResolved }) {
+export function EncounterScene({ title, text, pool, level = 4, isLegendary = false, hasMasterBall = false, team = [], onSeen, onCaught, onResolved }) {
   const isShiny = useMemo(() => {
     // 1/500 chance per i selvatici normali (0.002), 1/20 (0.05) per i leggendari
     const chance = isLegendary ? 0.05 : 0.002;
     return Math.random() < chance;
   }, [isLegendary]);
+
+  useEffect(() => {
+    if (isShiny || isLegendary) {
+      playShinySound();
+    }
+  }, [isShiny, isLegendary]);
 
   const wildId = useMemo(() => {
     const id = pool[Math.floor(Math.random() * pool.length)];
@@ -34,11 +43,17 @@ export function EncounterScene({ title, text, pool, level = 4, isLegendary = fal
 
   // I leggendari hanno un tasso base ridotto e non accettano cibo
   const baseRate = isLegendary ? 0.10 : 0.55;
+  const teamAbilities = computeTeamAbilities(team);
+  const hasSereneGrace = teamAbilities.some((a) => a.name === "Leggiadria");
 
   function attemptCapture(method) {
-    const chance = computeCaptureChance(method, baseRate, isLegendary);
+    const chance = computeCaptureChance(method, baseRate, isLegendary, hasSereneGrace);
     const success = rollCapture(chance);
-    if (success && onCaught) onCaught(wildId, isShiny);
+    if (success) {
+      if (onCaught) onCaught(wildId, isShiny);
+      if (method === "masterball") playMasterBallSound();
+      else playCaptureSound();
+    }
     setResult({ method, success, chance });
   }
 

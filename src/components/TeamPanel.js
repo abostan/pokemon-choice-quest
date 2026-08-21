@@ -1,6 +1,7 @@
 import React from "react";
 import { PokemonChip } from "./PokemonSprite.js";
 import { getItemDescription } from "../data/items.js";
+import { computeTeamAbilities } from "../data/abilities.js";
 
 const e = React.createElement;
 
@@ -46,6 +47,8 @@ function BadgeItem({ name }) {
  *  - onOpenBox(): callback per aprire il BoxModal
  */
 export function TeamPanel({ team, box, badges, items, isNuzlocke = false, onOpenBox }) {
+  const abilities = computeTeamAbilities(team);
+
   return e(
     "div",
     { className: "panel side-panel" },
@@ -76,6 +79,38 @@ export function TeamPanel({ team, box, badges, items, isNuzlocke = false, onOpen
           { className: "team-list" },
           team.map((p, idx) => e(PokemonChip, { key: `${p.id}-${idx}`, id: p.id, level: p.level, isShiny: p.isShiny }))
         ),
+
+    // Sezione Abilità Passive Attive
+    abilities.length > 0 &&
+      e(
+        "div",
+        { style: { marginTop: "12px" } },
+        e("span", { style: { fontSize: "0.75rem", fontWeight: "bold", color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.5px" } }, "🌟 Abilità Attive:"),
+        e(
+          "div",
+          { style: { display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "4px" } },
+          abilities.map((ab, idx) =>
+            e(
+              "span",
+              {
+                key: `${ab.name}-${idx}`,
+                title: ab.description,
+                style: {
+                  background: "rgba(251, 191, 36, 0.15)",
+                  border: "1px solid rgba(251, 191, 36, 0.4)",
+                  color: "#fef08a",
+                  padding: "2px 6px",
+                  borderRadius: "4px",
+                  fontSize: "0.72rem",
+                  fontWeight: "500",
+                  cursor: "help",
+                },
+              },
+              `${ab.icon} ${ab.name}`
+            )
+          )
+        )
+      ),
 
     // Sezione Box
     e(

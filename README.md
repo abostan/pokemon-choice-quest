@@ -29,8 +29,9 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa versione (v6.5)
+## Cosa contiene questa versione (v7.0)
 
+- **🌟 Sistema Abilità Passive dei Pokémon**: Abilità passive strategiche assegnate alle varie specie (Prepotenza, Pressione, Levitazione, Nuotavelox, Acceleratore, Leggiadria) che applicano bonus visibili a potenza, probabilità di successo e cattura!
 - **⚔️ Torneo dei Campioni della Lega (Post-Game)**: Grande evento ad eliminazione diretta sbloccato nel Post-Game per sfidare i 5 Campioni leggendari (Rosso, Rocco Petri, Camilla, Dandel ed Alisma) con potenze scalate fino a 260!
 - **🎵 Effetti Sonori & Audio 8-bit Retro (Web Audio API)**: Sintetizzatore audio nativo in Vanilla JS che riproduce jingle stile Game Boy per cattura, evoluzione, vittorie, Master Ball, Megaevoluzione ed incontri Shiny ✨ con toggle `🔊 Audio ON / 🔇 Audio OFF` nell'header!
 - **🏆 Sala della Fama & Hall of Fame Storica**: Registro permanente consultabile dall'header (`🏆 Sala della Fama`) che conserva la storia di tutte le squadre incoronate Campioni della Lega nelle 9 generazioni!

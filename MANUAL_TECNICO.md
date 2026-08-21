@@ -1,6 +1,6 @@
-# Manuale Tecnico — Pokémon: Scegli il Cammino (v6.5)
+# Manuale Tecnico — Pokémon: Scegli il Cammino (v7.0)
 
-> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v6.5 (Torneo dei Campioni della Lega Post-Game, Effetti Sonori & Audio 8-bit Web Audio API, Sala della Fama & Hall of Fame Storica, Megaevoluzione / Gigamax, Modalità Nuzlocke Hardcore, Efficacia Tipi, Boss Narrative & Master Ball).
+> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v7.0 (Abilità Passive dei Pokémon, Torneo dei Campioni della Lega Post-Game, Effetti Sonori & Audio 8-bit Web Audio API, Sala della Fama & Hall of Fame Storica, Megaevoluzione / Gigamax, Modalità Nuzlocke Hardcore, Efficacia Tipi, Boss Narrative & Master Ball).
 
 ---
 

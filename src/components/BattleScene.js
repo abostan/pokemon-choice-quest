@@ -1,29 +1,13 @@
 import React, { useState } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
-import { computeTeamPower, computeWinChance, rollBattle } from "../engine/battleLogic.js";
+import { computeTeamPower, computeWinChance, rollBattle, TACTICS } from "../engine/battleLogic.js";
 import { getItemDescription } from "../data/items.js";
 import { computeTypeEffectiveness } from "../engine/typeMatchup.js";
 import { computeMegaPower } from "../engine/megaLogic.js";
+import { playMegaSound, playVictoryJingle } from "../engine/soundEngine.js";
+import { computeTeamAbilities } from "../data/abilities.js";
 
 const e = React.createElement;
-
-const TACTICS = [
-  {
-    id: "aggressive",
-    label: "Attacco diretto",
-    hint: "Rischioso ma potente se la tua squadra è già forte",
-  },
-  {
-    id: "balanced",
-    label: "Strategia bilanciata",
-    hint: "Un buon compromesso in ogni situazione",
-  },
-  {
-    id: "defensive",
-    label: "Gioco difensivo e contrattacco",
-    hint: "Più sicuro contro avversari forti, meno spettacolare",
-  },
-];
 
 function getTrainerEmoji(title) {
   if (title.includes("Rivale")) return "🧢";
@@ -89,6 +73,7 @@ export function BattleScene({
   const [isMegaActive, setIsMegaActive] = useState(false);
 
   const hasTeam = team && team.length > 0;
+  const teamAbilities = computeTeamAbilities(team);
 
   // Estrae il tipo avversario dal titolo se non passato esplicitamente (es. "Capopalestra di tipo Roccia")
   const detectedType = opponentType || (opponentTitle.match(/tipo ([A-Za-z]+)/)?.[1] ?? "");
@@ -97,7 +82,12 @@ export function BattleScene({
   const baseTeamPower = computeTeamPower(team);
   const itemBoost = usedItem ? usedItem.boost : 0;
   const rawTeamPower = baseTeamPower + itemBoost;
-  const typePower = Math.round(rawTeamPower * typeEff.multiplier);
+
+  // Modificatore di Levitazione (se presente ed il team è vulnerabile, annulla lo svantaggio)
+  const hasLevitate = teamAbilities.some((a) => a.name === "Levitazione");
+  const effectiveMultiplier = hasLevitate && typeEff.multiplier < 1.0 ? 1.0 : typeEff.multiplier;
+
+  const typePower = Math.round(rawTeamPower * effectiveMultiplier);
   const totalTeamPower = isMegaActive ? computeMegaPower(typePower) : typePower;
 
   function handleUseItem(itemIdx) {
@@ -114,8 +104,9 @@ export function BattleScene({
 
   function fight(tactic) {
     if (!hasTeam) return;
-    const winChance = computeWinChance(totalTeamPower, opponentPower, tactic);
+    const winChance = computeWinChance(totalTeamPower, opponentPower, tactic, teamAbilities);
     const won = rollBattle(winChance);
+    if (won) playVictoryJingle();
     setResult({ tactic, won, winChance });
   }
 

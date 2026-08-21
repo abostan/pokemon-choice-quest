@@ -16,20 +16,25 @@
  * @param {number} baseRate probabilità di base tra 0 e 1
  * @param {boolean} isLegendary se il Pokémon è leggendario (tasso massimo 20%)
  */
-export function computeCaptureChance(method, baseRate = 0.55, isLegendary = false) {
+/**
+ * Calcola la probabilità di cattura (0..1) in base al metodo scelto
+ * dal giocatore, tasso base ed eventuale abilità Leggiadria.
+ */
+export function computeCaptureChance(method, baseRate = 0.55, isLegendary = false, hasSereneGrace = false) {
   if (method === 'masterball') {
     return 1.0; // 100% cattura garantita!
   }
+  const sereneBonus = hasSereneGrace ? 0.10 : 0;
   if (isLegendary) {
     const legMod = method === 'food' ? 1.2 : 1.0;
-    return clamp(0.15 * legMod, 0.05, 0.20);
+    return clamp(0.15 * legMod + sereneBonus, 0.05, 0.30);
   }
   const modifiers = {
     ball: 1.0,
     food: 1.25, // più efficace...
   };
   const mod = modifiers[method] ?? 1.0;
-  return clamp(baseRate * mod, 0.05, 0.90);
+  return clamp(baseRate * mod + sereneBonus, 0.05, 0.95);
 }
 
 /**
@@ -65,14 +70,26 @@ const TACTIC_MODIFIERS = {
 
 /**
  * Calcola la probabilità di vittoria (0..1) data la potenza delle due
- * squadre e la tattica scelta dal giocatore.
+ * squadre, la tattica scelta e le abilità passive attive.
  */
-export function computeWinChance(teamPower, opponentPower, tactic = 'balanced') {
+export function computeWinChance(teamPower, opponentPower, tactic = 'balanced', teamAbilities = []) {
   const { teamMult, opponentMult } = TACTIC_MODIFIERS[tactic] ?? TACTIC_MODIFIERS.balanced;
+  
+  // Abilità passive
+  const hasIntimidate = teamAbilities.some((a) => a.name === "Prepotenza");
+  const hasPressure = teamAbilities.some((a) => a.name === "Pressione");
+  const hasSpeedBoost = teamAbilities.some((a) => a.name === "Acceleratore");
+
+  const intimidateMod = hasIntimidate ? 0.90 : 1.0; // Riduce potenza avversaria del -10%
   const effectiveTeam = teamPower * teamMult;
-  const effectiveOpponent = Math.max(opponentPower * opponentMult, 1);
-  const raw = 0.5 + (effectiveTeam - effectiveOpponent) / (1.5 * effectiveOpponent);
-  return clamp(raw, 0.08, 0.85);
+  const effectiveOpponent = Math.max(opponentPower * opponentMult * intimidateMod, 1);
+
+  let raw = 0.5 + (effectiveTeam - effectiveOpponent) / (1.5 * effectiveOpponent);
+
+  if (hasPressure) raw += 0.08;
+  if (hasSpeedBoost) raw += 0.05;
+
+  return clamp(raw, 0.08, 0.92);
 }
 
 export function rollBattle(winChance, rng = Math.random) {
