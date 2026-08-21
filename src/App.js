@@ -353,8 +353,19 @@ export default function App() {
       continueTeam: state.multiGenRun ? state.team : null,
       onChooseStarter: (id) => {
         markCaught(id, false); // Auto-registra lo starter scelto nel Pokédex!
-        addToTeam({ id, level: 5 });
-        goTo("explore", { gymIndex: 0 });
+        if (state.multiGenRun && state.team.length > 0) {
+          // Sposta la squadra precedente nel Box PC per iniziare la regione solo col nuovo starter
+          setState((prev) => ({
+            ...prev,
+            box: [...prev.box, ...prev.team],
+            team: [{ id, level: 5 }],
+            phase: "explore",
+            gymIndex: 0,
+          }));
+        } else {
+          addToTeam({ id, level: 5 });
+          goTo("explore", { gymIndex: 0 });
+        }
       },
     });
 
@@ -483,18 +494,127 @@ export default function App() {
     const nextGymTitle = generation.gymLeaders[state.gymIndex].title;
     const useAltGrass = state.gymIndex % 2 === 1;
 
+    // Habitat tematici per ciascuna generazione
+    const firePools = {
+      kanto: [37, 58, 100, 81, 77], // Vulpix, Growlithe, Voltorb, Magnemite, Ponyta
+      johto: [155, 179, 218, 228, 239], // Cyndaquil, Mareep, Slugma, Houndour, Elekid
+      hoenn: [255, 309, 322, 304, 324], // Torchic, Electrike, Numel, Aron, Torkoal
+      sinnoh: [390, 403, 240, 436, 479], // Chimchar, Shinx, Magby, Bronzor, Rotom
+      unova: [498, 522, 554, 599, 607], // Tepig, Blitzle, Darumaka, Klink, Litwick
+      kalos: [653, 667, 694, 679, 669], // Fennekin, Litleo, Helioptile, Honedge, Flabébé
+    };
+
+    const ghostPools = {
+      kanto: [92, 63, 96, 35, 39], // Gastly, Abra, Drowzee, Clefairy, Jigglypuff
+      johto: [200, 198, 215, 280, 175], // Misdreavus, Murkrow, Sneasel, Ralts, Togepi
+      hoenn: [353, 355, 302, 325, 280], // Shuppet, Duskull, Sableye, Spoink, Ralts
+      sinnoh: [425, 442, 433, 434, 439], // Drifloon, Spiritomb, Chingling, Stunky, Mime Jr.
+      unova: [570, 607, 562, 574, 577], // Zorua, Litwick, Yamask, Gothita, Solosis
+      kalos: [708, 710, 677, 682, 684], // Phantump, Pumpkaboo, Espurr, Spritzee, Swirlix
+    };
+
+    const icePools = {
+      kanto: [124, 131, 90, 142], // Jynx, Lapras, Shellder, Aerodactyl
+      johto: [220, 225, 215, 227], // Swinub, Delibird, Sneasel, Skarmory
+      hoenn: [361, 363, 378, 374], // Snorunt, Spheal, Regice, Beldum
+      sinnoh: [459, 361, 436, 447], // Snover, Snorunt, Bronzor, Riolu
+      unova: [582, 613, 615, 624], // Vanillite, Cubchoo, Cryogonal, Pawniard
+      kalos: [712, 698, 679, 701], // Bergmite, Amaura, Honedge, Hawlucha
+    };
+
+    const fightingPools = {
+      kanto: [66, 56, 106, 107, 52], // Machop, Mankey, Hitmonlee, Hitmonchan, Meowth
+      johto: [236, 214, 190, 216, 209], // Tyrogue, Heracross, Aipom, Teddiursa, Snubbull
+      hoenn: [296, 307, 335, 287, 300], // Makuhita, Meditite, Zangoose, Slakoth, Skitty
+      sinnoh: [447, 453, 427, 417, 422], // Riolu, Croagunk, Buneary, Pachirisu, Shellos
+      unova: [532, 559, 619, 572, 506], // Timburr, Scraggy, Mienfoo, Minccino, Lillipup
+      kalos: [674, 701, 659, 676, 672], // Pancham, Hawlucha, Bunnelby, Furfrou, Skiddo
+    };
+
+    // Specie baby/rare per le uova misteriose in base alla gen
+    const eggPools = {
+      kanto: [133, 131, 147], // Eevee, Lapras, Dratini
+      johto: [175, 172, 246], // Togepi, Pichu, Larvitar
+      hoenn: [360, 328, 371], // Wynaut, Trapinch, Bagon
+      sinnoh: [447, 403, 443], // Riolu, Shinx, Gible
+      unova: [570, 559, 610], // Zorua, Scraggy, Axew
+      kalos: [677, 704, 714], // Espurr, Goomy, Noibat
+    };
+
     content = e(ChoiceScene, {
       key: `explore-${state.gymIndex}`,
       title: state.gymIndex === 0 ? "Il primo bivio" : "Verso la prossima palestra",
       text:
         state.gymIndex === 0
-          ? "Lasci il laboratorio del Professore. Davanti a te la strada si divide: puoi esplorare, sfidare allenatori o raccogliere strumenti."
-          : `Ti lasci alle spalle l'ultima palestra. Prima di affrontare "${nextGymTitle}", come vuoi prepararti?`,
+          ? "Lasci il laboratorio del Professore. Davanti a te la strada si divide: puoi esplorare vari habitat selvaggi, cercare un leggendario o prepararti."
+          : `Ti lasci alle spalle l'ultima palestra. Prima di affrontare "${nextGymTitle}", quale habitat vuoi esplorare?`,
       choices: [
+        {
+          id: "legendary",
+          label: "⭐ Santuario Antico (Incontro Leggendario)",
+          hint: "Segui antichi segni per scovare un Pokémon Leggendario della regione!",
+          onSelect: () => {
+            const legendaries = generation.legendaries || [150];
+            const uncaptured = legendaries.filter((id) => !state.caughtLegendaries.includes(id));
+            const selectedId = uncaptured.length > 0
+              ? uncaptured[Math.floor(Math.random() * uncaptured.length)]
+              : legendaries[Math.floor(Math.random() * legendaries.length)];
+            
+            goTo("legendaryEncounter", {
+              pendingEncounterPool: [selectedId],
+              pendingEncounterLevel: Math.min(100, 35 + state.gymIndex * 5),
+              pendingEncounterIsLegendary: true,
+            });
+          },
+        },
+        {
+          id: "fireZone",
+          label: "🌋 Vulcano & Centrale Elettrica",
+          hint: "Pokémon selvatici di tipo Fuoco, Elettrico ed Acciaio",
+          onSelect: () =>
+            goTo("encounter", {
+              pendingEncounterPool: firePools[state.generationId] || [37, 58, 100],
+              pendingEncounterLevel: tier.level,
+              pendingEncounterIsLegendary: false,
+            }),
+        },
+        {
+          id: "ghostZone",
+          label: "👻 Foresta Stregata & Rovine Antiche",
+          hint: "Pokémon selvatici di tipo Spettro, Psico, Buio e Fata",
+          onSelect: () =>
+            goTo("encounter", {
+              pendingEncounterPool: ghostPools[state.generationId] || [92, 63, 35],
+              pendingEncounterLevel: tier.level,
+              pendingEncounterIsLegendary: false,
+            }),
+        },
+        {
+          id: "iceZone",
+          label: "❄️ Vetta Innevata & Ghiacciaio",
+          hint: "Pokémon selvatici di tipo Ghiaccio, Acciaio e Volante",
+          onSelect: () =>
+            goTo("encounter", {
+              pendingEncounterPool: icePools[state.generationId] || [124, 131, 220],
+              pendingEncounterLevel: tier.level,
+              pendingEncounterIsLegendary: false,
+            }),
+        },
+        {
+          id: "fightingZone",
+          label: "🥊 Dojo dei Combattenti & Arena",
+          hint: "Pokémon selvatici di tipo Lotta e Normale",
+          onSelect: () =>
+            goTo("encounter", {
+              pendingEncounterPool: fightingPools[state.generationId] || [66, 56, 106],
+              pendingEncounterLevel: tier.level,
+              pendingEncounterIsLegendary: false,
+            }),
+        },
         {
           id: "grass",
           label: useAltGrass ? "🌿 Esplora un nuovo sentiero erboso" : "🌿 Addentrati nell'erba alta",
-          hint: "Incontra Pokémon selvatici locali",
+          hint: "Incontra Pokémon selvatici locali (Erba, Volante, Coleottero)",
           onSelect: () =>
             goTo("encounter", {
               pendingEncounterPool: useAltGrass ? tier.grass2 : tier.grass,
@@ -505,7 +625,7 @@ export default function App() {
         {
           id: "fish",
           label: "🎣 Vai a pescare sul fiume",
-          hint: "I Pokémon d'acqua abbondano da queste parti",
+          hint: "Pokémon d'acqua e acquatici rari",
           onSelect: () =>
             goTo("encounter", {
               pendingEncounterPool: tier.fishing,
@@ -515,8 +635,8 @@ export default function App() {
         },
         {
           id: "cave",
-          label: "🦇 Esplora una grotta vicina",
-          hint: "Pokémon di tipo roccia/buio e uno strumento da trovare",
+          label: "🦇 Esplora una grotta misteriosa",
+          hint: "Pokémon di tipo Roccia, Terra e Buio + minerale regalo",
           onSelect: () => {
             const pool = generation.items.cave;
             addItem(pool[Math.floor(Math.random() * pool.length)]);
@@ -528,8 +648,36 @@ export default function App() {
           },
         },
         {
+          id: "enemyTeam",
+          label: "🕵️‍♂️ Incursione del Team Nemico",
+          hint: "Sconfiggi le reclute del Team malvagio per liberare la strada e vincere un premio",
+          onSelect: () => {
+            const oppPower = getScaledPower(18 + state.gymIndex * 8);
+            goTo("trainerBattle", {
+              pendingTrainer: {
+                title: "Recluta del Team Nemico",
+                teamIds: [tier.grass[0], tier.cave[0] || tier.grass[1]],
+                power: oppPower,
+              },
+            });
+          },
+        },
+        {
+          id: "mysteryEgg",
+          label: "🐣 Cova un Uovo Misterioso",
+          hint: "Ricevi un uovo raro che si schiuderà in un nuovo Pokémon a Lv 5",
+          onSelect: () => {
+            const pool = eggPools[state.generationId] || [133, 175, 447];
+            const eggId = pool[Math.floor(Math.random() * pool.length)];
+            markCaught(eggId, false);
+            addToTeam({ id: eggId, level: 5 });
+            addItem("Super Pozione");
+            goTo("gymBattle");
+          },
+        },
+        {
           id: "trainer",
-          label: "⚔️ Sfida un Allenatore sul percorso",
+          label: "⚔️ Sfida un Allenatore del percorso",
           hint: "Battaglia rapida per XP della squadra ed un premio",
           onSelect: () => {
             const oppPower = getScaledPower(12 + state.gymIndex * 7);
@@ -544,7 +692,7 @@ export default function App() {
         },
         {
           id: "searchItems",
-          label: "🔍 Cercatore di Strumenti",
+          label: "🔍 Cercatore di Strumenti & Bacche",
           hint: "Esplora per trovare bacche, pozioni o pietre evolutive",
           onSelect: () => {
             const pool = [...generation.items.cave, ...generation.items.grass];
@@ -729,6 +877,20 @@ export default function App() {
   function handleDismissEvolutions(rejectedList) {
     setState((prev) => {
       let updatedTeam = [...prev.team];
+      const rejectedIds = new Set((rejectedList || []).map((r) => r.id));
+
+      const updatedPokedexRun = { ...prev.pokedexRun };
+      for (const evo of prev.pendingEvolutions || []) {
+        if (!rejectedIds.has(evo.id)) {
+          updateHistoricPokedex(evo.id, true, evo.isShiny);
+          updatedPokedexRun[evo.id] = {
+            seen: true,
+            caught: true,
+            shiny: evo.isShiny || updatedPokedexRun[evo.id]?.shiny || false,
+          };
+        }
+      }
+
       if (rejectedList && rejectedList.length > 0) {
         for (const rej of rejectedList) {
           const idx = updatedTeam.findIndex((p) => p.id === rej.id);
@@ -740,6 +902,7 @@ export default function App() {
       return {
         ...prev,
         team: updatedTeam,
+        pokedexRun: updatedPokedexRun,
         pendingEvolutions: [],
       };
     });

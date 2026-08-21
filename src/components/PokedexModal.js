@@ -4,13 +4,22 @@ import { loadHistoricPokedex } from "../engine/saveGame.js";
 
 const e = React.createElement;
 
-// Totale specie per le generazioni 1..6 (Kanto → Kalos)
 const TOTAL_POKEMON_COUNT = 721;
 
-// -------------------------------------------------------------------
-// Componente singola riga Pokédex
-// -------------------------------------------------------------------
-function PokedexEntry({ pokemonId, status, hasShiny }) {
+const REGIONS = [
+  { id: "all", name: "Tutti (1-721)", start: 1, end: 721 },
+  { id: "kanto", name: "Kanto (1-151)", start: 1, end: 151 },
+  { id: "johto", name: "Johto (152-251)", start: 152, end: 251 },
+  { id: "hoenn", name: "Hoenn (252-386)", start: 252, end: 386 },
+  { id: "sinnoh", name: "Sinnoh (387-493)", start: 387, end: 493 },
+  { id: "unova", name: "Unova (494-649)", start: 494, end: 649 },
+  { id: "kalos", name: "Kalos (650-721)", start: 650, end: 721 },
+];
+
+/**
+ * Singolo slot della griglia album del Pokédex.
+ */
+function PokedexGridCard({ pokemonId, status, hasShiny }) {
   const isDiscovered = status === "caught" || status === "seen";
   const { data, loading } = usePokemon(isDiscovered ? pokemonId : null);
 
@@ -19,12 +28,56 @@ function PokedexEntry({ pokemonId, status, hasShiny }) {
   if (!isDiscovered) {
     return e(
       "div",
+      {
+        className: "pokedex-grid-card unseen",
+        title: `${formattedId}: Non ancora scoperto`,
+      },
+      e("span", { className: "pokedex-grid-id" }, formattedId),
+      e("div", { className: "pokedex-grid-sprite" }, e("span", { className: "unseen-question" }, "?")),
+      e("span", { className: "pokedex-grid-name unseen" }, "???")
+    );
+  }
+
+  const name = loading ? "..." : (data?.name ?? formattedId);
+  const sprite = hasShiny ? (data?.spriteShiny || data?.sprite) : (data?.sprite ?? "");
+
+  const tooltipText = `${formattedId} ${data?.name || ''} ${hasShiny ? '(✨ Shiny)' : ''} [${status === 'caught' ? 'Catturato' : 'Visto'}]`;
+
+  return e(
+    "div",
+    {
+      className: `pokedex-grid-card ${status} ${hasShiny ? "shiny" : ""}`,
+      title: tooltipText,
+    },
+    e("span", { className: "pokedex-grid-id" }, formattedId),
+    e(
+      "div",
+      { className: "pokedex-grid-sprite" },
+      sprite
+        ? e("img", { src: sprite, alt: name, className: status === "seen" ? "seen-sprite" : "" })
+        : e("span", { className: "pokedex-no-sprite" }, "?")
+    ),
+    e(
+      "span",
+      { className: "pokedex-grid-name" },
+      hasShiny ? `✨ ${name}` : name
+    )
+  );
+}
+
+/**
+ * Singola riga della vista lista estesa.
+ */
+function PokedexListRow({ pokemonId, status, hasShiny }) {
+  const isDiscovered = status === "caught" || status === "seen";
+  const { data, loading } = usePokemon(isDiscovered ? pokemonId : null);
+  const formattedId = `#${String(pokemonId).padStart(3, "0")}`;
+
+  if (!isDiscovered) {
+    return e(
+      "div",
       { className: "pokedex-entry unseen" },
-      e(
-        "div",
-        { className: "pokedex-sprite" },
-        e("span", { className: "pokedex-no-sprite" }, "?")
-      ),
+      e("div", { className: "pokedex-sprite" }, e("span", { className: "pokedex-no-sprite" }, "?")),
       e(
         "div",
         { className: "pokedex-info" },
@@ -76,8 +129,10 @@ function PokedexEntry({ pokemonId, status, hasShiny }) {
 // Componente principale Pokédex
 // -------------------------------------------------------------------
 export function PokedexModal({ pokedexRun, onClose }) {
-  const [tab, setTab] = useState("run");           // "run" | "historic"
-  const [filter, setFilter] = useState("all");     // "all" | "registered" | "caught" | "unseen"
+  const [tab, setTab] = useState("run");             // "run" | "historic"
+  const [viewMode, setViewMode] = useState("grid");  // "grid" | "list"
+  const [regionFilter, setRegionFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all"); // "all" | "registered" | "caught" | "unseen"
   const [search, setSearch] = useState("");
   const [historic, setHistoric] = useState({});
 
@@ -89,10 +144,11 @@ export function PokedexModal({ pokedexRun, onClose }) {
 
   const activeDexMap = tab === "run" ? pokedexRun : historic;
 
-  // Genera l'elenco completo per tutti i 721 slot
+  // Genera tutti gli elementi in base alla regione selezionata
   const allEntries = useMemo(() => {
+    const reg = REGIONS.find((r) => r.id === regionFilter) || REGIONS[0];
     const list = [];
-    for (let id = 1; id <= TOTAL_POKEMON_COUNT; id++) {
+    for (let id = reg.start; id <= reg.end; id++) {
       const info = activeDexMap[id];
       const status = info ? (info.caught ? "caught" : "seen") : "unseen";
       list.push({
@@ -102,21 +158,18 @@ export function PokedexModal({ pokedexRun, onClose }) {
       });
     }
     return list;
-  }, [activeDexMap]);
+  }, [activeDexMap, regionFilter]);
 
-  // Conteggi per le statistiche
   const caughtCount = useMemo(() => Object.values(activeDexMap).filter((x) => x.caught).length, [activeDexMap]);
   const seenCount = useMemo(() => Object.keys(activeDexMap).length, [activeDexMap]);
 
-  // Filtra gli elementi
+  // Filtra per stato e ricerca
   const filteredEntries = useMemo(() => {
     return allEntries.filter((item) => {
-      // Filtro per stato
-      if (filter === "registered" && item.status === "unseen") return false;
-      if (filter === "caught" && item.status !== "caught") return false;
-      if (filter === "unseen" && item.status !== "unseen") return false;
+      if (statusFilter === "registered" && item.status === "unseen") return false;
+      if (statusFilter === "caught" && item.status !== "caught") return false;
+      if (statusFilter === "unseen" && item.status !== "unseen") return false;
 
-      // Filtro per ricerca ID (es: "25" o "025")
       if (search.trim()) {
         const q = search.trim().toLowerCase();
         const idStr = String(item.id);
@@ -125,7 +178,7 @@ export function PokedexModal({ pokedexRun, onClose }) {
       }
       return true;
     });
-  }, [allEntries, filter, search]);
+  }, [allEntries, statusFilter, search]);
 
   return e(
     "div",
@@ -137,11 +190,11 @@ export function PokedexModal({ pokedexRun, onClose }) {
       e(
         "div",
         { className: "modal-header" },
-        e("h2", { className: "scene-title", style: { margin: 0 } }, "📖 Pokédex Nazionale (Gen 1-6)"),
+        e("h2", { className: "scene-title", style: { margin: 0 } }, "📖 Pokédex Nazionale (Album Grid)"),
         e("button", { className: "modal-close-btn", onClick: onClose, "aria-label": "Chiudi" }, "✕")
       ),
 
-      // Tab selector
+      // Tab selector: Run vs Storico
       e(
         "div",
         { className: "pokedex-tabs" },
@@ -160,10 +213,49 @@ export function PokedexModal({ pokedexRun, onClose }) {
             onClick: () => setTab("historic"),
           },
           "Storico permanente"
+        ),
+        e(
+          "div",
+          { style: { marginLeft: "auto", display: "flex", gap: "4px" } },
+          e(
+            "button",
+            {
+              className: `pokedex-tab ${viewMode === "grid" ? "active" : ""}`,
+              onClick: () => setViewMode("grid"),
+              title: "Griglia Album",
+            },
+            "⬛ Griglia"
+          ),
+          e(
+            "button",
+            {
+              className: `pokedex-tab ${viewMode === "list" ? "active" : ""}`,
+              onClick: () => setViewMode("list"),
+              title: "Lista dettagliata",
+            },
+            "☰ Lista"
+          )
         )
       ),
 
-      // Statistiche e filtri
+      // Filtri per Regione
+      e(
+        "div",
+        { className: "pokedex-region-tabs" },
+        REGIONS.map((r) =>
+          e(
+            "button",
+            {
+              key: r.id,
+              className: `pokedex-region-btn ${regionFilter === r.id ? "active" : ""}`,
+              onClick: () => setRegionFilter(r.id),
+            },
+            r.name
+          )
+        )
+      ),
+
+      // Statistiche e ricerca
       e(
         "div",
         { className: "pokedex-controls" },
@@ -177,23 +269,23 @@ export function PokedexModal({ pokedexRun, onClose }) {
           { className: "pokedex-filter-bar" },
           e(
             "button",
-            { className: `pokedex-filter-btn ${filter === "all" ? "active" : ""}`, onClick: () => setFilter("all") },
-            `Tutti (${TOTAL_POKEMON_COUNT})`
+            { className: `pokedex-filter-btn ${statusFilter === "all" ? "active" : ""}`, onClick: () => setStatusFilter("all") },
+            "Tutti"
           ),
           e(
             "button",
-            { className: `pokedex-filter-btn ${filter === "registered" ? "active" : ""}`, onClick: () => setFilter("registered") },
-            `Scoperti (${seenCount})`
+            { className: `pokedex-filter-btn ${statusFilter === "registered" ? "active" : ""}`, onClick: () => setStatusFilter("registered") },
+            "Scoperti"
           ),
           e(
             "button",
-            { className: `pokedex-filter-btn ${filter === "caught" ? "active" : ""}`, onClick: () => setFilter("caught") },
-            `Catturati (${caughtCount})`
+            { className: `pokedex-filter-btn ${statusFilter === "caught" ? "active" : ""}`, onClick: () => setStatusFilter("caught") },
+            "Catturati"
           ),
           e(
             "button",
-            { className: `pokedex-filter-btn ${filter === "unseen" ? "active" : ""}`, onClick: () => setFilter("unseen") },
-            `Ignoti (${TOTAL_POKEMON_COUNT - seenCount})`
+            { className: `pokedex-filter-btn ${statusFilter === "unseen" ? "active" : ""}`, onClick: () => setStatusFilter("unseen") },
+            "Ignoti"
           )
         ),
         e("input", {
@@ -205,20 +297,22 @@ export function PokedexModal({ pokedexRun, onClose }) {
         })
       ),
 
-      // Lista delle specie (con scroll interno)
-      e(
-        "div",
-        { className: "pokedex-list" },
-        filteredEntries.slice(0, 150).map((en) =>
-          e(PokedexEntry, { key: en.id, pokemonId: en.id, status: en.status, hasShiny: en.hasShiny })
-        ),
-        filteredEntries.length > 150 &&
-          e(
-            "p",
-            { className: "empty-hint", style: { textAlign: "center", padding: "10px 0" } },
-            `Mostrati 150 di ${filteredEntries.length} risultati. Usa la barra di ricerca per trovare specie specifiche.`
+      // Vista Griglia o Lista
+      viewMode === "grid"
+        ? e(
+            "div",
+            { className: "pokedex-grid-container" },
+            filteredEntries.map((en) =>
+              e(PokedexGridCard, { key: en.id, pokemonId: en.id, status: en.status, hasShiny: en.hasShiny })
+            )
           )
-      )
+        : e(
+            "div",
+            { className: "pokedex-list" },
+            filteredEntries.map((en) =>
+              e(PokedexListRow, { key: en.id, pokemonId: en.id, status: en.status, hasShiny: en.hasShiny })
+            )
+          )
     )
   );
 }

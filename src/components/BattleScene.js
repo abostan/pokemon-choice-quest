@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
 import { computeTeamPower, computeWinChance, rollBattle } from "../engine/battleLogic.js";
+import { getItemDescription } from "../data/items.js";
 
 const e = React.createElement;
 
@@ -132,22 +133,24 @@ export function BattleScene({
       e(
         "div",
         { className: "battle-item-section" },
-        e("span", { className: "battle-item-label" }, "🎒 Usa uno strumento prima dello scontro:"),
+        e("span", { className: "battle-item-label" }, "🎒 Usa uno strumento prima dello scontro (passa sopra per info):"),
         e(
           "div",
           { className: "battle-item-list" },
-          items.map((itemName, idx) =>
-            e(
+          items.map((itemName, idx) => {
+            const desc = getItemDescription(itemName);
+            return e(
               "button",
               {
                 key: `${itemName}-${idx}`,
                 className: `battle-item-btn ${usedItem?.name === itemName ? "used" : ""}`,
                 disabled: usedItem !== null,
+                title: `${itemName}: ${desc}`,
                 onClick: () => handleUseItem(idx),
               },
               `🧪 ${itemName}`
-            )
-          )
+            );
+          })
         )
       ),
 

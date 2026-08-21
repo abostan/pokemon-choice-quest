@@ -10,7 +10,7 @@ const e = React.createElement;
  * props:
  *  - starterIds: Array<number>
  *  - generationName: string
- *  - continueTeam: Array<{id,level}> | null  — se presente, mostra il team attuale
+ *  - continueTeam: Array<{id,level}> | null  — se presente, mostra la squadra trasferita nel Box
  *  - onChooseStarter(id): callback
  */
 export function StartScreen({ starterIds, generationName, continueTeam, onChooseStarter }) {
@@ -23,19 +23,19 @@ export function StartScreen({ starterIds, generationName, continueTeam, onChoose
       "p",
       { className: "scene-text" },
       isContinue
-        ? `Il Professore Pokémon di ${generationName} ti offre un compagno locale. Il tuo team esistente ti accompagna nel viaggio.`
+        ? `Benvenuto a ${generationName}! I tuoi campioni della regione precedente sono stati riposti al sicuro nel Box PC. Scegli il tuo starter per iniziare la nuova avventura.`
         : "Il Professore ti lascia scegliere il tuo primo compagno di viaggio. A differenza del sito da cui è nata questa idea, qui non gira nessuna ruota: sei tu a decidere ogni passo."
     ),
     isContinue &&
       e(
         "div",
         { style: { marginBottom: "16px" } },
-        e("p", { className: "next-gen-label" }, "Il tuo team attuale:"),
+        e("p", { className: "next-gen-label" }, "I tuoi Pokémon custoditi nel Box:"),
         e(
           "div",
           { className: "team-list" },
           continueTeam.map((p, idx) =>
-            e(PokemonChip, { key: `${p.id}-${idx}`, id: p.id, level: p.level })
+            e(PokemonChip, { key: `${p.id}-${idx}`, id: p.id, level: p.level, isShiny: p.isShiny })
           )
         )
       ),

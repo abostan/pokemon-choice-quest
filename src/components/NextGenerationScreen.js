@@ -22,24 +22,24 @@ export function NextGenerationScreen({ currentGenName, nextGenName, team, onCont
     e(
       "p",
       { className: "scene-text" },
-      `Hai sconfitto il Campione e scritto il tuo nome nella storia di ${currentGenName}. Ma l'avventura non è finita: la regione di ${nextGenName} ti chiama.`
+      `Hai sconfitto il Campione e scritto il tuo nome nella Hall of Fame di ${currentGenName}. Una nuova avventura ti attende nella regione di ${nextGenName}!`
     ),
     e(
       "div",
       { className: "next-gen-team-preview" },
-      e("p", { className: "next-gen-label" }, "Il tuo team ti accompagna:"),
+      e("p", { className: "next-gen-label" }, "La tua squadra Hall of Fame (verrà riposta nel Box PC):"),
       e(
         "div",
         { className: "team-list" },
         team.map((p, idx) =>
-          e(PokemonChip, { key: `${p.id}-${idx}`, id: p.id, level: p.level })
+          e(PokemonChip, { key: `${p.id}-${idx}`, id: p.id, level: p.level, isShiny: p.isShiny })
         )
       )
     ),
     e(
       "p",
       { className: "scene-text", style: { marginTop: "16px" } },
-      `Puoi scegliere un nuovo starter di ${nextGenName} per aggiungerlo alla squadra e affrontare le 8 nuove palestre.`
+      `I tuoi campioni si riposeranno nel Box. Inizierai a ${nextGenName} solo con il tuo nuovo starter, e potrai recuperare i tuoi vecchi Pokémon dal Box in qualsiasi momento.`
     ),
     e(
       "button",

@@ -1,0 +1,34 @@
+// Descrizioni dettagliate di tutti gli strumenti presenti nel gioco.
+
+export const ITEM_DESCRIPTIONS = {
+  "Pozione": "Strumento curativo base. Aumenta la potenza effettiva della squadra di +10 per la battaglia.",
+  "Super Pozione": "Strumento curativo avanzato. Aumenta la potenza effettiva della squadra di +18 per la battaglia.",
+  "Iper Pozione": "Strumento curativo molto potente. Aumenta la potenza effettiva della squadra di +18 per la battaglia.",
+  "Antidoto": "Cura i problemi di stato e dona stabilità alla squadra in battaglia (+10 Potenza).",
+  "Pietra Metallica": "Minerale raro e resistente. Aumenta la potenza di battaglia di +14.",
+  "Pietra Solare": "Pietra mistica riscaldata dal sole. Aumenta la potenza di battaglia di +14.",
+  "Pietra Idrica": "Pietra evolutiva elementale dell'acqua. Aumenta la potenza di battaglia di +14.",
+  "Pietra Folletto": "Pietra incantata ricca di energia magica. Aumenta la potenza di battaglia di +14.",
+  "Pietra Brillante": "Pietra che brilla di una luce intensa. Aumenta la potenza di battaglia di +14.",
+  "Foglia Strana": "Foglia aromatica speciale. Rinfresca la squadra e dona +10 Potenza.",
+  "Biscotto Lavarone": "Famoso biscotto curativo di Lavarone. Rigenera la squadra (+10 Potenza).",
+  "Miele": "Miele profumato e dolcissimo. Attira la fortuna in battaglia (+10 Potenza).",
+  "Dolceofelia": "Prelibatezza regionale zuccherata. Aumenta il morale della squadra (+10 Potenza).",
+  "Galletta di Yantar": "Biscotto croccante della regione di Kalos (+10 Potenza).",
+  "Pallina Esca": "Strumento di supporto per attirare e pacificare i Pokémon.",
+  "Revitalizzante": "Rimedia alle ferite della squadra donando +14 Potenza in battaglia.",
+  "Rimedio Finale": "Cura completa che ripristina le energie del team (+14 Potenza).",
+};
+
+/**
+ * Restituisce la descrizione di uno strumento dato il suo nome.
+ * @param {string} name
+ * @returns {string}
+ */
+export function getItemDescription(name) {
+  if (!name) return "";
+  if (ITEM_DESCRIPTIONS[name]) return ITEM_DESCRIPTIONS[name];
+  if (name.includes("Pozione")) return "Strumento curativo. Aumenta la potenza della squadra in battaglia.";
+  if (name.includes("Pietra")) return "Pietra evolutiva / minerale speciale (+14 Potenza).";
+  return "Strumento utilizzabile dallo zaino per potenziare la squadra.";
+}

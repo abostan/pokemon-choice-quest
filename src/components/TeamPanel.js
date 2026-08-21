@@ -1,5 +1,6 @@
 import React from "react";
 import { PokemonChip } from "./PokemonSprite.js";
+import { getItemDescription } from "../data/items.js";
 
 const e = React.createElement;
 
@@ -88,13 +89,25 @@ export function TeamPanel({ team, box, badges, items, onOpenBox }) {
           badges.map((b, idx) => e(BadgeItem, { key: `${b}-${idx}`, name: b }))
         ),
 
-    e("h2", { style: { marginTop: "20px" } }, "Zaino"),
+    e("h2", { style: { marginTop: "20px" } }, "Zaino (Passa sopra per info)"),
     !items || items.length === 0
       ? e("p", { className: "empty-hint" }, "Zaino vuoto.")
       : e(
           "ul",
-          { style: { margin: 0, paddingLeft: "18px", color: "var(--text-dim)", fontSize: "0.85rem" } },
-          items.map((it, idx) => e("li", { key: `${it}-${idx}` }, it))
+          { className: "inventory-list" },
+          items.map((it, idx) => {
+            const desc = getItemDescription(it);
+            return e(
+              "li",
+              {
+                key: `${it}-${idx}`,
+                className: "inventory-item-row",
+                title: `${it}: ${desc}`,
+              },
+              e("span", { className: "inventory-item-name" }, `🧪 ${it}`),
+              e("span", { className: "inventory-item-tooltip" }, desc)
+            );
+          })
         )
   );
 }
