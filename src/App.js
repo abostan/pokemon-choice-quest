@@ -13,6 +13,7 @@ import { ResumeScreen } from "./components/ResumeScreen.js";
 import { EvolutionNotice } from "./components/EvolutionNotice.js";
 import { BoxModal } from "./components/BoxModal.js";
 import { HallOfFameModal } from "./components/HallOfFameModal.js";
+import { NuzlockeGameOverScreen } from "./components/NuzlockeGameOverScreen.js";
 import { getGeneration, getExplorationTier, getNextGeneration } from "./data/generations.js";
 import { checkEvolution } from "./data/evolutions.js";
 import { addHallOfFameEntry } from "./engine/hallOfFame.js";
@@ -49,6 +50,7 @@ function initialState() {
     gymIndex: 0,
     eliteIndex: 0,
     rivalDone: false,
+    villainBossDone: false,
 
     // --- Squadra e inventario ---
     team: [],
@@ -104,11 +106,11 @@ export default function App() {
   // Auto-save su activeSlotId ogni volta che lo stato cambia (debounce 600ms)
   const saveTimerRef = useRef(null);
   useEffect(() => {
-    if (state.phase === "generationSelect" || state.phase === "resume") return;
-
+    if (state.phase === "generationSelect" || state.phase === "resume" || state.phase === "nuzlockeGameOver") return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+
     saveTimerRef.current = setTimeout(() => {
-      saveGame(state, activeSlotId);
+      saveGame(activeSlotId, { state });
       refreshSlots();
     }, 600);
 
@@ -116,6 +118,17 @@ export default function App() {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
   }, [state, activeSlotId]);
+
+  // Controllo globale Nuzlocke Game Over: se non ci sono Pokémon sani né in squadra né nel Box
+  useEffect(() => {
+    if (!state.isNuzlocke || state.phase === "nuzlockeGameOver" || state.phase === "generationSelect" || state.phase === "starterSelect" || state.phase === "resume") return;
+    const hasHealthyInTeam = state.team.some((p) => !p.isFainted);
+    const hasHealthyInBox = state.box.some((p) => !p.isFainted);
+
+    if (!hasHealthyInTeam && !hasHealthyInBox) {
+      update({ phase: "nuzlockeGameOver" });
+    }
+  }, [state.isNuzlocke, state.team, state.box, state.phase]);
 
   // -------------------------------------------------------
   // Funzioni di mutazione stato
@@ -127,11 +140,10 @@ export default function App() {
 
   function addToTeam(pokemon) {
     setState((prev) => {
-      const clampedP = { ...pokemon, level: Math.min(MAX_LEVEL, pokemon.level || 5) };
       if (prev.team.length < MAX_TEAM_SIZE) {
-        return { ...prev, team: [...prev.team, clampedP] };
+        return { ...prev, team: [...prev.team, pokemon] };
       } else {
-        return { ...prev, box: [...prev.box, clampedP] };
+        return { ...prev, box: [...prev.box, pokemon] };
       }
     });
   }
@@ -287,10 +299,24 @@ export default function App() {
       if (!prev.isNuzlocke || prev.team.length === 0) return prev;
       const fainted = { ...prev.team[prev.team.length - 1], isFainted: true };
       const nextTeam = prev.team.slice(0, prev.team.length - 1);
+      const nextBox = [...prev.box, fainted];
+      const hasHealthyInBox = nextBox.some((p) => !p.isFainted);
+
+      if (nextTeam.length === 0 && !hasHealthyInBox) {
+        return {
+          ...prev,
+          team: nextTeam,
+          box: nextBox,
+          phase: "nuzlockeGameOver",
+        };
+      }
+
+      const shouldOpenBox = nextTeam.length === 0 && hasHealthyInBox;
       return {
         ...prev,
         team: nextTeam,
-        box: [...prev.box, fainted],
+        box: nextBox,
+        boxModalOpen: shouldOpenBox ? true : prev.boxModalOpen,
       };
     });
   }
@@ -855,7 +881,9 @@ export default function App() {
       team: state.team,
       items: state.items,
       rewardBadge: gym.badge,
+      isNuzlocke: state.isNuzlocke,
       onUseItem: useItem,
+      onOpenBox: () => update({ boxModalOpen: true }),
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(gym.badge);
         else handleNuzlockeLoss();
@@ -876,7 +904,9 @@ export default function App() {
       team: state.team,
       items: state.items,
       rewardBadge: null,
+      isNuzlocke: state.isNuzlocke,
       onUseItem: useItem,
+      onOpenBox: () => update({ boxModalOpen: true }),
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(null);
         else handleNuzlockeLoss();
@@ -897,7 +927,9 @@ export default function App() {
       team: state.team,
       items: state.items,
       rewardBadge: null,
+      isNuzlocke: state.isNuzlocke,
       onUseItem: useItem,
+      onOpenBox: () => update({ boxModalOpen: true }),
       onResolved: ({ won }) => {
         if (won) {
           resolveBattleWin(null);
@@ -925,7 +957,9 @@ export default function App() {
       team: state.team,
       items: state.items,
       rewardBadge: null,
+      isNuzlocke: state.isNuzlocke,
       onUseItem: useItem,
+      onOpenBox: () => update({ boxModalOpen: true }),
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(null);
         else handleNuzlockeLoss();
@@ -951,7 +985,9 @@ export default function App() {
       team: state.team,
       items: state.items,
       rewardBadge: champion.badge,
+      isNuzlocke: state.isNuzlocke,
       onUseItem: useItem,
+      onOpenBox: () => update({ boxModalOpen: true }),
       onResolved: ({ won }) => {
         if (won) {
           resolveBattleWin(champion.badge);
@@ -964,6 +1000,16 @@ export default function App() {
           handleNuzlockeLoss();
         }
         checkNextGeneration();
+      },
+    });
+
+  } else if (state.phase === "nuzlockeGameOver") {
+    content = e(NuzlockeGameOverScreen, {
+      lastGenName: generation?.name ?? "Pokémon",
+      badgesCount: state.badges.length,
+      onRestart: () => {
+        deleteSave(activeSlotId);
+        setState({ ...initialState(), phase: "generationSelect" });
       },
     });
 

@@ -79,12 +79,16 @@ export function BattleScene({
   team,
   items = [],
   rewardBadge,
+  isNuzlocke = false,
   onUseItem,
+  onOpenBox,
   onResolved,
 }) {
   const [result, setResult] = useState(null); // { tactic, won, winChance } | null
   const [usedItem, setUsedItem] = useState(null); // { name, boost } | null
   const [isMegaActive, setIsMegaActive] = useState(false);
+
+  const hasTeam = team && team.length > 0;
 
   // Estrae il tipo avversario dal titolo se non passato esplicitamente (es. "Capopalestra di tipo Roccia")
   const detectedType = opponentType || (opponentTitle.match(/tipo ([A-Za-z]+)/)?.[1] ?? "");
@@ -109,6 +113,7 @@ export function BattleScene({
   }
 
   function fight(tactic) {
+    if (!hasTeam) return;
     const winChance = computeWinChance(totalTeamPower, opponentPower, tactic);
     const won = rollBattle(winChance);
     setResult({ tactic, won, winChance });
@@ -127,8 +132,35 @@ export function BattleScene({
     // Avatar dell'Allenatore Avversario
     e(TrainerAvatar, { title: opponentTitle, opponentPower }),
 
+    // Avviso se la squadra è vuota
+    !hasTeam &&
+      e(
+        "div",
+        {
+          style: {
+            margin: "20px 0",
+            padding: "16px",
+            borderRadius: "12px",
+            background: "rgba(225, 29, 72, 0.15)",
+            border: "1px solid #f43f5e",
+            textAlign: "center",
+          },
+        },
+        e("p", { style: { fontWeight: "bold", color: "#fda4af", margin: "0 0 8px 0" } }, "⚠️ Non hai nessun Pokémon attivo in squadra!"),
+        e("p", { style: { fontSize: "0.88rem", color: "#cbd5e1", margin: "0 0 12px 0" } }, "Devi ritirare un Pokémon sano dal Box per poter lottare."),
+        e(
+          "button",
+          {
+            className: "continue-btn",
+            style: { background: "linear-gradient(135deg, #d97706, #92400e)", color: "#fff", border: "1px solid #f59e0b" },
+            onClick: onOpenBox,
+          },
+          "📦 Apri Gestione Box"
+        )
+      ),
+
     // Badge Efficacia dei Tipi
-    typeEff.message && e(
+    hasTeam && typeEff.message && e(
       "div",
       {
         className: `type-advantage-badge ${typeEff.status}`,
@@ -147,7 +179,7 @@ export function BattleScene({
     ),
 
     // Megaevoluzione Button / Badge
-    !result && !isMegaActive && e(
+    hasTeam && !result && !isMegaActive && e(
       "button",
       {
         className: "mega-btn",
@@ -168,7 +200,7 @@ export function BattleScene({
       "🔮 Attiva MEGAEVOLUZIONE / GIGAMAX! (+30% Potenza Squadra)"
     ),
 
-    isMegaActive && e(
+    hasTeam && isMegaActive && e(
       "div",
       {
         className: "mega-active-badge",
@@ -199,7 +231,7 @@ export function BattleScene({
     ),
 
     // Sezione Oggetti dallo Zaino (se non ha ancora attaccato)
-    !result && items && items.length > 0 &&
+    hasTeam && !result && items && items.length > 0 &&
       e(
         "div",
         { className: "battle-item-section" },
@@ -231,7 +263,7 @@ export function BattleScene({
         `✨ Hai usato "${usedItem.name}"! La squadra guadagna +${usedItem.boost} Potenza per questa battaglia.`
       ),
 
-    !result &&
+    hasTeam && !result &&
       e(
         "div",
         { className: "choice-list", style: { marginTop: "16px" } },
@@ -251,6 +283,8 @@ export function BattleScene({
         { className: `outcome-box ${result.won ? "" : "fail"}` },
         result.won
           ? `Hai vinto la battaglia!${rewardBadge ? ` Ottieni la medaglia "${rewardBadge}".` : ""}`
+          : isNuzlocke
+          ? "💀 Sconfitta Nuzlocke: il tuo Pokémon è svenuto ed è stato trasferito nel Box!"
           : "Hai perso questa battaglia.",
         e(
           "div",
@@ -260,6 +294,16 @@ export function BattleScene({
                 "button",
                 { className: "continue-btn", onClick: () => onResolved({ won: true }) },
                 "Continua"
+              )
+            : isNuzlocke
+            ? e(
+                "button",
+                {
+                  className: "continue-btn",
+                  style: { background: "linear-gradient(135deg, #be123c, #881337)", color: "#fff" },
+                  onClick: () => onResolved({ won: false }),
+                },
+                "💀 Registra la sconfitta"
               )
             : [
                 e("button", { key: "retry", className: "continue-btn", onClick: retry }, "Riprova la battaglia"),
