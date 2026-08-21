@@ -1,6 +1,8 @@
 // Descrizioni dettagliate di tutti gli strumenti presenti nel gioco.
 
 export const ITEM_DESCRIPTIONS = {
+  "Master Ball": "La Poké Ball definitiva. Cattura qualsiasi Pokémon selvatico o leggendario con successo garantito al 100%!",
+  "Caramella Rara": "Caramella prodigiosa ricolma di energia. Aumenta istantaneamente il livello di tutti i Pokémon in squadra di +3!",
   "Pozione": "Strumento curativo base. Aumenta la potenza effettiva della squadra di +10 per la battaglia.",
   "Super Pozione": "Strumento curativo avanzato. Aumenta la potenza effettiva della squadra di +18 per la battaglia.",
   "Iper Pozione": "Strumento curativo molto potente. Aumenta la potenza effettiva della squadra di +18 per la battaglia.",

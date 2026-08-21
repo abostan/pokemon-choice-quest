@@ -12,6 +12,7 @@ for (const generation of GENERATIONS) {
   let gymIndex = 0;
   let eliteIndex = 0;
   let rivalDone = false;
+  let villainBossDone = false;
   let phase = "explore";
   let steps = 0;
   const maxSteps = 200;
@@ -33,6 +34,9 @@ for (const generation of GENERATIONS) {
       if (generation.rival && !rivalDone && generation.rival.afterGymIndex === finishedGymIndex) {
         gymIndex = nextGymIndex;
         phase = "rivalBattle";
+      } else if (generation.villainBoss && !villainBossDone && generation.villainBoss.afterGymIndex === finishedGymIndex) {
+        gymIndex = nextGymIndex;
+        phase = "villainBossBattle";
       } else if (nextGymIndex >= generation.gymLeaders.length) {
         gymIndex = nextGymIndex;
         eliteIndex = 0;
@@ -44,6 +48,10 @@ for (const generation of GENERATIONS) {
     } else if (phase === "rivalBattle") {
       console.log(`  rivale: ${generation.rival.title} (potenza ${generation.rival.opponentPower})`);
       rivalDone = true;
+      phase = "explore";
+    } else if (phase === "villainBossBattle") {
+      console.log(`  capo team: ${generation.villainBoss.title} (potenza ${generation.villainBoss.opponentPower}, premio: ${generation.villainBoss.rewardItem})`);
+      villainBossDone = true;
       phase = "explore";
     } else if (phase === "eliteBattle") {
       const member = generation.eliteFour[eliteIndex];

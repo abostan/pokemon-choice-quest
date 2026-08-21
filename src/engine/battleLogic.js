@@ -17,6 +17,9 @@
  * @param {boolean} isLegendary se il Pokémon è leggendario (tasso massimo 20%)
  */
 export function computeCaptureChance(method, baseRate = 0.55, isLegendary = false) {
+  if (method === 'masterball') {
+    return 1.0; // 100% cattura garantita!
+  }
   if (isLegendary) {
     const legMod = method === 'food' ? 1.2 : 1.0;
     return clamp(0.15 * legMod, 0.05, 0.20);

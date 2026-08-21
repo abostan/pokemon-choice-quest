@@ -79,6 +79,15 @@ export const GENERATIONS = [
       afterGymIndex: 2, // compare dopo la 3a palestra (indice 0-based 2)
     },
 
+    // Battaglia Boss Narrativa contro il Capo del Team malvagio dopo la 4a palestra
+    villainBoss: {
+      title: "Capo Team Rocket — Giovanni",
+      teamIds: [53, 111, 34, 112],
+      opponentPower: 52,
+      rewardItem: "Master Ball",
+      afterGymIndex: 3, // compare dopo la 4a palestra
+    },
+
     // Leggendari catturabili nella modalità post-game infinita (5% prob. per round)
     legendaries: [144, 145, 146, 150], // Articuno, Zapdos, Moltres, Mewtwo
   },
@@ -147,6 +156,14 @@ export const GENERATIONS = [
       teamIds: [163, 168, 41],
       opponentPower: 34,
       afterGymIndex: 2,
+    },
+
+    villainBoss: {
+      title: "Capo Reclute Team Rocket — Archer",
+      teamIds: [229, 110, 130],
+      opponentPower: 52,
+      rewardItem: "Caramella Rara",
+      afterGymIndex: 3,
     },
 
     // Leggendari catturabili nella modalità post-game infinita (5% prob. per round)
@@ -219,6 +236,14 @@ export const GENERATIONS = [
       afterGymIndex: 2,
     },
 
+    villainBoss: {
+      title: "Capo Team Magma/Aqua — Max & Archie",
+      teamIds: [323, 319, 229],
+      opponentPower: 52,
+      rewardItem: "Master Ball",
+      afterGymIndex: 3,
+    },
+
     legendaries: [377, 378, 379, 380, 381, 382, 383, 384],
   },
 
@@ -286,6 +311,14 @@ export const GENERATIONS = [
       teamIds: [397, 404, 391],
       opponentPower: 34,
       afterGymIndex: 2,
+    },
+
+    villainBoss: {
+      title: "Capo Team Galassia — Cyrus",
+      teamIds: [198, 215, 130, 461],
+      opponentPower: 52,
+      rewardItem: "Master Ball",
+      afterGymIndex: 3,
     },
 
     legendaries: [480, 481, 482, 483, 484, 485, 486, 487],
@@ -357,6 +390,14 @@ export const GENERATIONS = [
       afterGymIndex: 2,
     },
 
+    villainBoss: {
+      title: "Capo Team Plasma — Ghetsis",
+      teamIds: [635, 563, 625, 604],
+      opponentPower: 52,
+      rewardItem: "Caramella Rara",
+      afterGymIndex: 3,
+    },
+
     legendaries: [638, 639, 640, 641, 642, 643, 644, 645, 646],
   },
 
@@ -424,6 +465,14 @@ export const GENERATIONS = [
       teamIds: [662, 678, 654],
       opponentPower: 34,
       afterGymIndex: 2,
+    },
+
+    villainBoss: {
+      title: "Capo Team Flare — Lysandre",
+      teamIds: [668, 198, 479, 635],
+      opponentPower: 52,
+      rewardItem: "Master Ball",
+      afterGymIndex: 3,
     },
 
     legendaries: [716, 717, 718],
@@ -495,6 +544,14 @@ export const GENERATIONS = [
       afterGymIndex: 2,
     },
 
+    villainBoss: {
+      title: "Capo Team Skull — Guzma",
+      teamIds: [768, 212, 127],
+      opponentPower: 52,
+      rewardItem: "Caramella Rara",
+      afterGymIndex: 3,
+    },
+
     legendaries: [785, 786, 787, 788, 791, 792, 800],
   },
 
@@ -564,6 +621,14 @@ export const GENERATIONS = [
       afterGymIndex: 2,
     },
 
+    villainBoss: {
+      title: "Presidente Macro Cosmos — Rose",
+      teamIds: [839, 879, 884, 870],
+      opponentPower: 52,
+      rewardItem: "Master Ball",
+      afterGymIndex: 3,
+    },
+
     legendaries: [888, 889, 890, 891, 892, 898],
   },
 
@@ -631,6 +696,14 @@ export const GENERATIONS = [
       teamIds: [921, 935, 906],
       opponentPower: 34,
       afterGymIndex: 2,
+    },
+
+    villainBoss: {
+      title: "Capo Team Star — Eri & Cassiopea",
+      teamIds: [935, 936, 968, 970],
+      opponentPower: 52,
+      rewardItem: "Caramella Rara",
+      afterGymIndex: 3,
     },
 
     legendaries: [1001, 1002, 1003, 1004, 1007, 1008, 1024],

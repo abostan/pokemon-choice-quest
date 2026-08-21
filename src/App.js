@@ -288,6 +288,15 @@ export default function App() {
       return;
     }
 
+    if (
+      generation.villainBoss &&
+      !state.villainBossDone &&
+      generation.villainBoss.afterGymIndex === finishedGymIndex
+    ) {
+      goTo("villainBossBattle", { gymIndex: nextGymIndex });
+      return;
+    }
+
     if (nextGymIndex >= generation.gymLeaders.length) {
       goTo("eliteBattle", { gymIndex: nextGymIndex, eliteIndex: 0 });
       return;
@@ -466,6 +475,7 @@ export default function App() {
     });
 
   } else if (state.phase === "legendaryEncounter") {
+    const hasMb = state.items.includes("Master Ball");
     content = e(EncounterScene, {
       key: `legendary-${state.pendingEncounterPool?.[0]}`,
       title: "⭐ Incontro leggendario!",
@@ -473,9 +483,14 @@ export default function App() {
       pool: state.pendingEncounterPool,
       level: state.pendingEncounterLevel,
       isLegendary: true,
+      hasMasterBall: hasMb,
       onSeen: markSeen,
       onCaught: markCaught,
-      onResolved: ({ caught, pokemon }) => {
+      onResolved: ({ caught, pokemon, usedMasterBall }) => {
+        if (usedMasterBall) {
+          const mbIdx = state.items.indexOf("Master Ball");
+          if (mbIdx !== -1) useItem(mbIdx);
+        }
         if (caught) {
           addToTeam(pokemon);
           update({
@@ -779,6 +794,7 @@ export default function App() {
     });
 
   } else if (state.phase === "encounter") {
+    const hasMb = state.items.includes("Master Ball");
     content = e(EncounterScene, {
       key: `encounter-${state.gymIndex}`,
       title: "Incontro selvaggio",
@@ -786,9 +802,14 @@ export default function App() {
       pool: state.pendingEncounterPool,
       level: state.pendingEncounterLevel,
       isLegendary: state.pendingEncounterIsLegendary,
+      hasMasterBall: hasMb,
       onSeen: markSeen,
       onCaught: markCaught,
-      onResolved: ({ caught, pokemon }) => {
+      onResolved: ({ caught, pokemon, usedMasterBall }) => {
+        if (usedMasterBall) {
+          const mbIdx = state.items.indexOf("Master Ball");
+          if (mbIdx !== -1) useItem(mbIdx);
+        }
         if (caught) addToTeam(pokemon);
         goTo("gymBattle");
       },
@@ -831,6 +852,32 @@ export default function App() {
       onResolved: ({ won }) => {
         if (won) resolveBattleWin(null);
         update({ rivalDone: true, phase: "explore" });
+      },
+    });
+
+  } else if (state.phase === "villainBossBattle") {
+    const boss = generation.villainBoss;
+    const scaledPower = getScaledPower(boss.opponentPower);
+    content = e(BattleScene, {
+      key: "villain-boss",
+      title: "🕵️ Scontro Boss Narrativo!",
+      text: `${boss.title} tenta di ostacolare il tuo cammino! Sconfiggilo per salvare la regione ed ottenere la ricompensa: ${boss.rewardItem}!`,
+      opponentTitle: boss.title,
+      opponentTeamIds: boss.teamIds,
+      opponentPower: scaledPower,
+      team: state.team,
+      items: state.items,
+      rewardBadge: null,
+      onUseItem: useItem,
+      onResolved: ({ won }) => {
+        if (won) {
+          resolveBattleWin(null);
+          addItem(boss.rewardItem);
+          if (boss.rewardItem === "Caramella Rara") {
+            boostTeam(3);
+          }
+        }
+        update({ villainBossDone: true, phase: "explore" });
       },
     });
 

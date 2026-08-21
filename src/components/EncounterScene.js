@@ -16,7 +16,7 @@ const e = React.createElement;
  *  - onCaught(id, isShiny): chiamata quando il Pokémon è catturato (per il Pokédex)
  *  - onResolved({ caught, pokemon }): chiamata quando la scena finisce
  */
-export function EncounterScene({ title, text, pool, level = 4, isLegendary = false, onSeen, onCaught, onResolved }) {
+export function EncounterScene({ title, text, pool, level = 4, isLegendary = false, hasMasterBall = false, onSeen, onCaught, onResolved }) {
   const isShiny = useMemo(() => {
     // 1/500 chance per i selvatici normali (0.002), 1/20 (0.05) per i leggendari
     const chance = isLegendary ? 0.05 : 0.002;
@@ -36,7 +36,7 @@ export function EncounterScene({ title, text, pool, level = 4, isLegendary = fal
   const baseRate = isLegendary ? 0.10 : 0.55;
 
   function attemptCapture(method) {
-    const chance = computeCaptureChance(method, baseRate);
+    const chance = computeCaptureChance(method, baseRate, isLegendary);
     const success = rollCapture(chance);
     if (success && onCaught) onCaught(wildId, isShiny);
     setResult({ method, success, chance });
@@ -44,9 +44,9 @@ export function EncounterScene({ title, text, pool, level = 4, isLegendary = fal
 
   function handleContinue() {
     if (result?.success) {
-      onResolved({ caught: true, pokemon: { id: wildId, level, isShiny } });
+      onResolved({ caught: true, pokemon: { id: wildId, level, isShiny }, usedMasterBall: result.method === "masterball" });
     } else {
-      onResolved({ caught: false, pokemon: null });
+      onResolved({ caught: false, pokemon: null, usedMasterBall: false });
     }
   }
 
@@ -65,6 +65,12 @@ export function EncounterScene({ title, text, pool, level = 4, isLegendary = fal
       e(
         "div",
         { className: "choice-list", style: { marginTop: "16px" } },
+        hasMasterBall && e(
+          "button",
+          { className: "choice-btn master-ball-btn", onClick: () => attemptCapture("masterball"), style: { background: "linear-gradient(135deg, #6b21a8, #3b0764)", color: "#fff", border: "2px solid #a855f7" } },
+          e("span", null, "🟣 Lancia una MASTER BALL!"),
+          e("span", { className: "choice-hint", style: { color: "#e9d5ff" } }, "Cattura GARANTITA AL 100%! Consuma la tua Master Ball dallo zaino.")
+        ),
         e(
           "button",
           { className: "choice-btn", onClick: () => attemptCapture("ball") },
