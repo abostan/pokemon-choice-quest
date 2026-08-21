@@ -1,8 +1,8 @@
-# Pokémon: Scegli il Cammino — Spec v2
+# Pokémon: Scegli il Cammino — Spec v5.0
 
-Documento di lavoro per la seconda iterazione dell'app. Raccoglie le richieste emerse in chat, le decisioni prese insieme e le domande ancora aperte, prima di toccare il codice. Aggiorniamo questo file (nel progetto "Pokemon") man mano che decidiamo o cambiamo idea.
+Documento di lavoro e specifica tecnica delle funzionalità del progetto.
 
-**Stato:** bozza da rivedere insieme — nessuna riga di codice ancora scritta per questi punti.
+**Stato:** ✅ Tutte le specifiche (Gen 1-6, 721 Pokedex, Multi-Save, Shiny, Oggetti, Allenatori di Percorso, Visual Badges) sono state interamente implementate e verificate.
 
 ---
 

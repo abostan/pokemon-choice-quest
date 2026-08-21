@@ -25,13 +25,19 @@ export function rollCapture(chance, rng = Math.random) {
   return rng() < chance;
 }
 
+export const MAX_LEVEL = 100;
+
+export function clampLevel(level) {
+  return Math.min(MAX_LEVEL, Math.max(1, level));
+}
+
 /**
  * Potenza complessiva di una squadra, usata per stimare l'esito delle
  * battaglie. Più Pokémon e livelli più alti = squadra più forte.
  */
 export function computeTeamPower(team) {
   if (!team || team.length === 0) return 0;
-  const totalLevels = team.reduce((sum, p) => sum + p.level, 0);
+  const totalLevels = team.reduce((sum, p) => sum + Math.min(p.level, MAX_LEVEL), 0);
   const countBonus = team.length * 2; // avere più Pokémon aiuta comunque
   return totalLevels + countBonus;
 }

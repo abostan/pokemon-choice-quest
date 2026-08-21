@@ -22,19 +22,49 @@ const TACTICS = [
   },
 ];
 
+function getTrainerEmoji(title) {
+  if (title.includes("Rivale")) return "🧢";
+  if (title.includes("Campione")) return "👑";
+  if (title.includes("Alto Comando")) return "⚔️";
+  if (title.includes("Roccia")) return "🪨";
+  if (title.includes("Acqua")) return "💧";
+  if (title.includes("Elettrico")) return "⚡";
+  if (title.includes("Erba")) return "🌿";
+  if (title.includes("Veleno")) return "☠️";
+  if (title.includes("Psico") || title.includes("Spettro")) return "🔮";
+  if (title.includes("Fuoco")) return "🔥";
+  if (title.includes("Terra")) return "🏔️";
+  if (title.includes("Volante")) return "🦅";
+  if (title.includes("Coleottero")) return "🐛";
+  if (title.includes("Normale")) return "🥛";
+  if (title.includes("Lotta")) return "🥊";
+  if (title.includes("Acciaio")) return "🗡️";
+  if (title.includes("Ghiaccio")) return "❄️";
+  if (title.includes("Drago")) return "🐉";
+  if (title.includes("Folletto")) return "🧚";
+  return "👤";
+}
+
 /**
- * Scena di battaglia: il giocatore sceglie facoltativamente un oggetto dallo zaino,
- * poi sceglie una tattica e l'esito viene calcolato.
- *
- * props:
- *  - title, text
- *  - opponentTitle, opponentTeamIds
- *  - opponentPower (number)
- *  - team (array {id, level, isShiny})
- *  - items (array of strings)
- *  - rewardBadge (string|null)
- *  - onUseItem(itemIndex): callback per consumare l'oggetto dallo zaino
- *  - onResolved({ won })
+ * Avatar del Capopalestra / Avversario
+ */
+function TrainerAvatar({ title, opponentPower }) {
+  const emoji = getTrainerEmoji(title);
+  return e(
+    "div",
+    { className: "trainer-avatar-card" },
+    e("div", { className: "trainer-avatar-icon" }, emoji),
+    e(
+      "div",
+      { className: "trainer-avatar-info" },
+      e("span", { className: "trainer-title" }, title),
+      e("span", { className: "trainer-power" }, `⚡ Potenza Avversaria: ${opponentPower}`)
+    )
+  );
+}
+
+/**
+ * Scena di battaglia con Avatar dell'Allenatore e uso oggetti dallo zaino.
  */
 export function BattleScene({
   title,
@@ -82,10 +112,14 @@ export function BattleScene({
     { className: "panel" },
     e("h2", { className: "scene-title" }, title),
     e("p", { className: "scene-text" }, text),
+
+    // Avatar dell'Allenatore Avversario
+    e(TrainerAvatar, { title: opponentTitle, opponentPower }),
+
+    // Squadra Avversario
     e(
       "div",
-      { style: { marginBottom: "14px" } },
-      e("strong", null, opponentTitle),
+      { style: { marginBottom: "16px" } },
       e(
         "div",
         { className: "team-list", style: { marginTop: "8px" } },

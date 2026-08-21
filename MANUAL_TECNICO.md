@@ -1,6 +1,6 @@
-# Manuale Tecnico — Pokémon: Scegli il Cammino (v4.0)
+# Manuale Tecnico — Pokémon: Scegli il Cammino (v5.0)
 
-> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v4.0.
+> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v5.0.
 
 ---
 
@@ -14,7 +14,7 @@
 |---|---|
 | **React 18** (via CDN `esm.sh`) | UI e gestione dello stato globale |
 | **Vanilla JS (ES Modules)** | Logica pura, dati e motori di gioco — zero build step |
-| **Vanilla CSS** | Design system completo (dark mode, modali, Shiny glow, multi-slot cards) |
+| **Vanilla CSS** | Design system completo (dark mode, modali, Shiny glow, medaglie grafiche, multi-slot cards) |
 | **PokeAPI** (`pokeapi.co`) | Fetch in tempo reale di sprite normali e Shiny, nomi e tipi |
 | **`localStorage` & JSON API** | Persistenza multi-slot (3 slot), esportazione/importazione backup JSON e Pokédex storico |
 
@@ -37,28 +37,28 @@ pokemon-choice-quest/
 │   └── simulate-flow.mjs   # Script Node.js per testare a secco le 6 generazioni
 └── src/
     ├── main.js             # Punto d'ingresso React: monta <App /> nel DOM
-    ├── App.js              # Stato globale e macchina a stati (fasi di gioco, activeSlotId)
-    ├── styles.css          # Design system CSS unico (variabili, modali, Shiny, slot cards)
+    ├── App.js              # Stato globale, macchina a stati e opzioni di bivio (trainerBattle, searchItems)
+    ├── styles.css          # Design system CSS unico (variabili, modali, Shiny, visual badges, avatar card)
     ├── data/
     │   ├── generations.js  # Dati delle 6 generazioni (Kanto, Johto, Hoenn, Sinnoh, Unova, Kalos)
     │   └── evolutions.js   # Mappa completa delle evoluzioni (300+ specie)
     ├── engine/
-    │   ├── battleLogic.js  # Logica pura per cattura e battaglie (formule matematiche)
+    │   ├── battleLogic.js  # Logica pura per cattura, cap Lv100 (clampLevel) e battaglie
     │   └── saveGame.js     # Modulo di salvataggio multi-slot (1..3), export/import JSON e Pokédex
     ├── hooks/
     │   └── usePokemon.js   # Hook React con cache in memoria per PokeAPI (sprite standard + Shiny)
     └── components/
         ├── GenerationSelectScreen.js  # Schermata di selezione della regione iniziale
         ├── StartScreen.js             # Selezione dello starter della generazione
-        ├── ChoiceScene.js             # Scena generica a bivio (esplorazione/allenamento)
+        ├── ChoiceScene.js             # Scena generica a bivio (esplorazione, allenatori, oggetti)
         ├── EncounterScene.js          # Scena incontro con Pokémon selvatico / leggendario / Shiny
-        ├── BattleScene.js             # Scena battaglia (con uso strumenti dallo zaino)
+        ├── BattleScene.js             # Scena battaglia (con card avatar avversario e strumenti)
         ├── EndScreen.js               # Schermata di conclusione della run
-        ├── TeamPanel.js               # Sidebar per squadra, box, medaglie e zaino
+        ├── TeamPanel.js               # Sidebar per squadra, box, medaglie visuali (BadgeItem) e zaino
         ├── PokemonSprite.js           # Componenti PokemonChip e PokemonPreview (supporto Shiny)
         ├── NextGenerationScreen.js    # Schermata passaggio a nuova generazione post-Lega
         ├── PostgameScreen.js          # Schermata intro alla modalità infinita
-        ├── PokedexModal.js            # Modale Pokédex (vista Run & vista Storico, badge Shiny)
+        ├── PokedexModal.js            # Modale Pokédex (721 slot, specie ignote "?", filtri e ricerca #ID)
         ├── ResumeScreen.js            # Schermata di gestione dei 3 Slot e backup JSON
         ├── EvolutionNotice.js         # Overlay animato evoluzioni con opzione Tasto B (annulla)
         └── BoxModal.js                # Modale gestione Box e swap Pokémon
@@ -78,12 +78,14 @@ stateDiagram-v2
     resume --> generationSelect : Nuova partita
     resume --> explore : Riprendi partita
 
-    generationSelect --> starterSelect : Selezione generazione
+    generationSelect --> starterSelect : Selezione generazione (Gen 1-6)
     starterSelect --> explore : Selezione starter
 
     explore --> encounter : Erba alta / Pesca / Grotta
-    explore --> gymBattle : Allenamento (salta alla palestra)
+    explore --> trainerBattle : Sfida Allenatore del Percorso
+    explore --> gymBattle : Allenamento o Cercatore Strumenti
 
+    trainerBattle --> gymBattle : Risolto (+XP e Super Pozione)
     encounter --> gymBattle : Risolto (catturato o fuggito)
 
     gymBattle --> rivalBattle : Dopo gym N (se rivale programmato)
@@ -96,7 +98,7 @@ stateDiagram-v2
     eliteBattle --> championBattle : Sconfitti i 4 membri
 
     championBattle --> nextGenSelect : Esiste generazione successiva
-    championBattle --> postgame : Ultima generazione completata
+    championBattle --> postgame : Ultima generazione completata (Kalos)
 
     nextGenSelect --> starterSelect : Nuova regione (mantiene squadra/box/zaino)
     postgame --> postgameExplore : Avvio modalità infinita
@@ -120,8 +122,8 @@ stateDiagram-v2
   rivalDone: false,
 
   // Squadra e inventario
-  team: [],                 // Array<{id, level}> (max 6)
-  box: [],                  // Array<{id, level}> (riserva)
+  team: [],                 // Array<{id, level, isShiny}> (max 6)
+  box: [],                  // Array<{id, level, isShiny}> (riserva)
   badges: [],               // Array<string> (medaglie regione corrente)
   items: [],                // Array<string> (oggetti nello zaino)
 
@@ -129,18 +131,22 @@ stateDiagram-v2
   pendingEncounterPool: null,
   pendingEncounterLevel: 4,
   pendingEncounterIsLegendary: false,
+  pendingTrainer: null,     // { title, teamIds, power }
 
   // Multi-generazione e post-game
   multiGenRun: false,
   postgameRound: 0,
 
-  // Pokédex
-  pokedexRun: {},           // { [id]: { seen: true, caught: boolean } }
+  // Pokédex (Nazionale 721 specie)
+  pokedexRun: {},           // { [id]: { seen: true, caught: boolean, shiny: boolean } }
   pokedexOpen: false,
 
   // Evoluzioni e Leggendari
   pendingEvolutions: [],    // Array<{ evolvedFrom, id, level }>
   caughtLegendaries: [],    // Array<number> (ID leggendari catturati)
+
+  // Multi-Slot Save
+  activeSlotId: 1,          // 1 | 2 | 3
 
   // Modali UI
   boxModalOpen: false,
@@ -155,13 +161,13 @@ stateDiagram-v2
 
 Modulo completamente disaccoppiato da React per il calcolo delle formule matematiche:
 
+- **Cap Massimo Livello**:
+  - `MAX_LEVEL = 100` e `clampLevel(level)`: assicura che il livello di ciascun Pokémon non superi mai 100.
 - **Cattura**:
   - `computeCaptureChance(method, baseRate)`: applica moltiplicatori (`ball`: 1.0×, `food`: 1.25×) e clamp tra 5% e 95%.
   - `rollCapture(chance, rng = Math.random)`: esegue il tiro di dado.
-
 - **Potenza della Squadra**:
-  - `computeTeamPower(team)`: calcola $\sum \text{livelli} + (\text{lunghezza team} \times 2)$.
-
+  - `computeTeamPower(team)`: calcola $\sum \min(\text{livelli}, 100) + (\text{lunghezza team} \times 2)$.
 - **Vittoria in Battaglia**:
   - `computeWinChance(teamPower, opponentPower, tactic)`: applica i moltiplicatori di tattica (`aggressive`: team 1.2×, `balanced`: 1.0×, `defensive`: team 0.95×, opp 0.8×).
   - Formula: $0.5 + \frac{\text{teamEff} - \text{oppEff}}{2 \times \text{oppEff}}$, clampata tra 12% e 90%.
@@ -171,13 +177,12 @@ Modulo completamente disaccoppiato da React per il calcolo delle formule matemat
 
 Gestisce la persistenza lato client tramite l'API `localStorage`:
 
-- **Salvataggio Partita (`pcq_save_v1`)**:
-  - `saveGame(state)`: serializza lo stato filtrando i campi transienti (`SKIP_FIELDS`).
-  - `loadGame()`: recupera e valida la struttura del salvataggio.
-  - `deleteSave()`: rimuove il salvataggio.
-
+- **Salvataggio Multi-Slot (`pcq_save_slot_1`, `2`, `3`)**:
+  - `saveGame(state, slotId)`: serializza lo stato filtrando i campi transienti (`SKIP_FIELDS`) salvando il timestamp dell'ultimo aggiornamento.
+  - `loadGame(slotId)`: recupera e valida la struttura del salvataggio dello slot specificato.
+  - `exportSaveJson(slotId)` / `importSaveJson(jsonString, slotId)`: esportazione/importazione su file locale.
 - **Pokédex Storico (`pcq_pokedex_historic`)**:
-  - `updateHistoricPokedex(pokemonId, caught)`: salva o aggiorna lo stato visto/catturato con timestamp `firstSeen` e `firstCaught`.
+  - `updateHistoricPokedex(pokemonId, caught, isShiny)`: salva o aggiorna lo stato visto/catturato/shiny con timestamp `firstSeen` e `firstCaught`.
   - `loadHistoricPokedex()`: restituisce la mappa completa delle specie registrate nel browser.
 
 ---
@@ -186,16 +191,15 @@ Gestisce la persistenza lato client tramite l'API `localStorage`:
 
 ### 5.1 `generations.js`
 
-Contiene la configurazione delle **4 generazioni**:
+Contiene la configurazione delle **6 generazioni**:
 
 ```js
 {
-  id: "kanto" | "johto" | "hoenn" | "sinnoh",
+  id: "kanto" | "johto" | "hoenn" | "sinnoh" | "unova" | "kalos",
   name: string,
   starterIds: [id1, id2, id3],
   explorationTiers: [
     { level: number, grass: [], fishing: [], cave: [], grass2: [] },
-    // 3 tier riusati lungo le 8 palestre
   ],
   items: { cave: [], grass: [] },
   gymLeaders: [ { title, badge, teamIds, opponentPower } ], // 8 elementi
@@ -210,7 +214,7 @@ Funzioni esportate: `getGeneration(id)`, `getExplorationTier(gen, gymIndex)`, `g
 
 ### 5.2 `evolutions.js`
 
-Mappa 180+ specie di Pokémon delle prime 4 generazioni con soglia di livello:
+Mappa 300+ specie di Pokémon delle prime 6 generazioni con soglia di livello:
 
 ```js
 export const EVOLUTIONS = {
@@ -219,25 +223,23 @@ export const EVOLUTIONS = {
 };
 ```
 
-Funzione `checkEvolution(pokemon)`: se il livello è $\ge$ `evolvesAt`, restituisce l'oggetto Pokémon con `id: evolvesTo` e `evolvedFrom: originalId`.
-
 ---
 
 ## 6. Componenti UI (`src/components/`)
 
 | Componente | Ruolo |
 |---|---|
-| `GenerationSelectScreen` | Selezione della regione di partenza tra quelle disponibili. |
+| `GenerationSelectScreen` | Selezione della regione di partenza tra Kanto, Johto, Hoenn, Sinnoh, Unova e Kalos. |
 | `StartScreen` | Scelta dello starter. Se in run multi-gen, mostra il team attuale che accompagna il giocatore. |
-| `ChoiceScene` | Scena narrative a bivio per esplorazione o allenamento. |
-| `EncounterScene` | Gestisce l'incontro selvatico/leggendario. Supporta flag `isLegendary` (tasso 10%, no cibo). |
-| `BattleScene` | Scena di combattimento con scelta delle 3 tattiche e visualizzazione del team avversario. |
-| `TeamPanel` | Sidebar fissa: squadra (max 6), anteprima box, medaglie e zaino. |
-| `PokemonSprite` | `PokemonChip` (formato compatto 34px) e `PokemonPreview` (formato card 72px) con tipi. |
+| `ChoiceScene` | Scena narrative a bivio per esplorazione, allenatori di percorso, cercatore strumenti o allenamento. |
+| `EncounterScene` | Gestisce l'incontro selvatico/leggendario. Supporta flag `isShiny` e `isLegendary`. |
+| `BattleScene` | Scena di combattimento con Card Avatar avversario, uso strumenti dallo zaino e tattiche. |
+| `TeamPanel` | Sidebar fissa: squadra (max 6), anteprima box, medaglie grafiche (`BadgeItem`) e zaino. |
+| `PokemonSprite` | `PokemonChip` (formato compatto 34px) e `PokemonPreview` (formato card 72px) con supporto Shiny ✨. |
 | `NextGenerationScreen` | Transizione alla nuova regione mantenendo il team/box/zaino accumulato. |
 | `PostgameScreen` | Schermata celebrativa e di passaggio alla modalità infinita. |
-| `PokedexModal` | Modale con tab toggle "Run attuale" e "Storico", conteggio catturati/visti e ricerca visuale. |
-| `ResumeScreen` | Schermata di caricamento salvataggio all'avvio della app. |
+| `PokedexModal` | Modale con 721 specie (Gen 1-6), visualizzazione specie ignote, filtri rapidi e ricerca per ID. |
+| `ResumeScreen` | Schermata di gestione dei 3 Slot di salvataggio e backup JSON. |
 | `EvolutionNotice` | Overlay animato di evoluzione con opzione per annullare/bloccare l'evoluzione di ciascun Pokémon (Tasto B). |
 | `BoxModal` | Modale di gestione della riserva con UX a 2 colonne per scambiare Pokémon tra squadra e box. |
 
@@ -255,12 +257,12 @@ Funzione `checkEvolution(pokemon)`: se il livello è $\ge$ `evolvesAt`, restitui
 - `--success`: `#4caf7d` / `--danger`: `#e0554f`
 - `--radius`: `14px`
 
-### Stili Speciali Aggiunti in v3+
-- `.pokedex-modal`: Layout a modale con tab navigabili e status badge (`✓ Catturato` verde, `👁 Visto` grigio).
-- `.box-modal`: Layout griglia a due colonne (`Squadra` vs `Box`) con indicatore di selezione (`.selected`).
-- `.evo-overlay`: Backdrop opaco con `backdrop-filter: blur(4px)` e carte evoluzione con pulsante annulla (`.evo-toggle-btn`).
-- `.encounter-legendary`: Glowing animato viola/dorato (`@keyframes legendaryGlow`) per gli incontri con i Pokémon leggendari.
-- `.type-pill.type-*`: Classi CSS dedicate per la colorazione dinamica di ciascun tipo Pokémon (Fuoco, Acqua, Erba, Elettro, Psico, Drago, ecc.).
+### Stili Speciali Aggiunti in v4+ e v5.0
+- `.pokedex-modal`: Layout a modale con filtri rapidi, input di ricerca, e carte per specie ignote (`.pokedex-entry.unseen`).
+- `.badge-visual-chip`: Chip con gradiente, border accent e icona emoji tematica per ciascuna medaglia.
+- `.trainer-avatar-card`: Card avatar in `BattleScene` con icona circolare dell'allenatore e potenza calcolata.
+- `.shiny-badge`: Badge dorato Shiny ✨ con animazione CSS shimmer e bordo dorato.
+- `.slot-card`: Scheda slot salvataggio con anteprima squadra e azioni per export/import JSON.
 
 ---
 
@@ -272,4 +274,5 @@ Script eseguibile via Node.js per la verifica automatica del flusso di gioco:
 node scripts/simulate-flow.mjs
 ```
 
-Esegue una simulazione a secco di tutte e 4 le generazioni verificate in sequenza (22 passi ciascuna), assicurandosi che nessun indice di palestra, rivale, Alto Comando o campione risulti `undefined` o generi eccezioni di runtime.
+Esegue una simulazione a secco di tutte e 6 le generazioni verificate in sequenza (22 passi ciascuna), assicurandosi che nessun indice di palestra, rivale, Alto Comando o campione risulti `undefined` o generi eccezioni di runtime.
+

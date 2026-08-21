@@ -78,13 +78,37 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 - [x] Riprogettazione di `ResumeScreen` con schede interattive, date e riassunti per ogni slot.
 - [x] Funzionalità di **Esportazione Backup JSON** e **Importazione Backup JSON** da file locale.
 
+### Versione 5.0 — Pokédex Nazionale 721 Specie, Allenatori di Percorso & UI Polishing (attuale)
+
+#### 📖 Pokédex Nazionale Completo (Gen 1-6)
+- [x] Estensione del Pokédex a **tutti i 721 slot** delle prime 6 generazioni.
+- [x] Visualizzazione delle specie non ancora scoperte con carte dedicate (`? Ignoto`, `#025 — ???`).
+- [x] Nuovi filtri rapidi nella barra Pokédex (`Tutti`, `Scoperti`, `Catturati`, `Ignoti`).
+- [x] Barra di ricerca dinamica per `#ID` numerico con auto-padding (es. `25` o `025`).
+- [x] Statistiche numeriche in tempo reale su specie viste e catturate su 721.
+
+#### ⚔️ Allenatori di Percorso & Nuove Opzioni di Bivio
+- [x] Nuova scelta narrativa `Sfida un Allenatore` nei bivi tra una palestra e l'altra.
+- [x] Sfida rapida per accumulare XP della squadra e strumenti bonus (es. `Super Pozione`).
+- [x] Nuova azione `Cercatore di Strumenti` per raccogliere pozioni, bacche e pietre evolutive nel percorso.
+
+#### 🏅 Medaglie Grafiche & Card Avatar Avversario
+- [x] Rendering delle medaglie nel `TeamPanel` con chip grafici (`BadgeItem`) e icone tematiche dedicate per ogni tipo di palestra (🪨, 💧, ⚡, 🌿, ☠️, 🔮, 🔥, 🏔️, 🦅, 🥛, 🥊, 🗡️, ❄️, 🐉, 🧚, 👑).
+- [x] Card Avatar dell'Avversario (`BattleScene`) con icona rappresentativa, titolo ufficiale e indicatore di potenza della squadra nemica.
+
+#### ⚖️ Scaling della Difficoltà & Cap Livello 100
+- [x] Algoritmo `getScaledPower` per la progressione dinamica della difficoltà della squadra avversaria nelle run multi-generazione successive.
+- [x] Cap massimo di livello fissato a 100 (`clampLevel` & `MAX_LEVEL = 100`) per prevenire overflow nei conteggi di potenza.
+
 ---
 
-## 🔮 Prossimi Sviluppi & Idee Future (v5.0)
+## 🔮 Prossimi Sviluppi & Idee Future (v6.0)
 
 - [ ] **Altre Generazioni**: Alola (Gen 7), Galar (Gen 8), Paldea (Gen 9).
 - [ ] **Sistema di Mosse e Tipi Reali**: efficacia dei tipi (Super Efficace / Non Molto Efficace) durante le battaglie.
-- [ ] **Eventi Narrativi Speciali**: sfide storia con i team nemici (Team Rocket / Team Plasma / Team Flare).
+- [ ] **Eventi Narrativi Speciali**: sfide storia con i team nemici (Team Rocket / Team Plasma / Team Flare / Team Galactic).
 - [ ] **Effetti Sonori Web Audio API**: piccoli effetti audio rétro 8-bit per cattura, vittoria ed evoluzione.
+- [ ] **Modalità Sfida / Nuzlocke**: regole speciali con permadeath dei Pokémon esausti.
+
 
 

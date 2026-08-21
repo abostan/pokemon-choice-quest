@@ -29,16 +29,20 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa versione (v3+)
+## Cosa contiene questa versione (v5.0)
 
-- **4 Generazioni giocabili**: Kanto (Gen 1), Johto (Gen 2), Hoenn (Gen 3), Sinnoh (Gen 4)
-- **Progressione Multi-Generazione**: dopo aver battuto la Lega di una regione, si può passare alla generazione successiva mantenendo squadra, box e zaino!
-- **Evoluzioni dei Pokémon**: evoluzioni automatiche al raggiungimento del livello soglia, con possibilità di annullare/bloccare l'evoluzione (Premendo il tasto B)
-- **Gestione Box**: gestione riserva per scambiare i Pokémon quando la squadra (max 6) è piena
-- **Pokédex completo**: modale sempre accessibile con due viste (Run attuale e Storico persistito su `localStorage`)
-- **Salvataggio Automatico**: salvataggio stato su `localStorage` e schermata per riprendere la partita
-- **Modalità Infinita Post-Game**: completate le generazioni, l'esplorazione continua liberamente a difficoltà crescente
-- **Incontri Leggendari**: probabilità del 5% ad ogni round post-game di incontrare Pokémon leggendari unici (Articuno, Zapdos, Groudon, Dialga, ecc.)
+- **6 Generazioni giocabili**: Kanto (Gen 1), Johto (Gen 2), Hoenn (Gen 3), Sinnoh (Gen 4), Unova (Gen 5) e Kalos (Gen 6).
+- **📖 Pokédex Nazionale Completo (721 specie)**: Modale Pokédex esteso con tutti i 721 slot delle prime 6 Gen, supporto specie ignote (`? Ignoto`), filtri rapidi e ricerca dinamica per `#ID`.
+- **✨ Sistema Pokémon Shiny**: Probabilità 1/500 di incontrare uno Shiny selvatico (1/20 per i leggendari), con badge dorato ✨ e sprite Shiny dedicato.
+- **🎒 Oggetti & Strumenti in Battaglia**: Usa Pozioni, Super Pozioni ed Erbe mediche prima delle battaglie per potenziare la squadra.
+- **⚔️ Sfide Allenatore di Percorso & Cercatore Strumenti**: Scelte narrative nei bivi tra una palestra e l'altra per accumulare XP, oggetti o affrontare duelli.
+- **🏅 Medaglie Grafiche Visuali**: Chip grafici tematici con icone uniche per ogni tipo di palestra nel pannello laterale (`TeamPanel`).
+- **👤 Avatar Avversario in Battaglia**: Scheda avatar visiva con icona, titolo e potenza stimata del Capopalestra o rivale prima dello scontro.
+- **💾 Salvataggio Multi-Slot & Backup JSON**: 3 slot di salvataggio indipendenti con data/ora e supporto completo ad esportazione/importazione di file JSON.
+- **Progressione Multi-Generazione**: passa da una regione all'altra mantenendo la tua squadra accumulata, i box e gli strumenti!
+- **Evoluzioni & Blocco Tasto B**: evoluzioni automatiche al livello soglia con opzione visiva per annullare/bloccare l'evoluzione di ogni specie.
+- **Modalità Infinita Post-Game & Leggendari**: esplorazione infinita a difficoltà crescente dopo Kalos, con probabilità del 5% di incontrare Pokémon leggendari unici.
+
 
 
 ## Struttura del progetto

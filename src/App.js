@@ -27,8 +27,11 @@ import {
 
 const e = React.createElement;
 
-// Quanti livelli guadagna l'intera squadra dopo aver vinto una battaglia importante
+// Quanti livelli guadagna la squadra dopo una battaglia di palestra/Lega
 const WIN_LEVEL_BOOST = 3;
+
+// Limite massimo di livello Pokémon
+const MAX_LEVEL = 100;
 
 // Limite massimo di Pokémon nella squadra attiva
 const MAX_TEAM_SIZE = 6;
@@ -55,9 +58,11 @@ function initialState() {
     pendingEncounterPool: null,
     pendingEncounterLevel: 4,
     pendingEncounterIsLegendary: false,
+    pendingTrainer: null,
 
     // --- Multi-generazione e post-game ---
     multiGenRun: false,
+    completedGensCount: 0,
     postgameRound: 0,
 
     // --- Pokédex ---
@@ -80,7 +85,6 @@ export default function App() {
   const [slotsData, setSlotsData] = useState(() => loadAllSlots());
 
   const [state, setState] = useState(() => {
-    // Se esiste qualsiasi salvataggio, mostra la ResumeScreen
     if (hasSave()) {
       return { ...initialState(), phase: "resume" };
     }
@@ -117,10 +121,11 @@ export default function App() {
 
   function addToTeam(pokemon) {
     setState((prev) => {
+      const clampedP = { ...pokemon, level: Math.min(MAX_LEVEL, pokemon.level || 5) };
       if (prev.team.length < MAX_TEAM_SIZE) {
-        return { ...prev, team: [...prev.team, pokemon] };
+        return { ...prev, team: [...prev.team, clampedP] };
       } else {
-        return { ...prev, box: [...prev.box, pokemon] };
+        return { ...prev, box: [...prev.box, clampedP] };
       }
     });
   }
@@ -143,12 +148,13 @@ export default function App() {
   }
 
   /**
-   * Aumenta il livello di tutti i Pokémon del team e controlla le evoluzioni.
+   * Aumenta il livello della squadra clampando a MAX_LEVEL (100).
    */
   function boostTeam(amount) {
     setState((prev) => {
       const newTeam = prev.team.map((p) => {
-        const boosted = { ...p, level: p.level + amount };
+        const boostedLevel = Math.min(MAX_LEVEL, p.level + amount);
+        const boosted = { ...p, level: boostedLevel };
         return checkEvolution(boosted);
       });
       const evolutions = newTeam.filter((p) => p.evolvedFrom != null);
@@ -252,10 +258,17 @@ export default function App() {
   }
 
   // -------------------------------------------------------
-  // Logica di avanzamento
+  // Logica di avanzamento & Scalabilità Difficoltà
   // -------------------------------------------------------
 
   const generation = state.generationId ? getGeneration(state.generationId) : null;
+
+  // Moltiplicatore di difficoltà basato sul numero di generazioni completate
+  const difficultyMult = 1 + (state.completedGensCount || 0) * 0.35;
+
+  function getScaledPower(basePower) {
+    return Math.round(basePower * difficultyMult);
+  }
 
   function resolveBattleWin(badge) {
     addBadge(badge);
@@ -286,9 +299,9 @@ export default function App() {
   function checkNextGeneration() {
     const nextGen = getNextGeneration(state.generationId);
     if (nextGen) {
-      goTo("nextGenSelect", { nextGenId: nextGen.id });
+      goTo("nextGenSelect", { nextGenId: nextGen.id, completedGensCount: (state.completedGensCount || 0) + 1 });
     } else {
-      goTo("postgame");
+      goTo("postgame", { completedGensCount: (state.completedGensCount || 0) + 1 });
     }
   }
 
@@ -302,7 +315,7 @@ export default function App() {
       const legendaryId = availableLegendaries[Math.floor(Math.random() * availableLegendaries.length)];
       goTo("legendaryEncounter", {
         pendingEncounterPool: [legendaryId],
-        pendingEncounterLevel: 60 + state.postgameRound * 2,
+        pendingEncounterLevel: Math.min(MAX_LEVEL, 60 + state.postgameRound * 2),
         pendingEncounterIsLegendary: true,
       });
     } else {
@@ -339,6 +352,7 @@ export default function App() {
       generationName: generation.name,
       continueTeam: state.multiGenRun ? state.team : null,
       onChooseStarter: (id) => {
+        markCaught(id, false); // Auto-registra lo starter scelto nel Pokédex!
         addToTeam({ id, level: 5 });
         goTo("explore", { gymIndex: 0 });
       },
@@ -372,16 +386,16 @@ export default function App() {
     const lastTier = generation
       ? generation.explorationTiers[generation.explorationTiers.length - 1]
       : { grass: [25, 39, 52], fishing: [129, 60], cave: [41, 74], grass2: [63, 92], level: 30 };
-    const pgLevel = lastTier.level + state.postgameRound * 5;
+    const pgLevel = Math.min(MAX_LEVEL, lastTier.level + state.postgameRound * 5);
 
     content = e(ChoiceScene, {
       key: `postgame-${state.postgameRound}`,
-      title: "Esplorazione libera",
-      text: `Continui ad esplorare il mondo Pokémon. I Pokémon selvatici sono sempre più forti. (Round ${state.postgameRound + 1})`,
+      title: "Esplorazione libera post-game",
+      text: `Continui ad esplorare il mondo Pokémon. I Pokémon selvatici ed avversari sono al massimo della potenza. (Round ${state.postgameRound + 1})`,
       choices: [
         {
           id: "grass",
-          label: "Addentrati nell'erba alta",
+          label: "🌿 Addentrati nell'erba alta",
           hint: "Pokémon selvatici sempre più forti",
           onSelect: () =>
             goTo("encounter", {
@@ -392,7 +406,7 @@ export default function App() {
         },
         {
           id: "fish",
-          label: "Vai a pescare",
+          label: "🎣 Vai a pescare",
           hint: "Pokémon acquatici rari",
           onSelect: () =>
             goTo("encounter", {
@@ -403,8 +417,8 @@ export default function App() {
         },
         {
           id: "cave",
-          label: "Esplora una grotta",
-          hint: "Pokémon insoliti e possibile oggetto",
+          label: "🦇 Esplora una grotta",
+          hint: "Pokémon insoliti e strumenti",
           onSelect: () => {
             const pool = generation?.items?.cave ?? ["Pozione"];
             addItem(pool[Math.floor(Math.random() * pool.length)]);
@@ -416,9 +430,21 @@ export default function App() {
           },
         },
         {
+          id: "trainer",
+          label: "⚔️ Sfida un Allenatore di passaggio",
+          hint: "Battaglia rapida per XP extra e strumenti",
+          onSelect: () => {
+            const teamIds = [lastTier.grass[0], lastTier.cave[0]];
+            const power = getScaledPower(35 + state.postgameRound * 5);
+            goTo("trainerBattle", {
+              pendingTrainer: { title: "Allenatore di passaggio", teamIds, power },
+            });
+          },
+        },
+        {
           id: "train",
-          label: "Allenati",
-          hint: "La squadra sale di livello",
+          label: "🏋️‍♂️ Allenamento guidato",
+          hint: "La squadra sale di livello (cap Lv100)",
           onSelect: () => {
             boostTeam(2);
             update({ postgameRound: state.postgameRound + 1 });
@@ -462,13 +488,13 @@ export default function App() {
       title: state.gymIndex === 0 ? "Il primo bivio" : "Verso la prossima palestra",
       text:
         state.gymIndex === 0
-          ? "Lasci il laboratorio del Professore. Davanti a te la strada si divide: puoi esplorare, oppure prepararti in altro modo."
+          ? "Lasci il laboratorio del Professore. Davanti a te la strada si divide: puoi esplorare, sfidare allenatori o raccogliere strumenti."
           : `Ti lasci alle spalle l'ultima palestra. Prima di affrontare "${nextGymTitle}", come vuoi prepararti?`,
       choices: [
         {
           id: "grass",
-          label: useAltGrass ? "Esplora un nuovo sentiero erboso" : "Addentrati nell'erba alta",
-          hint: "Potresti incontrare un Pokémon selvatico",
+          label: useAltGrass ? "🌿 Esplora un nuovo sentiero erboso" : "🌿 Addentrati nell'erba alta",
+          hint: "Incontra Pokémon selvatici locali",
           onSelect: () =>
             goTo("encounter", {
               pendingEncounterPool: useAltGrass ? tier.grass2 : tier.grass,
@@ -478,7 +504,7 @@ export default function App() {
         },
         {
           id: "fish",
-          label: "Vai a pescare",
+          label: "🎣 Vai a pescare sul fiume",
           hint: "I Pokémon d'acqua abbondano da queste parti",
           onSelect: () =>
             goTo("encounter", {
@@ -489,8 +515,8 @@ export default function App() {
         },
         {
           id: "cave",
-          label: "Esplora una grotta vicina",
-          hint: "Pokémon più insoliti, e forse un oggetto da trovare",
+          label: "🦇 Esplora una grotta vicina",
+          hint: "Pokémon di tipo roccia/buio e uno strumento da trovare",
           onSelect: () => {
             const pool = generation.items.cave;
             addItem(pool[Math.floor(Math.random() * pool.length)]);
@@ -502,15 +528,64 @@ export default function App() {
           },
         },
         {
+          id: "trainer",
+          label: "⚔️ Sfida un Allenatore sul percorso",
+          hint: "Battaglia rapida per XP della squadra ed un premio",
+          onSelect: () => {
+            const oppPower = getScaledPower(12 + state.gymIndex * 7);
+            goTo("trainerBattle", {
+              pendingTrainer: {
+                title: "Allenatore del percorso",
+                teamIds: [tier.grass[0], tier.cave[0] || tier.grass[1]],
+                power: oppPower,
+              },
+            });
+          },
+        },
+        {
+          id: "searchItems",
+          label: "🔍 Cercatore di Strumenti",
+          hint: "Esplora per trovare bacche, pozioni o pietre evolutive",
+          onSelect: () => {
+            const pool = [...generation.items.cave, ...generation.items.grass];
+            const foundItem = pool[Math.floor(Math.random() * pool.length)];
+            addItem(foundItem);
+            boostTeam(1);
+            goTo("gymBattle");
+          },
+        },
+        {
           id: "train",
-          label: "Fermati ad allenare la squadra",
-          hint: "Nessun nuovo Pokémon, ma la squadra sale di livello",
+          label: "🏋️‍♂️ Allenamento intensivo",
+          hint: "Nessun Pokémon selvatico, ma la squadra guadagna +2 Livelli",
           onSelect: () => {
             boostTeam(2);
             goTo("gymBattle");
           },
         },
       ],
+    });
+
+  } else if (state.phase === "trainerBattle") {
+    const tr = state.pendingTrainer || { title: "Allenatore", teamIds: [16, 19], power: 15 };
+    content = e(BattleScene, {
+      key: "trainer-battle",
+      title: "Battaglia sul percorso",
+      text: `${tr.title} ti incrocia lo sguardo e ti sfida a duello!`,
+      opponentTitle: tr.title,
+      opponentTeamIds: tr.teamIds,
+      opponentPower: tr.power,
+      team: state.team,
+      items: state.items,
+      rewardBadge: null,
+      onUseItem: useItem,
+      onResolved: ({ won }) => {
+        if (won) {
+          boostTeam(2);
+          addItem("Super Pozione");
+        }
+        goTo("gymBattle");
+      },
     });
 
   } else if (state.phase === "encounter") {
@@ -531,13 +606,14 @@ export default function App() {
 
   } else if (state.phase === "gymBattle") {
     const gym = generation.gymLeaders[state.gymIndex];
+    const scaledPower = getScaledPower(gym.opponentPower);
     content = e(BattleScene, {
       key: `gym-${state.gymIndex}`,
       title: `Palestra ${state.gymIndex + 1} di ${generation.gymLeaders.length}`,
       text: `Entri nella palestra. ${gym.title} ti sfida a duello.`,
       opponentTitle: gym.title,
       opponentTeamIds: gym.teamIds,
-      opponentPower: gym.opponentPower,
+      opponentPower: scaledPower,
       team: state.team,
       items: state.items,
       rewardBadge: gym.badge,
@@ -550,13 +626,14 @@ export default function App() {
 
   } else if (state.phase === "rivalBattle") {
     const rival = generation.rival;
+    const scaledPower = getScaledPower(rival.opponentPower);
     content = e(BattleScene, {
       key: "rival",
       title: "Sfida a sorpresa",
       text: `${rival.title} ti blocca la strada per una battaglia improvvisata.`,
       opponentTitle: rival.title,
       opponentTeamIds: rival.teamIds,
-      opponentPower: rival.opponentPower,
+      opponentPower: scaledPower,
       team: state.team,
       items: state.items,
       rewardBadge: null,
@@ -569,13 +646,14 @@ export default function App() {
 
   } else if (state.phase === "eliteBattle") {
     const member = generation.eliteFour[state.eliteIndex];
+    const scaledPower = getScaledPower(member.opponentPower);
     content = e(BattleScene, {
       key: `elite-${state.eliteIndex}`,
       title: `${member.title} (${state.eliteIndex + 1}/${generation.eliteFour.length})`,
       text: "Sei entrato nella sala dell'Alto Comando. Un membro dopo l'altro, senza tregua.",
       opponentTitle: member.title,
       opponentTeamIds: member.teamIds,
-      opponentPower: member.opponentPower,
+      opponentPower: scaledPower,
       team: state.team,
       items: state.items,
       rewardBadge: null,
@@ -593,13 +671,14 @@ export default function App() {
 
   } else if (state.phase === "championBattle") {
     const champion = generation.champion;
+    const scaledPower = getScaledPower(champion.opponentPower);
     content = e(BattleScene, {
       key: "champion",
       title: "Sfida finale: il Campione",
       text: `Davanti a te, l'ultimo ostacolo: ${champion.title}.`,
       opponentTitle: champion.title,
       opponentTeamIds: champion.teamIds,
-      opponentPower: champion.opponentPower,
+      opponentPower: scaledPower,
       team: state.team,
       items: state.items,
       rewardBadge: champion.badge,
