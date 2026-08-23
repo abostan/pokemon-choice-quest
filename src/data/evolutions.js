@@ -394,7 +394,6 @@ export const EVOLUTIONS = {
   739:{ evolvesAt: 36, evolvesTo: 740 }, // Crabrawler → Crabominable
   742:{ evolvesAt: 25, evolvesTo: 743 }, // Cutiefly   → Ribombee
   744:{ evolvesAt: 25, evolvesTo: 745 }, // Rockruff   → Lycanroc
-  746:{ evolvesAt: 20, evolvesTo: 747 }, // Wishiwashi → School Form
   747:{ evolvesAt: 38, evolvesTo: 748 }, // Mareanie   → Toxapex
   749:{ evolvesAt: 30, evolvesTo: 750 }, // Mudbray    → Mudsdale
   751:{ evolvesAt: 22, evolvesTo: 752 }, // Dewpider   → Araquanid
@@ -404,7 +403,7 @@ export const EVOLUTIONS = {
   759:{ evolvesAt: 27, evolvesTo: 760 }, // Stufful    → Bewear
   761:{ evolvesAt: 18, evolvesTo: 762 }, // Bounsweet  → Steenee
   762:{ evolvesAt: 28, evolvesTo: 763 }, // Steenee    → Tsareena
-  766:{ evolvesAt: 36, evolvesTo: 767 }, // Passimian  → Oranguru
+  767:{ evolvesAt: 30, evolvesTo: 768 }, // Wimpod     → Golisopod
   769:{ evolvesAt: 42, evolvesTo: 770 }, // Sandygast  → Palossand
   782:{ evolvesAt: 35, evolvesTo: 783 }, // Jangmo-o   → Hakamo-o
   783:{ evolvesAt: 45, evolvesTo: 784 }, // Hakamo-o   → Kommo-o
@@ -460,18 +459,20 @@ export const EVOLUTIONS = {
   929:{ evolvesAt: 35, evolvesTo: 930 }, // Dolliv     → Arboliva
   932:{ evolvesAt: 24, evolvesTo: 933 }, // Nacli      → Naclstack
   933:{ evolvesAt: 38, evolvesTo: 934 }, // Naclstack  → Garganacl
-  935:{ evolvesAt: 30, evolvesTo: 936 }, // Charcadet  → Armarouge
+  935:{ evolvesAt: 30, evolvesTo: 936 }, // Charcadet  → Armarouge (Ceruledge è l'altro ramo, non modellabile con evolvesTo singolo)
   938:{ evolvesAt: 30, evolvesTo: 939 }, // Tadbulb    → Bellibolt
   940:{ evolvesAt: 26, evolvesTo: 941 }, // Wattrel    → Kilowattrel
   942:{ evolvesAt: 30, evolvesTo: 943 }, // Maschiff   → Mabosstiff
   944:{ evolvesAt: 28, evolvesTo: 945 }, // Shroodle   → Grafaiai
+  946:{ evolvesAt: 30, evolvesTo: 947 }, // Bramblin   → Brambleghast
   948:{ evolvesAt: 30, evolvesTo: 949 }, // Toedscool  → Toedscruel
   953:{ evolvesAt: 35, evolvesTo: 954 }, // Rellor     → Rabsca
   955:{ evolvesAt: 30, evolvesTo: 956 }, // Flittle    → Espathra
   957:{ evolvesAt: 24, evolvesTo: 958 }, // Tinkatink  → Tinkatuff
   958:{ evolvesAt: 38, evolvesTo: 959 }, // Tinkatuff  → Tinkaton
   963:{ evolvesAt: 24, evolvesTo: 964 }, // Finizen    → Palafin
-  968:{ evolvesAt: 40, evolvesTo: 969 }, // Varoom     → Revavroom
+  965:{ evolvesAt: 40, evolvesTo: 966 }, // Varoom     → Revavroom
+  969:{ evolvesAt: 35, evolvesTo: 970 }, // Glimmet    → Glimmora
   971:{ evolvesAt: 30, evolvesTo: 972 }, // Greavard   → Houndstone
   974:{ evolvesAt: 40, evolvesTo: 975 }, // Cetoddle   → Cetitan
   996:{ evolvesAt: 35, evolvesTo: 997 }, // Frigibax   → Arctibax

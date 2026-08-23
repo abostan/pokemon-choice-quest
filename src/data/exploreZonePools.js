@@ -26,7 +26,7 @@ export const FIRE_POOLS_BY_REGION = {
   kalos: [653, 667, 694, 679, 669],
   alola: [725, 726, 727, 758, 776], // Litten, Torracat, Incineroar, Salazzle, Turtonator
   galar: [813, 814, 815, 851, 844], // Scorbunny, Raboot, Cinderace, Centiskorch, Sandaconda
-  paldea: [909, 910, 911, 936, 950], // Fuecoco, Crocalor, Skeledirge, Armarouge, Klawf
+  paldea: [909, 910, 911, 935, 950], // Fuecoco, Crocalor, Skeledirge, Charcadet (→Armarouge), Klawf
 };
 
 export const GHOST_POOLS_BY_REGION = {
@@ -38,7 +38,7 @@ export const GHOST_POOLS_BY_REGION = {
   kalos: [708, 710, 677, 682, 684],
   alola: [769, 770, 778, 781, 764], // Sandygast, Palossand, Mimikyu, Dhelmise, Comfey
   galar: [854, 855, 867, 858, 861], // Sinistea, Polteageist, Runerigus, Hatterene, Grimmsnarl
-  paldea: [971, 972, 956, 942, 958], // Greavard, Houndstone, Espathra, Maschiff, Tinkatuff
+  paldea: [971, 972, 956, 942, 957, 937, 946], // Greavard, Houndstone, Espathra, Maschiff, Tinkatink (→Tinkatuff→Tinkaton), Ceruledge, Bramblin (→Brambleghast)
 };
 
 export const ICE_POOLS_BY_REGION = {
@@ -62,7 +62,7 @@ export const FIGHTING_POOLS_BY_REGION = {
   kalos: [674, 701, 659, 676, 672],
   alola: [766, 759, 760, 735, 734], // Passimian, Stufful, Bewear, Gumshoos, Yungoos
   galar: [870, 865, 853, 820, 832], // Falinks, Sirfetch'd, Grapploct, Greedent, Dubwool
-  paldea: [979, 915, 925, 982, 981], // Annihilape, Lechonk, Maushold, Dudunsparce, Farigiraf
+  paldea: [979, 915, 925, 982, 981, 967], // Annihilape, Lechonk, Maushold, Dudunsparce, Farigiraf, Cyclizar
 };
 
 export const EGG_POOLS_BY_REGION = {
@@ -92,7 +92,7 @@ export const FOSSIL_POOLS_BY_REGION = {
   // Paldea non ha fossili classici: i Pokémon Paradosso "antichi" (creature
   // preistoriche letteralmente riportate in vita/studiate in laboratorio
   // nel gioco originale) sono il fit tematico più diretto disponibile.
-  paldea: [984, 985, 986, 987, 988], // Great Tusk, Scream Tail, Brute Bonnet, Flutter Mane, Slither Wing
+  paldea: [984, 985, 986, 987, 988, 989], // Great Tusk, Scream Tail, Brute Bonnet, Flutter Mane, Slither Wing, Sandy Shocks
 };
 
 export const SAFARI_POOLS_BY_REGION = {
@@ -104,7 +104,7 @@ export const SAFARI_POOLS_BY_REGION = {
   kalos: [704, 708, 712, 687, 703], // + Malamar, Carbink
   alola: [746, 748, 750, 774, 775], // Wishiwashi, Toxapex, Mudsdale, Minior, Komala
   galar: [845, 846, 871, 874, 852], // Cramorant, Arrokuda, Pincurchin, Stonjourner, Clobbopus
-  paldea: [931, 976, 977, 963, 961], // Squawkabilly, Veluza, Dondozo, Finizen, Wugtrio
+  paldea: [931, 976, 977, 963, 961, 969, 978], // Squawkabilly, Veluza, Dondozo, Finizen, Wugtrio, Glimmet (→Glimmora), Tatsugiri
 };
 
 export const NPC_TRADE_POOL = [83, 122, 124, 127, 131, 214, 303, 441, 538, 677];
