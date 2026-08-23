@@ -85,6 +85,16 @@ export function computeTeamPower(team, statsById = {}) {
   return Math.round(totalLevels + countBonus);
 }
 
+// Malus di potenza applicato quando la squadra è "affaticata" da una
+// sconfitta recente (state.teamFatigued) e non è ancora passata dal Centro
+// Pokémon a curarsi. Rende "Cura la Squadra" una vera scelta strategica
+// invece di un placeholder cosmetico senza alcun effetto meccanico.
+export const FATIGUE_MULTIPLIER = 0.90;
+
+export function computeFatigueMultiplier(teamFatigued) {
+  return teamFatigued ? FATIGUE_MULTIPLIER : 1.0;
+}
+
 export const TACTICS = [
   { id: "aggressive", label: "⚔️ Attacco Aggressivo", hint: "+15% potenza attacco, ma aumenta il rischio" },
   { id: "balanced", label: "⚖️ Tattica Bilanciata", hint: "Equilibrio standard tra attacco e difesa" },

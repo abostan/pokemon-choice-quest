@@ -106,12 +106,13 @@ export function SceneRouter({ game }) {
       coins: state.coins || 0,
       team: state.team,
       items: state.items,
+      teamFatigued: state.teamFatigued,
       onHealTeam: () => {
         const updatedTeam = state.team.map((p) => ({
           ...p,
           isFainted: false,
         }));
-        update({ team: updatedTeam });
+        update({ team: updatedTeam, teamFatigued: false });
       },
       onBuyItem: (itemName, price) => {
         addItem(itemName);
@@ -187,6 +188,8 @@ export function SceneRouter({ game }) {
       items: state.items,
       rewardBadge: null,
       isNuzlocke: state.isNuzlocke,
+      activeWeather: state.activeWeather,
+      teamFatigued: state.teamFatigued,
       celebrateOnWin: state.tournamentRound >= CHAMPIONS_TOURNAMENT.length - 1,
       onUseItem: useItem,
       onOpenBox: () => update({ boxModalOpen: true }),
@@ -236,6 +239,8 @@ export function SceneRouter({ game }) {
       team: state.team,
       items: state.items,
       rewardBadge: null,
+      activeWeather: state.activeWeather,
+      teamFatigued: state.teamFatigued,
       onUseItem: useItem,
       onPowerBoost: update,
       onResolved: ({ won }) => {

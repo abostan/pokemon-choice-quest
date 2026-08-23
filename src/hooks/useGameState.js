@@ -44,6 +44,7 @@ export function initialState() {
     tournamentRound: 0,
     isNuzlocke: false,
     isRandomizer: false,
+    teamFatigued: false,
     monoType: null,
     choicesCount: 0,
     pokedexRun: {},
@@ -51,6 +52,7 @@ export function initialState() {
     activeMega: false,
     activeTerastal: false,
     activeItemBoost: 0,
+    activeWeather: null,
     pendingEvolutions: [],
     caughtLegendaries: [],
     boxModalOpen: false,
@@ -224,17 +226,21 @@ export function useGameState() {
   }
 
   function handleNuzlockeLoss() {
-    if (!state.isNuzlocke || state.team.length === 0) return;
+    if (state.team.length === 0) return;
     setState((prev) => {
-      if (!prev.isNuzlocke || prev.team.length === 0) return prev;
-      const fainted = { ...prev.team[prev.team.length - 1], isFainted: true };
-      const nextTeam = prev.team.slice(0, prev.team.length - 1);
-      const nextBox = [...prev.box, fainted];
+      if (prev.team.length === 0) return prev;
+      const fatigued = prev.teamFatigued ? prev : { ...prev, teamFatigued: true };
+
+      if (!fatigued.isNuzlocke) return fatigued;
+
+      const fainted = { ...fatigued.team[fatigued.team.length - 1], isFainted: true };
+      const nextTeam = fatigued.team.slice(0, fatigued.team.length - 1);
+      const nextBox = [...fatigued.box, fainted];
       const hasHealthyInBox = nextBox.some((p) => !p.isFainted);
 
       if (nextTeam.length === 0 && !hasHealthyInBox) {
         return {
-          ...prev,
+          ...fatigued,
           team: nextTeam,
           box: nextBox,
           phase: "nuzlockeGameOver",
@@ -243,10 +249,10 @@ export function useGameState() {
 
       const shouldOpenBox = nextTeam.length === 0 && hasHealthyInBox;
       return {
-        ...prev,
+        ...fatigued,
         team: nextTeam,
         box: nextBox,
-        boxModalOpen: shouldOpenBox ? true : prev.boxModalOpen,
+        boxModalOpen: shouldOpenBox ? true : fatigued.boxModalOpen,
       };
     });
   }

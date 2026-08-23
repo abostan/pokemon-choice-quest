@@ -52,6 +52,7 @@ export function PokeCenterScene({
   coins = 0,
   team = [],
   items = [],
+  teamFatigued = false,
   onHealTeam,
   onBuyItem,
   onLeave,
@@ -61,10 +62,15 @@ export function PokeCenterScene({
   const [message, setMessage] = useState("");
 
   function handleHeal() {
+    const wasFatigued = teamFatigued;
     if (onHealTeam) onHealTeam();
     playHealJingle();
     setHealed(true);
-    setMessage("✨ La tua squadra è stata completamente curata ed è in perfetta forma!");
+    setMessage(
+      wasFatigued
+        ? "✨ La tua squadra era affaticata da una sconfitta recente: ora è di nuovo curata e al massimo delle forze (malus -10% Potenza rimosso)!"
+        : "✨ La tua squadra è stata completamente curata ed è in perfetta forma!"
+    );
   }
 
   function handleBuy(shopItem) {
@@ -160,7 +166,7 @@ export function PokeCenterScene({
             disabled: healed,
             style: { padding: "12px 24px", fontSize: "1.05rem", fontWeight: "bold" },
           },
-          healed ? "✨ Squadra in Forma!" : "🏥 Cura la Squadra (Gratis)"
+          healed ? "✨ Squadra in Forma!" : teamFatigued ? "😓 Cura la Squadra Affaticata (Gratis)" : "🏥 Cura la Squadra (Gratis)"
         )
       ),
 

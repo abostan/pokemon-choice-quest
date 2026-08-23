@@ -70,3 +70,52 @@ export function computeTypeEffectiveness(team, opponentType) {
     message: "",
   };
 }
+
+/**
+ * Calcola il bonus di potenza della Terastallizzazione dato il tipo Tera
+ * estratto casualmente ed il tipo dell'avversario. A differenza del vecchio
+ * +25% flat, il bonus ora scala in base al vantaggio/svantaggio di tipo:
+ * il +25% resta il caso base (nessun vantaggio/svantaggio), ma sale al +35%
+ * se il tipo Tera è Super Efficace contro l'avversario e scende al +10% se
+ * è invece l'avversario ad avere il vantaggio.
+ *
+ * @param {string} teraType
+ * @param {string} opponentType
+ * @returns {{ multiplier: number, status: 'super'|'weak'|'neutral', message: string }}
+ */
+export function computeTeraEffect(teraType, opponentType) {
+  if (!teraType) {
+    return { multiplier: 1.0, status: "neutral", message: "" };
+  }
+  if (!opponentType) {
+    return {
+      multiplier: 1.25,
+      status: "neutral",
+      message: `💎 Terastallizzato di tipo ${teraType}: +25% Potenza Squadra.`,
+    };
+  }
+
+  const teraTargets = TYPE_SUPER_EFFECTIVE[teraType] || [];
+  if (teraTargets.includes(opponentType) || opponentType.includes(teraType)) {
+    return {
+      multiplier: 1.35,
+      status: "super",
+      message: `💎 Terastallizzato di tipo ${teraType}: Super Efficace contro ${opponentType}! (+35% Potenza Squadra)`,
+    };
+  }
+
+  const oppTargets = TYPE_SUPER_EFFECTIVE[opponentType] || [];
+  if (oppTargets.includes(teraType)) {
+    return {
+      multiplier: 1.10,
+      status: "weak",
+      message: `💎 Terastallizzato di tipo ${teraType}: svantaggiato contro ${opponentType} (+10% Potenza Squadra)`,
+    };
+  }
+
+  return {
+    multiplier: 1.25,
+    status: "neutral",
+    message: `💎 Terastallizzato di tipo ${teraType}: +25% Potenza Squadra.`,
+  };
+}

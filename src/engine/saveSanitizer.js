@@ -32,6 +32,7 @@ export function sanitizeGameState(raw) {
 
     isNuzlocke: !!raw.isNuzlocke,
     isRandomizer: !!raw.isRandomizer,
+    teamFatigued: !!raw.teamFatigued,
     monoType: typeof raw.monoType === "string" ? raw.monoType : null,
     choicesCount: typeof raw.choicesCount === "number" ? Math.max(0, raw.choicesCount) : 0,
     pokedexRun: raw.pokedexRun && typeof raw.pokedexRun === "object" ? raw.pokedexRun : {},
@@ -39,6 +40,7 @@ export function sanitizeGameState(raw) {
     activeMega: false,
     activeTerastal: false,
     activeItemBoost: 0,
+    activeWeather: null,
 
     pendingEvolutions: Array.isArray(raw.pendingEvolutions) ? raw.pendingEvolutions : [],
     caughtLegendaries: Array.isArray(raw.caughtLegendaries) ? raw.caughtLegendaries : [],

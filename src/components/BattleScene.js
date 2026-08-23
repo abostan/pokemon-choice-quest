@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
-import { computeTeamPower, computeWinChance, rollBattle, TACTICS } from "../engine/battleLogic.js";
+import { computeTeamPower, computeWinChance, rollBattle, computeFatigueMultiplier, TACTICS } from "../engine/battleLogic.js";
 import { useTeamStats } from "../hooks/useTeamStats.js";
 import { getItemDescription, groupItemsByName } from "../data/items.js";
-import { computeTypeEffectiveness } from "../engine/typeMatchup.js";
+import { computeTypeEffectiveness, computeTeraEffect } from "../engine/typeMatchup.js";
+import { computeWeatherEffect } from "../engine/weatherLogic.js";
 import { computeMegaPower } from "../engine/megaLogic.js";
 import { playMegaSound, playVictoryJingle } from "../engine/soundEngine.js";
 import { recordBattle } from "../engine/runRecorder.js";
@@ -56,6 +57,8 @@ export function BattleScene({
   rewardBadge,
   isNuzlocke = false,
   celebrateOnWin = false,
+  activeWeather = null,
+  teamFatigued = false,
   onUseItem,
   onOpenBox,
   onPowerBoost,
@@ -65,6 +68,7 @@ export function BattleScene({
   const [usedItem, setUsedItem] = useState(null); // { name, boost } | null
   const [isMegaActive, setIsMegaActive] = useState(false);
   const [isTerastalActive, setIsTerastalActive] = useState(false);
+  const [teraType, setTeraType] = useState(null);
 
   const hasTeam = team && team.length > 0;
   const teamAbilities = computeTeamAbilities(team);
@@ -72,6 +76,7 @@ export function BattleScene({
   // Estrae il tipo avversario dal titolo se non passato esplicitamente (es. "Capopalestra di tipo Roccia")
   const detectedType = opponentType || (opponentTitle.match(/tipo ([A-Za-z]+)/)?.[1] ?? "");
   const typeEff = computeTypeEffectiveness(team, detectedType);
+  const weatherEff = computeWeatherEffect(team, activeWeather);
 
   const statsById = useTeamStats(team);
   const baseTeamPower = computeTeamPower(team, statsById);
@@ -84,8 +89,10 @@ export function BattleScene({
 
   const typePower = Math.round(rawTeamPower * effectiveMultiplier);
   const megaMult = isMegaActive ? 1.3 : 1.0;
-  const teraMult = isTerastalActive ? 1.25 : 1.0;
-  const totalTeamPower = Math.round(typePower * megaMult * teraMult);
+  const teraEff = isTerastalActive ? computeTeraEffect(teraType, detectedType) : { multiplier: 1.0, status: "neutral", message: "" };
+  const teraMult = teraEff.multiplier;
+  const fatigueMult = computeFatigueMultiplier(teamFatigued);
+  const totalTeamPower = Math.round(typePower * megaMult * teraMult * weatherEff.multiplier * fatigueMult);
 
   function handleUseItem(itemIdx) {
     if (usedItem) return;
@@ -170,6 +177,49 @@ export function BattleScene({
       typeEff.message
     ),
 
+    // Badge Effetto Meteo (se una condizione atmosferica è attiva per questa battaglia)
+    hasTeam && activeWeather && weatherEff.message && e(
+      "div",
+      {
+        className: `weather-effect-badge ${weatherEff.status}`,
+        style: {
+          margin: "10px 0",
+          padding: "8px 12px",
+          borderRadius: "8px",
+          fontSize: "0.88rem",
+          fontWeight: "600",
+          background:
+            weatherEff.status === "boost"
+              ? "rgba(34, 197, 94, 0.2)"
+              : weatherEff.status === "malus"
+              ? "rgba(239, 68, 68, 0.2)"
+              : "rgba(14, 116, 144, 0.2)",
+          border: `1px solid ${weatherEff.status === "boost" ? "var(--success)" : weatherEff.status === "malus" ? "var(--danger)" : "#0e7490"}`,
+          color: weatherEff.status === "boost" ? "var(--success)" : weatherEff.status === "malus" ? "var(--danger)" : "#67e8f9",
+        },
+      },
+      weatherEff.message
+    ),
+
+    // Badge Squadra Affaticata (sconfitta recente non ancora curata al Centro Pokémon)
+    hasTeam && teamFatigued && e(
+      "div",
+      {
+        className: "fatigue-badge",
+        style: {
+          margin: "10px 0",
+          padding: "8px 12px",
+          borderRadius: "8px",
+          fontSize: "0.88rem",
+          fontWeight: "600",
+          background: "rgba(239, 68, 68, 0.15)",
+          border: "1px solid var(--danger)",
+          color: "var(--danger)",
+        },
+      },
+      "😓 Squadra Affaticata da una sconfitta recente (-10% Potenza): passa dal Centro Pokémon per curarla!"
+    ),
+
     // Megaevoluzione Button / Badge (esclusiva con la Terastallizzazione)
     hasTeam && !result && !isMegaActive && !isTerastalActive && e(
       "button",
@@ -220,11 +270,13 @@ export function BattleScene({
         },
         onClick: () => {
           playMegaSound();
+          const rolledType = TYPE_LIST[Math.floor(Math.random() * TYPE_LIST.length)];
+          setTeraType(rolledType);
           setIsTerastalActive(true);
           if (onPowerBoost) onPowerBoost({ activeTerastal: true });
         },
       },
-      "💎 Attiva TERASTALLIZZAZIONE! (+25% Potenza Tipo Tera)"
+      "💎 Attiva TERASTALLIZZAZIONE! (tipo Tera casuale, +10~35% Potenza)"
     ),
 
     hasTeam && isTerastalActive && e(
@@ -241,7 +293,7 @@ export function BattleScene({
           margin: "6px 0 10px 0",
         },
       },
-      "💎 TERASTALLIZZAZIONE ATTIVA (+25% POTENZA TIPO TERA!)"
+      `💎 TERASTALLIZZAZIONE ATTIVA — ${teraEff.message}`
     ),
 
     // Squadra Avversario
@@ -335,7 +387,7 @@ export function BattleScene({
                 {
                   className: "continue-btn",
                   onClick: () => {
-                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0 });
+                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0, activeWeather: null });
                     onResolved({ won: true });
                   },
                 },
@@ -348,7 +400,7 @@ export function BattleScene({
                   className: "continue-btn",
                   style: { background: "linear-gradient(135deg, var(--danger), var(--danger-dark))", color: "#fff" },
                   onClick: () => {
-                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0 });
+                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0, activeWeather: null });
                     onResolved({ won: false });
                   },
                 },
@@ -363,7 +415,7 @@ export function BattleScene({
                     className: "continue-btn",
                     style: { background: "#2c3e4e", color: "#eef3f8" },
                     onClick: () => {
-                      if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0 });
+                      if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0, activeWeather: null });
                       onResolved({ won: false });
                     },
                   },

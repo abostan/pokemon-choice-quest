@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { ChoiceScene } from "../ChoiceScene.js";
+import { CasinoScene } from "../CasinoScene.js";
 import { getExplorationTier } from "../../data/generations.js";
 import { MAX_LEVEL } from "../../hooks/useGameState.js";
 import { computeExploreSeed, computePostgameSeed, pickWeightedIds, pickTopIds } from "../../engine/explorePicker.js";
 import { EXPLORE_SPECIAL_WEIGHTS } from "../../data/exploreOptions.js";
+import { rollCasinoOutcome } from "../../engine/casinoLogic.js";
+import { rollWeather } from "../../data/weather.js";
 import { recordCrossroad, recordChoice } from "../../engine/runRecorder.js";
 
 function withRecordedChoices(choices, phase) {
@@ -31,6 +34,25 @@ export function ExploreSceneContainer({ game }) {
     addToTeam,
     startPostgameExplore,
   } = game;
+
+  const [casinoOpen, setCasinoOpen] = useState(false);
+
+  function playCasino(stake, pokemonLevel) {
+    const outcome = rollCasinoOutcome(stake);
+    if (outcome.tier === "jackpot") {
+      const porygonId = Math.random() < 0.5 ? 137 : 233;
+      markCaught(porygonId, false);
+      addToTeam({ id: porygonId, level: pokemonLevel });
+      addItem("Master Ball");
+    } else if (outcome.tier === "mid") {
+      addItem("Caramella Rara");
+      boostTeam(1);
+    } else {
+      boostTeam(1);
+    }
+    update({ coins: Math.max(0, (state.coins || 0) + outcome.coinsDelta) });
+    return outcome;
+  }
 
   if (state.phase === "postgameExplore") {
     const lastTier = generation
@@ -123,30 +145,17 @@ export function ExploreSceneContainer({ game }) {
       {
         id: "casinoGameCorner",
         label: "🎰 Casinò Razzo & Sala Giochi",
-        hint: "Fai girare le slot machine per vincere Porygon, monete e premi epici",
-        onSelect: () => {
-          const roll = Math.random();
-          if (roll < 0.25) {
-            markCaught(474, false);
-            addToTeam({ id: 474, level: Math.min(MAX_LEVEL, pgLevel) });
-            addItem("Master Ball");
-            update({ coins: (state.coins || 0) + 25 });
-          } else {
-            boostTeam(3);
-            update({ coins: (state.coins || 0) + 10 });
-          }
-          update({ postgameRound: state.postgameRound + 1 });
-          setTimeout(() => startPostgameExplore(), 0);
-        },
+        hint: "Scegli la puntata e fai girare le slot machine per vincere Porygon, monete e premi epici",
+        onSelect: () => setCasinoOpen(true),
       },
       {
         id: "weatherCondition",
         label: "☀️ micro-Clima & Evento Atmosferico",
-        hint: "Tempesta o sole intenso potenziante per la tua squadra",
+        hint: "Tempesta o sole intenso: influenzerà la tua prossima battaglia in base al tipo della squadra",
         onSelect: () => {
-          boostTeam(2);
+          const weather = rollWeather();
           addItem("Super Pozione");
-          update({ postgameRound: state.postgameRound + 1 });
+          update({ activeWeather: weather, postgameRound: state.postgameRound + 1 });
           setTimeout(() => startPostgameExplore(), 0);
         },
       },
@@ -317,6 +326,18 @@ export function ExploreSceneContainer({ game }) {
       seedInputs: { postgameRound: state.postgameRound },
     });
 
+    if (casinoOpen) {
+      return e(CasinoScene, {
+        coins: state.coins || 0,
+        onPlay: (stake) => playCasino(stake, pgLevel),
+        onLeave: () => {
+          setCasinoOpen(false);
+          update({ postgameRound: state.postgameRound + 1 });
+          setTimeout(() => startPostgameExplore(), 0);
+        },
+      });
+    }
+
     return e(ChoiceScene, {
       key: `postgame-${state.postgameRound}`,
       title: "Esplorazione libera post-game",
@@ -328,6 +349,17 @@ export function ExploreSceneContainer({ game }) {
   const tier = getExplorationTier(generation, state.gymIndex);
   const nextGymTitle = generation?.gymLeaders?.[state.gymIndex]?.title ?? "la prossima Palestra";
   const useAltGrass = state.gymIndex % 2 === 1;
+
+  if (casinoOpen) {
+    return e(CasinoScene, {
+      coins: state.coins || 0,
+      onPlay: (stake) => playCasino(stake, Math.min(MAX_LEVEL, tier.level + 4)),
+      onLeave: () => {
+        setCasinoOpen(false);
+        goTo("gymBattle");
+      },
+    });
+  }
 
   const firePools = {
     kanto: [37, 58, 100, 81, 77],
@@ -587,25 +619,8 @@ export function ExploreSceneContainer({ game }) {
       id: "casinoGameCorner",
       weight: EXPLORE_SPECIAL_WEIGHTS.casinoGameCorner,
       label: "🎰 Casinò Razzo & Sala Giochi",
-      hint: "Scommetti le tue monete alle slot machine per tentare di vincere Porygon, Master Ball o Pokédollari!",
-      onSelect: () => {
-        const roll = Math.random();
-        if (roll < 0.25) {
-          const porygonId = Math.random() < 0.5 ? 137 : 233;
-          markCaught(porygonId, false);
-          addToTeam({ id: porygonId, level: Math.min(MAX_LEVEL, tier.level + 4) });
-          addItem("Master Ball");
-          update({ coins: (state.coins || 0) + 8 });
-        } else if (roll < 0.65) {
-          addItem("Caramella Rara");
-          update({ coins: (state.coins || 0) + 3 });
-          boostTeam(1);
-        } else {
-          boostTeam(1);
-          update({ coins: Math.max(0, (state.coins || 0) - 1) });
-        }
-        goTo("gymBattle");
-      },
+      hint: "Scegli la puntata e scommetti alle slot machine per tentare di vincere Porygon, Master Ball o Pokédollari!",
+      onSelect: () => setCasinoOpen(true),
     },
     {
       id: "safariZone",
@@ -633,10 +648,11 @@ export function ExploreSceneContainer({ game }) {
       id: "weatherCondition",
       weight: EXPLORE_SPECIAL_WEIGHTS.weatherCondition,
       label: "☀️ micro-Clima & Evento Atmosferico",
-      hint: "Venti sabbiosi, piogge o sole intenso sferzano il percorso potenziando la squadra",
+      hint: "Venti sabbiosi, piogge o sole intenso: influenzeranno la prossima battaglia in base al tipo della squadra",
       onSelect: () => {
+        const weather = rollWeather();
         addItem("Super Pozione");
-        boostTeam(2);
+        update({ activeWeather: weather });
         goTo("gymBattle");
       },
     },

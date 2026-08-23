@@ -2,11 +2,12 @@ import React from "react";
 import { PokemonChip } from "./PokemonSprite.js";
 import { getItemDescription, groupItemsByName } from "../data/items.js";
 import { computeTeamAbilities } from "../data/abilities.js";
-import { computeTeamPower } from "../engine/battleLogic.js";
+import { computeTeamPower, computeFatigueMultiplier } from "../engine/battleLogic.js";
 import { usePokemon } from "../hooks/usePokemon.js";
 import { useMegaSprite } from "../hooks/useMegaSprite.js";
 import { useTeamStats } from "../hooks/useTeamStats.js";
 import { getTypeIcon } from "../data/types.js";
+import { computeWeatherEffect } from "../engine/weatherLogic.js";
 import { getBadgeType } from "../data/generations.js";
 import { TapTooltip } from "./TapTooltip.js";
 import { ItemIcon } from "./ItemIcon.js";
@@ -83,6 +84,8 @@ export function TeamPanel({
   activeMega = false,
   activeTerastal = false,
   activeItemBoost = 0,
+  activeWeather = null,
+  teamFatigued = false,
   onOpenBox,
 }) {
   const abilities = computeTeamAbilities(team);
@@ -90,8 +93,14 @@ export function TeamPanel({
   const baseTeamPower = computeTeamPower(team, statsById);
   const itemBoost = activeItemBoost || 0;
   const megaMult = activeMega ? 1.3 : 1.0;
+  const fatigueMult = computeFatigueMultiplier(teamFatigued);
+  // Approssimazione: qui non conosciamo il tipo dell'avversario né il tipo
+  // Tera estratto in BattleScene, quindi mostriamo il caso base +25% (il
+  // valore reale in battaglia può salire a +35% o scendere a +10% in base
+  // al type-matchup, vedi computeTeraEffect in engine/typeMatchup.js).
   const teraMult = activeTerastal ? 1.25 : 1.0;
-  const teamPower = Math.round((baseTeamPower + itemBoost) * megaMult * teraMult);
+  const weatherMult = computeWeatherEffect(team, activeWeather).multiplier;
+  const teamPower = Math.round((baseTeamPower + itemBoost) * megaMult * teraMult * weatherMult * fatigueMult);
   const bonusDiff = teamPower - baseTeamPower;
 
   // Griglia 2x3 fissa con 6 slot
@@ -178,6 +187,24 @@ export function TeamPanel({
           style: { background: "linear-gradient(135deg, #b45309, #78350f)", color: "#fef3c7" },
         },
         `🎯 MONO-TIPO: ${monoType.toUpperCase()}`
+      ),
+      activeWeather && e(
+        "div",
+        {
+          className: "badge-status",
+          style: { background: "linear-gradient(135deg, #0e7490, #164e63)", color: "#cffafe" },
+          title: "Attivo per la prossima battaglia",
+        },
+        `${activeWeather.icon} METEO: ${activeWeather.name.toUpperCase()}`
+      ),
+      teamFatigued && e(
+        "div",
+        {
+          className: "badge-status",
+          style: { background: "linear-gradient(135deg, var(--danger), var(--danger-dark))" },
+          title: "Passa dal Centro Pokémon per rimuovere il malus",
+        },
+        "😓 SQUADRA AFFATICATA (-10% Potenza)"
       )
     ),
 

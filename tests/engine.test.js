@@ -6,6 +6,7 @@ import {
   computeWinChance,
   computeCaptureChance,
   computeStatMultiplier,
+  computeFatigueMultiplier,
   clampLevel,
   clamp,
 } from "../src/engine/battleLogic.js";
@@ -118,6 +119,17 @@ test("saveSanitizer - sanitizeGameState cleans corrupt data", () => {
   assert.deepStrictEqual(clean.team, []);
   assert.strictEqual(clean.coins, 0);
   assert.strictEqual(clean.gymIndex, 0);
+});
+
+test("saveSanitizer - teamFatigued è preservato dal salvataggio (a differenza di activeMega/activeTerastal, non è un toggle solo di battaglia)", () => {
+  assert.strictEqual(sanitizeGameState({ teamFatigued: true }).teamFatigued, true);
+  assert.strictEqual(sanitizeGameState({ teamFatigued: false }).teamFatigued, false);
+  assert.strictEqual(sanitizeGameState({}).teamFatigued, false);
+});
+
+test("battleLogic - computeFatigueMultiplier: -10% se affaticata, neutro altrimenti", () => {
+  assert.strictEqual(computeFatigueMultiplier(true), 0.90);
+  assert.strictEqual(computeFatigueMultiplier(false), 1.0);
 });
 
 test("movePicker - pickSignatureMove sceglie la mossa level-up al livello più alto", () => {

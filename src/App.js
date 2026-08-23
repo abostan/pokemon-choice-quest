@@ -388,6 +388,8 @@ export default function App() {
           activeMega: state.activeMega,
           activeTerastal: state.activeTerastal,
           activeItemBoost: state.activeItemBoost,
+          activeWeather: state.activeWeather,
+          teamFatigued: state.teamFatigued,
           onOpenBox: () => update({ boxModalOpen: true }),
           onSwapTeamPosition: game.swapTeamPosition,
         })
