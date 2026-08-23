@@ -25,8 +25,10 @@ const e = React.createElement;
  *  - pokedexRun: { [id]: { seen, caught, shiny } } — usato per mostrare il badge "già catturato"
  *  - lastEncounterId: id dell'ultimo Pokémon selvatico incontrato (qualunque zona) —
  *    escluso dall'estrazione se il pool ha altre opzioni, per non rivedere subito lo stesso
+ *  - hasBallLure: bool — se true, mostra il bottone per usare una Pallina Esca dallo zaino
+ *    (+8% probabilità di cattura con Poké Ball/Cibo, consumata all'uso)
  */
-export function EncounterScene({ title, text, pool = [], level = 4, isLegendary = false, hasMasterBall = false, team = [], pokedexRun = {}, lastEncounterId = null, onSeen, onCaught, onResolved }) {
+export function EncounterScene({ title, text, pool = [], level = 4, isLegendary = false, hasMasterBall = false, hasBallLure = false, team = [], pokedexRun = {}, lastEncounterId = null, onSeen, onCaught, onResolved }) {
   const isShiny = useMemo(() => {
     return Math.random() < getShinyChance(isLegendary);
   }, [isLegendary]);
@@ -74,6 +76,7 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
   const alreadyCaught = !!pokedexRun[wildId]?.caught;
 
   const [result, setResult] = useState(null); // { method, success } | null
+  const [ballLureActive, setBallLureActive] = useState(false);
 
   // I leggendari hanno un tasso base ridotto e non accettano cibo
   const baseRate = isLegendary ? 0.10 : 0.55;
@@ -81,7 +84,7 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
   const hasSereneGrace = teamAbilities.some((a) => a.name === "Leggiadria");
 
   function attemptCapture(method) {
-    const chance = computeCaptureChance(method, baseRate, isLegendary, hasSereneGrace);
+    const chance = computeCaptureChance(method, baseRate, isLegendary, hasSereneGrace, ballLureActive);
     const success = rollCapture(chance);
     recordCapture({ method, chance, success, isLegendary, pokemonId: wildId });
     if (success) {
@@ -94,9 +97,9 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
 
   function handleContinue() {
     if (result?.success) {
-      onResolved({ caught: true, pokemon: { id: wildId, level, isShiny }, usedMasterBall: result.method === "masterball", wildId });
+      onResolved({ caught: true, pokemon: { id: wildId, level, isShiny }, usedMasterBall: result.method === "masterball", usedBallLure: ballLureActive, wildId });
     } else {
-      onResolved({ caught: false, pokemon: null, usedMasterBall: false, wildId });
+      onResolved({ caught: false, pokemon: null, usedMasterBall: false, usedBallLure: ballLureActive, wildId });
     }
   }
 
@@ -111,11 +114,22 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
       { className: "legendary-badge" },
       "⭐ Incontro leggendario — probabilità di cattura ridotta!"
     ),
+    ballLureActive && e(
+      "div",
+      { className: "ball-lure-badge" },
+      "🎯 Pallina Esca attiva — +8% probabilità di cattura con Poké Ball/Cibo"
+    ),
     e(PokemonPreview, { id: wildId, isShiny, alreadyCaught }),
     !result &&
       e(
         "div",
         { className: "choice-list", style: { marginTop: "16px" } },
+        hasBallLure && !ballLureActive && e(
+          "button",
+          { className: "choice-btn", onClick: () => setBallLureActive(true), style: { background: "linear-gradient(135deg, #ca8a04, #854d0e)", color: "#fff", border: "2px solid var(--gold)" } },
+          e("span", null, "🎯 Usa la Pallina Esca"),
+          e("span", { className: "choice-hint", style: { color: "var(--gold-light)" } }, "+8% probabilità di cattura con Poké Ball/Cibo per questo incontro")
+        ),
         hasMasterBall && e(
           "button",
           { className: "choice-btn master-ball-btn", onClick: () => attemptCapture("masterball"), style: { background: "linear-gradient(135deg, #6b21a8, #3b0764)", color: "#fff", border: "2px solid #a855f7" } },
@@ -140,7 +154,7 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
         ),
         e(
           "button",
-          { className: "choice-btn", onClick: () => onResolved({ caught: false, pokemon: null, wildId }) },
+          { className: "choice-btn", onClick: () => onResolved({ caught: false, pokemon: null, usedBallLure: ballLureActive, wildId }) },
           e("span", null, "Ignora e prosegui"),
           e("span", { className: "choice-hint" }, "Nessun rischio, ma nessuna cattura")
         )

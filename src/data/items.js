@@ -22,7 +22,7 @@ export const ITEM_DESCRIPTIONS = {
   "Miele": "Miele profumato e dolcissimo. Attira la fortuna in battaglia (+10 Potenza).",
   "Dolceofelia": "Prelibatezza regionale zuccherata. Aumenta il morale della squadra (+10 Potenza).",
   "Galletta di Yantar": "Biscotto croccante della regione di Kalos (+10 Potenza).",
-  "Pallina Esca": "Strumento di supporto per attirare e pacificare i Pokémon.",
+  "Pallina Esca": "Usabile in un incontro selvatico (non in battaglia): +8% probabilità di cattura con Poké Ball/Cibo.",
   "Revitalizzante": "Rimedia alle ferite della squadra donando +14 Potenza in battaglia.",
   "Rimedio Finale": "Cura completa che ripristina le energie del team (+14 Potenza).",
   "Assorbosfera": "Strumento tenuto. Aumenta la potenza di attacco del Pokémon del +20% in battaglia.",

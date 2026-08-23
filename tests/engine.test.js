@@ -74,6 +74,19 @@ test("battleLogic - computeCaptureChance masterball & legendary", () => {
   assert.ok(Math.abs(legSereneChance - 0.15) < 1e-9);
 });
 
+test("battleLogic - computeCaptureChance con Pallina Esca (+8%, dimezzato sui leggendari)", () => {
+  const withoutLure = computeCaptureChance("ball", 0.5, false, false, false);
+  const withLure = computeCaptureChance("ball", 0.5, false, false, true);
+  assert.ok(Math.abs(withLure - (withoutLure + 0.08)) < 1e-9);
+
+  const legWithoutLure = computeCaptureChance("ball", 0.5, true, false, false);
+  const legWithLure = computeCaptureChance("ball", 0.5, true, false, true);
+  assert.ok(Math.abs(legWithLure - (legWithoutLure + 0.04)) < 1e-9, "sui leggendari il bonus è dimezzato, come Leggiadria");
+
+  // Master Ball resta garanzia 100% indipendentemente dalla Pallina Esca
+  assert.strictEqual(computeCaptureChance("masterball", 0.5, false, false, true), 1.0);
+});
+
 test("battleLogic - clampLevel", () => {
   assert.strictEqual(clampLevel(0), 1);
   assert.strictEqual(clampLevel(50), 50);

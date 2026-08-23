@@ -1150,6 +1150,18 @@ body {
   text-align: center;
 }
 
+.ball-lure-badge {
+  background: linear-gradient(90deg, #4a3510, #6b4f14);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  color: var(--gold-light);
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding: 8px 14px;
+  text-align: center;
+}
+
 /* ------------------------------------------------------------------
    Shiny Pokémon Effects & Badges
    ------------------------------------------------------------------ */

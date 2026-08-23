@@ -35,6 +35,12 @@ const SHOP_ITEMS = [
     icon: "🟣",
     description: "La Poké Ball definitiva. Cattura garantita al 100% per qualsiasi specie!",
   },
+  {
+    name: "Pallina Esca",
+    price: 2,
+    icon: "🎯",
+    description: "Usabile in un incontro selvatico: +8% probabilità di cattura con Poké Ball/Cibo.",
+  },
 ];
 
 /**

@@ -131,6 +131,8 @@ export function SceneRouter({ game }) {
           { name: "Caramella Rara", price: 5 },
           { name: "Resti", price: 6 },
           { name: "Assorbosfera", price: 6 },
+          { name: "Stolascelta", price: 7 },
+          { name: "Baccamela", price: 7 },
           { name: "Master Ball", price: 10 },
         ]
       : [
@@ -261,6 +263,7 @@ export function SceneRouter({ game }) {
   if (state.phase === "encounter" || state.phase === "legendaryEncounter") {
     const isLegendary = state.phase === "legendaryEncounter";
     const hasMb = state.items.includes("Master Ball");
+    const hasLure = state.items.includes("Pallina Esca");
     const tier = getExplorationTier(generation, state.gymIndex);
     const fallbackPool = isLegendary ? (generation?.legendaries || [150]) : (tier?.grass || [25]);
     // Il pool è già filtrato per Randomizer/Mono-Tipo da goTo() al momento della transizione di stato.
@@ -278,16 +281,27 @@ export function SceneRouter({ game }) {
       level: state.pendingEncounterLevel,
       isLegendary: isLegendary || state.pendingEncounterIsLegendary,
       hasMasterBall: hasMb,
+      hasBallLure: hasLure,
       pokedexRun: state.pokedexRun,
       lastEncounterId: state.lastEncounterId,
       onSeen: markSeen,
       onCaught: markCaught,
-      onResolved: ({ caught, pokemon, usedMasterBall, wildId }) => {
+      onResolved: ({ caught, pokemon, usedMasterBall, usedBallLure, wildId }) => {
         update({ lastEncounterId: wildId });
+        // Rimuove dall'indice più alto al più basso: gli indici sono calcolati
+        // sullo stesso `state.items` non ancora aggiornato, rimuovere prima
+        // l'indice più basso sfaserebbe quello più alto (splice successivo
+        // sul posto sbagliato) se entrambi gli oggetti vengono usati insieme.
+        const indicesToRemove = [];
         if (usedMasterBall) {
           const mbIdx = state.items.indexOf("Master Ball");
-          if (mbIdx !== -1) useItem(mbIdx);
+          if (mbIdx !== -1) indicesToRemove.push(mbIdx);
         }
+        if (usedBallLure) {
+          const lureIdx = state.items.indexOf("Pallina Esca");
+          if (lureIdx !== -1) indicesToRemove.push(lureIdx);
+        }
+        indicesToRemove.sort((a, b) => b - a).forEach((idx) => useItem(idx));
         if (caught) {
           addToTeam(pokemon);
           if (isLegendary) {

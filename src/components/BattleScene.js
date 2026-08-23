@@ -3,6 +3,7 @@ import { PokemonChip } from "./PokemonSprite.js";
 import { computeTeamPower, computeWinChance, rollBattle, computeFatigueMultiplier, TACTICS } from "../engine/battleLogic.js";
 import { useTeamStats } from "../hooks/useTeamStats.js";
 import { getItemDescription, groupItemsByName } from "../data/items.js";
+import { computeItemEffect } from "../engine/itemEffects.js";
 import { computeTypeEffectiveness, computeTeraEffect } from "../engine/typeMatchup.js";
 import { computeWeatherEffect } from "../engine/weatherLogic.js";
 import { computeMegaPower } from "../engine/megaLogic.js";
@@ -80,31 +81,37 @@ export function BattleScene({
 
   const statsById = useTeamStats(team);
   const baseTeamPower = computeTeamPower(team, statsById);
-  const itemBoost = usedItem ? usedItem.boost : 0;
-  const rawTeamPower = baseTeamPower + itemBoost;
+  const itemEffect = usedItem ? usedItem.effect : null;
+  const itemFlatBoost = itemEffect?.kind === "flat" ? itemEffect.value : 0;
+  const itemPercentMult = itemEffect?.kind === "percent" ? 1 + itemEffect.value : 1.0;
+  const itemNeutralizesType = itemEffect?.kind === "neutralizeType";
+  const rawTeamPower = baseTeamPower + itemFlatBoost;
 
-  // Modificatore di Levitazione (se presente ed il team è vulnerabile, annulla lo svantaggio)
+  // Modificatore di Levitazione/Baccamela (se presente ed il team è vulnerabile, annulla lo svantaggio)
   const hasLevitate = teamAbilities.some((a) => a.name === "Levitazione");
-  const effectiveMultiplier = hasLevitate && typeEff.multiplier < 1.0 ? 1.0 : typeEff.multiplier;
+  const effectiveMultiplier = (hasLevitate || itemNeutralizesType) && typeEff.multiplier < 1.0 ? 1.0 : typeEff.multiplier;
 
   const typePower = Math.round(rawTeamPower * effectiveMultiplier);
   const megaMult = isMegaActive ? 1.3 : 1.0;
   const teraEff = isTerastalActive ? computeTeraEffect(teraType, detectedType) : { multiplier: 1.0, status: "neutral", message: "" };
   const teraMult = teraEff.multiplier;
   const fatigueMult = computeFatigueMultiplier(teamFatigued);
-  const totalTeamPower = Math.round(typePower * megaMult * teraMult * weatherEff.multiplier * fatigueMult);
+  const totalTeamPower = Math.round(typePower * megaMult * teraMult * weatherEff.multiplier * fatigueMult * itemPercentMult);
 
   function handleUseItem(itemIdx) {
     if (usedItem) return;
     const itemName = items[itemIdx];
-    let boost = 10;
-    if (itemName.includes("Iper")) boost = 24;
-    else if (itemName.includes("Super")) boost = 18;
-    else if (itemName.includes("Pozione")) boost = 10;
-    else if (itemName.includes("Pietra") || itemName.includes("Rimedio")) boost = 14;
-
-    setUsedItem({ name: itemName, boost });
-    if (onPowerBoost) onPowerBoost({ activeItemBoost: boost });
+    const effect = computeItemEffect(itemName);
+    setUsedItem({ name: itemName, effect });
+    if (onPowerBoost) {
+      // TeamPanel legge activeItemBoost come bonus fisso approssimato (non
+      // conosce l'avversario, stesso compromesso già documentato per la
+      // Terastallizzazione) — per un oggetto percentuale convertiamo il
+      // bonus in un equivalente fisso al momento dell'uso.
+      const approxFlatBoost =
+        effect.kind === "flat" ? effect.value : effect.kind === "percent" ? Math.round(baseTeamPower * effect.value) : 0;
+      onPowerBoost({ activeItemBoost: approxFlatBoost });
+    }
     if (onUseItem) onUseItem(itemIdx);
   }
 
@@ -120,6 +127,8 @@ export function BattleScene({
   function retry() {
     setResult(null);
   }
+
+  const battleItemGroups = groupItemsByName(items).filter((g) => g.name !== "Pallina Esca");
 
   return e(
     "div",
@@ -307,8 +316,13 @@ export function BattleScene({
       )
     ),
 
-    // Sezione Oggetti dallo Zaino (se non ha ancora attaccato)
-    hasTeam && !result && items && items.length > 0 &&
+    // Sezione Oggetti dallo Zaino (se non ha ancora attaccato). La Pallina
+    // Esca è esclusa qui: è ora uno strumento di cattura usabile solo
+    // nell'incontro selvatico (EncounterScene.js), non in battaglia. Il
+    // filtro va sui gruppi (non sull'array `items` prima di raggrupparli),
+    // così `firstIndex` resta un indice valido nell'array originale — è
+    // quello che `onUseItem`/`useItem` consumano per rimuovere l'oggetto.
+    hasTeam && !result && items && battleItemGroups.length > 0 &&
       e(
         "div",
         { className: "battle-item-section" },
@@ -316,7 +330,7 @@ export function BattleScene({
         e(
           "div",
           { className: "battle-item-list" },
-          groupItemsByName(items).map(({ name: itemName, count, firstIndex }) => {
+          battleItemGroups.map(({ name: itemName, count, firstIndex }) => {
             const desc = getItemDescription(itemName);
             const label = count > 1 ? `${itemName} x${count}` : itemName;
             return e(
@@ -343,7 +357,11 @@ export function BattleScene({
       e(
         "div",
         { className: "battle-item-notice" },
-        `✨ Hai usato "${usedItem.name}"! La squadra guadagna +${usedItem.boost} Potenza per questa battaglia.`
+        itemEffect.kind === "percent"
+          ? `✨ Hai usato "${usedItem.name}"! La squadra guadagna +${Math.round(itemEffect.value * 100)}% Potenza per questa battaglia.`
+          : itemEffect.kind === "neutralizeType"
+          ? `✨ Hai usato "${usedItem.name}"! Annulla lo svantaggio di tipo per questa battaglia.`
+          : `✨ Hai usato "${usedItem.name}"! La squadra guadagna +${itemEffect.value} Potenza per questa battaglia.`
       ),
 
     hasTeam && !result &&

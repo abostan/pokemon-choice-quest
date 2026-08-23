@@ -22,21 +22,24 @@ import { getPokemonNature, computeNatureMultiplier } from "../data/natures.js";
  * Calcola la probabilità di cattura (0..1) in base al metodo scelto
  * dal giocatore, tasso base ed eventuale abilità Leggiadria.
  */
-export function computeCaptureChance(method, baseRate = 0.55, isLegendary = false, hasSereneGrace = false) {
+export function computeCaptureChance(method, baseRate = 0.55, isLegendary = false, hasSereneGrace = false, hasBallLure = false) {
   if (method === 'masterball') {
     return 1.0; // 100% cattura garantita!
   }
+  // Stesso trattamento di hasSereneGrace: dimezzato sui leggendari (v8.6, per
+  // non rendere la Pallina Esca troppo forte contro il tasso già ridotto).
   const sereneBonus = hasSereneGrace ? 0.10 : 0;
+  const lureBonus = hasBallLure ? 0.08 : 0;
   if (isLegendary) {
     const legMod = method === 'food' ? 1.2 : 1.0;
-    return clamp(0.10 * legMod + sereneBonus / 2, 0.03, 0.20);
+    return clamp(0.10 * legMod + (sereneBonus + lureBonus) / 2, 0.03, 0.20);
   }
   const modifiers = {
     ball: 1.0,
     food: 1.25, // più efficace...
   };
   const mod = modifiers[method] ?? 1.0;
-  return clamp(baseRate * mod + sereneBonus, 0.05, 0.95);
+  return clamp(baseRate * mod + sereneBonus + lureBonus, 0.05, 0.95);
 }
 
 /**
