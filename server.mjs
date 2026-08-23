@@ -109,7 +109,41 @@ const server = createServer((req, res) => {
   serveStatic(req, res);
 });
 
-server.listen(PORT, "127.0.0.1", () => {
-  console.log(`Pokémon: Scegli il Cammino — http://localhost:${PORT}`);
-  console.log(`I log di sessione (pcqRunLog.save() dalla console) verranno salvati in ${LOGS_DIR}`);
-});
+// Se la porta è già occupata (tipicamente un processo node precedente mai
+// terminato correttamente, es. un server di test rimasto orfano) proviamo
+// automaticamente le porte successive invece di far crashare tutto con un
+// EADDRINUSE non gestito: così "npm start" funziona sempre al primo colpo.
+const MAX_PORT_ATTEMPTS = 10;
+
+function listenWithFallback(port, attempt = 0) {
+  // Riusiamo lo stesso Server su più tentativi: un listener "listening"
+  // registrato per un tentativo fallito (che quindi non ha mai emesso
+  // "listening", solo "error") resta agganciato anche al tentativo
+  // successivo — .once non basta a rimuoverlo, perché si "consuma" solo
+  // quando l'evento per cui è registrato scatta davvero. Va ripulito a mano
+  // prima di ogni retry, altrimenti al bind riuscito scattano ENTRAMBI i
+  // listener (quello vecchio con la porta sbagliata nel closure, e quello
+  // nuovo) — bug osservato in test manuale: stampava sia "porta 3000" (mai
+  // aperta) sia "porta 3001" insieme.
+  server.removeAllListeners("error");
+  server.removeAllListeners("listening");
+
+  server.once("error", (err) => {
+    if (err.code === "EADDRINUSE" && attempt < MAX_PORT_ATTEMPTS) {
+      console.warn(`[server] Porta ${port} già in uso (probabile processo precedente non chiuso), provo la ${port + 1}...`);
+      listenWithFallback(port + 1, attempt + 1);
+      return;
+    }
+    console.error("[server] Impossibile avviare il server:", err);
+    process.exit(1);
+  });
+
+  server.once("listening", () => {
+    console.log(`Pokémon: Scegli il Cammino — http://localhost:${port}`);
+    console.log(`I log di sessione (pcqRunLog.save() dalla console) verranno salvati in ${LOGS_DIR}`);
+  });
+
+  server.listen(port, "127.0.0.1");
+}
+
+listenWithFallback(PORT);
