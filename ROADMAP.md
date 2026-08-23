@@ -86,14 +86,14 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 
 ## 🔮 Prossimi Sviluppi & Pianificazione Futura
 
-### 🎯 Fase 1: Espansione dei Bivi & Eventi Dinamici (L'Esperienza dei Bivi)
-- [ ] **🧪 Laboratorio Fossili**: evento speciale per consegnare un fossile antico e far rianimare Pokémon rari (Omanyte, Kabuto, Aerodactyl, Lileep, Cranidos, Tyrunt).
-- [ ] **🤝 Scambio Allenatore (NPC Trade)**: incontra un Allenatore sul percorso disposto a scambiare un suo Pokémon raro per una specie specifica.
-- [ ] **🎰 Casinò Razzo & Sala Giochi**: minigioco facoltativo per scommettere le monete guadagnate e vincere Master Ball, Monete extra o strumenti rari.
-- [ ] **🌾 Zona Safari**: zona di esplorazione speciale ad alto rischio/ricompensa dove usare sassi ed esche per catturare Pokémon esotici.
-- [ ] **🛒 Mercante Ambulante & Pietre Evolutive**: negozio itinerante per acquistare pietre evolutive specifiche (Pietra Focaia, Idropietra, Pietra Lunare) o Caramelle Rare.
-- [ ] **☀️ Sistema Meteo sui Percorsi**: eventi atmosferici dinamici (Sole Intenso, Pioggia Battente, Tempesta di Sabbia, Nebbia) che potenziano o indeboliscono determinati tipi durante l'esplorazione.
-- [ ] **🎰 Modalità "Chaos Roulette" (Opzionale)**: selettore nelle opzioni per far girare una roulette visiva nei bivi invece di scegliere manualmente.
+### 🎯 Fase 1: Espansione dei Bivi & Eventi Dinamici (L'Esperienza dei Bivi - COMPLETATO)
+- [x] **🧪 Laboratorio Fossili**: evento speciale per consegnare un fossile antico e far rianimare Pokémon rari (Omanyte, Kabuto, Aerodactyl, Lileep, Cranidos, Tyrunt).
+- [x] **🤝 Scambio Allenatore (NPC Trade)**: incontra un Allenatore sul percorso disposto a scambiare un suo Pokémon raro per una specie specifica.
+- [x] **🎰 Casinò Razzo & Sala Giochi**: minigioco facoltativo per scommettere le monete guadagnate e vincere Porygon, Master Ball, Monete extra o strumenti rari.
+- [x] **🌾 Zona Safari**: zona di esplorazione speciale ad alto rischio/ricompensa dove usare Safari Ball per catturare Pokémon esotici.
+- [x] **🛒 Mercante Ambulante & Pietre Evolutive**: negozio itinerante per acquistare pietre evolutive specifiche (Pietra Focaia, Idropietra, Pietra Lunare) o Caramelle Rare.
+- [x] **☀️ Sistema Meteo sui Percorsi**: eventi atmosferici dinamici (Sole Intenso, Pioggia Battente, Tempesta di Sabbia, Nebbia) che potenziano o indeboliscono determinati tipi durante l'esplorazione.
+- [x] **🎰 Modalità "Chaos Roulette" (Opzionale)**: opzione "Ruota del Destino" per far girare una roulette nei bivi invece di scegliere manualmente.
 
 ---
 

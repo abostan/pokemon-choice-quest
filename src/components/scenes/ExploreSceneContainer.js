@@ -332,6 +332,119 @@ export function ExploreSceneContainer({ game }) {
         goTo("gymBattle");
       },
     },
+    {
+      id: "fossilRevival",
+      weight: 0.20,
+      label: "🧪 Laboratorio Fossili Antichi",
+      hint: "Consegna un fossile per rianimare e catturare un Pokémon preistorico a Lv 15",
+      onSelect: () => {
+        const fossilPools = {
+          kanto: [138, 140, 142],
+          johto: [138, 140, 345, 347],
+          hoenn: [345, 347, 142],
+          sinnoh: [408, 410, 142],
+          unova: [564, 566],
+          kalos: [696, 698],
+        };
+        const pool = fossilPools[state.generationId] || [138, 140, 142, 345, 347];
+        const fossilId = pool[Math.floor(Math.random() * pool.length)];
+        markCaught(fossilId, false);
+        addToTeam({ id: fossilId, level: 15 });
+        boostTeam(1);
+        goTo("gymBattle");
+      },
+    },
+    {
+      id: "npcTrade",
+      weight: 0.20,
+      label: "🤝 Allenatore in cerca di Scambi",
+      hint: "Un Allenatore del percorso ti offre una specie rara in cambio di una collaborazione",
+      onSelect: () => {
+        const tradePool = [83, 122, 124, 127, 131, 214, 303, 441, 538, 677];
+        const tradeId = tradePool[Math.floor(Math.random() * tradePool.length)];
+        markCaught(tradeId, false);
+        const avgLevel = state.team.length > 0
+          ? Math.round(state.team.reduce((acc, p) => acc + (p.level || 5), 0) / state.team.length) + 2
+          : 12;
+        addToTeam({ id: tradeId, level: Math.min(MAX_LEVEL, avgLevel) });
+        addItem("Super Pozione");
+        goTo("gymBattle");
+      },
+    },
+    {
+      id: "wanderingMerchant",
+      weight: 0.22,
+      label: "🛒 Mercante Ambulante di Strumenti",
+      hint: "Acquista pietre evolutive rare o Caramelle Rare con i tuoi Pokédollari",
+      onSelect: () => {
+        const merchantItems = ["Pietra Focaia", "Idropietra", "Pietra Foglia", "Pietra Tuono", "Pietraluna", "Caramella Rara"];
+        const boughtItem = merchantItems[Math.floor(Math.random() * merchantItems.length)];
+        addItem(boughtItem);
+        if (boughtItem === "Caramella Rara") {
+          boostTeam(2);
+        } else {
+          boostTeam(1);
+        }
+        goTo("gymBattle");
+      },
+    },
+    {
+      id: "casinoGameCorner",
+      weight: 0.22,
+      label: "🎰 Casinò Razzo & Sala Giochi",
+      hint: "Scommetti le tue monete alle slot machine per tentare di vincere Porygon, Master Ball o Pokédollari!",
+      onSelect: () => {
+        const roll = Math.random();
+        if (roll < 0.25) {
+          const porygonId = Math.random() < 0.5 ? 137 : 233;
+          markCaught(porygonId, false);
+          addToTeam({ id: porygonId, level: Math.min(MAX_LEVEL, tier.level + 4) });
+          addItem("Master Ball");
+          update({ coins: (state.coins || 0) + 8 });
+        } else if (roll < 0.65) {
+          addItem("Caramella Rara");
+          update({ coins: (state.coins || 0) + 3 });
+          boostTeam(1);
+        } else {
+          boostTeam(1);
+          update({ coins: Math.max(0, (state.coins || 0) - 1) });
+        }
+        goTo("gymBattle");
+      },
+    },
+    {
+      id: "safariZone",
+      weight: 0.22,
+      label: "🌾 Parco Safari — Riserva Naturale",
+      hint: "Entra nella riserva per incontrare ed armarti di Safari Ball contro Pokémon esotici e rari",
+      onSelect: () => {
+        const safariPools = {
+          kanto: [123, 127, 128, 115, 113, 147],
+          johto: [214, 225, 234, 246],
+          hoenn: [328, 335, 359, 371],
+          sinnoh: [443, 453, 455],
+          unova: [559, 610, 621],
+          kalos: [704, 708, 712],
+        };
+        const pool = safariPools[state.generationId] || [123, 127, 128, 115, 147];
+        goTo("encounter", {
+          pendingEncounterPool: pool,
+          pendingEncounterLevel: tier.level + 2,
+          pendingEncounterIsLegendary: false,
+        });
+      },
+    },
+    {
+      id: "weatherCondition",
+      weight: 0.25,
+      label: "☀️ micro-Clima & Evento Atmosferico",
+      hint: "Venti sabbiosi, piogge o sole intenso sferzano il percorso potenziando la squadra",
+      onSelect: () => {
+        addItem("Super Pozione");
+        boostTeam(2);
+        goTo("gymBattle");
+      },
+    },
   ];
 
   const rolledSpecials = [];
@@ -339,14 +452,14 @@ export function ExploreSceneContainer({ game }) {
   for (const opt of shuffled) {
     if (Math.random() < opt.weight) {
       rolledSpecials.push(opt);
-      if (rolledSpecials.length >= 2) break;
+      if (rolledSpecials.length >= 3) break;
     }
   }
-  if (rolledSpecials.length < 2) {
+  if (rolledSpecials.length < 3) {
     for (const opt of shuffled) {
       if (!rolledSpecials.some((o) => o.id === opt.id)) {
         rolledSpecials.push(opt);
-        if (rolledSpecials.length >= 2) break;
+        if (rolledSpecials.length >= 3) break;
       }
     }
   }
@@ -373,10 +486,22 @@ export function ExploreSceneContainer({ game }) {
     },
   };
 
+  const chaosRouletteChoice = {
+    id: "chaosRoulette",
+    label: "🎰 Ruota del Destino (Chaos Roulette)",
+    hint: "Lascia che sia la sorte a scegliere casualmente uno dei bivi per te!",
+    onSelect: () => {
+      const remaining = [baseGrassChoice, ...rolledSpecials, baseTrainChoice];
+      const chosen = remaining[Math.floor(Math.random() * remaining.length)];
+      chosen.onSelect();
+    },
+  };
+
   const exploreChoices = [
     baseGrassChoice,
     ...rolledSpecials,
     baseTrainChoice,
+    chaosRouletteChoice,
   ];
 
   return e(ChoiceScene, {
