@@ -33,6 +33,7 @@ export function sanitizeGameState(raw) {
     pokedexRun: raw.pokedexRun && typeof raw.pokedexRun === "object" ? raw.pokedexRun : {},
     pokedexOpen: false,
     activeMega: false,
+    activeTerastal: false,
     activeItemBoost: 0,
 
     pendingEvolutions: Array.isArray(raw.pendingEvolutions) ? raw.pendingEvolutions : [],

@@ -98,15 +98,15 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 ---
 
 ### 🍇 Fase 2: Espansione Contenuti — Generazione 9 (Paldea)
-- [ ] **Starter Gen 9**: inserire *Sprigatito*, *Fuecoco*, e *Quaxly*.
-- [ ] **Capipalestra & Lega di Paldea**: le 8 palestre di Paldea, i Superquattro ed il Campione Geeta / Nemi.
-- [ ] **Leggendari & Ultra-Bestie di Paldea**: incontri con *Koraidon*, *Miraidon* ed *I Quattro Tesori della Rovina* (Chien-Pao, Ting-Lu, Wo-Chien, Chi-Yu).
+- [x] **Starter Gen 9**: inseriti *Sprigatito*, *Fuecoco*, e *Quaxly*.
+- [x] **Capipalestra & Lega di Paldea**: le 8 palestre di Paldea, i Superquattro (Rika, Poppy, Larry, Hassel) ed il Campione Geeta / Nemi.
+- [x] **Leggendari & Ultra-Bestie di Paldea**: incontri con *Koraidon*, *Miraidon* ed *I Quattro Tesori della Rovina* (Chien-Pao, Ting-Lu, Wo-Chien, Chi-Yu).
 
 ---
 
 ### 💎 Fase 3: Meccaniche di Lotta Avanzate & Strumenti
-- [ ] **💎 Terastallizzazione (Terastal)**: meccanica di Gen 9 per Terastallizzare un Pokémon in battaglia (+25% potenza del tipo Tera).
-- [ ] **🎒 Strumenti Tenuti (Held Items)**: assegna strumenti alla squadra (Assorbosfera, Resti, Stolascelta, Baccamela) con effetti passivi durante le battaglie.
+- [x] **💎 Terastallizzazione (Terastal)**: meccanica di Gen 9 per Terastallizzare un Pokémon in battaglia (+25% potenza del tipo Tera con pulsante dedicato e sincronizzazione potenza).
+- [x] **🎒 Strumenti Tenuti (Held Items)**: integrazione strumenti passivi in battaglia (Assorbosfera +20%, Resti +10%, Stolascelta +15%, Baccamela).
 
 ---
 

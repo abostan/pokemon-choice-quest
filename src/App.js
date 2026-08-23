@@ -266,6 +266,7 @@ export default function App() {
           coins: state.coins || 0,
           isNuzlocke: state.isNuzlocke,
           activeMega: state.activeMega,
+          activeTerastal: state.activeTerastal,
           activeItemBoost: state.activeItemBoost,
           onOpenBox: () => update({ boxModalOpen: true }),
           onSwapTeamPosition: game.swapTeamPosition,

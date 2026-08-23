@@ -78,6 +78,7 @@ export function TeamPanel({
   coins = 0,
   isNuzlocke = false,
   activeMega = false,
+  activeTerastal = false,
   activeItemBoost = 0,
   onOpenBox,
 }) {
@@ -85,7 +86,8 @@ export function TeamPanel({
   const baseTeamPower = computeTeamPower(team);
   const itemBoost = activeItemBoost || 0;
   const megaMult = activeMega ? 1.3 : 1.0;
-  const teamPower = Math.round((baseTeamPower + itemBoost) * megaMult);
+  const teraMult = activeTerastal ? 1.25 : 1.0;
+  const teamPower = Math.round((baseTeamPower + itemBoost) * megaMult * teraMult);
   const bonusDiff = teamPower - baseTeamPower;
 
   // Griglia 2x3 fissa con 6 slot

@@ -72,6 +72,7 @@ export function BattleScene({
   const [result, setResult] = useState(null); // { tactic, won, winChance } | null
   const [usedItem, setUsedItem] = useState(null); // { name, boost } | null
   const [isMegaActive, setIsMegaActive] = useState(false);
+  const [isTerastalActive, setIsTerastalActive] = useState(false);
 
   const hasTeam = team && team.length > 0;
   const teamAbilities = computeTeamAbilities(team);
@@ -89,7 +90,9 @@ export function BattleScene({
   const effectiveMultiplier = hasLevitate && typeEff.multiplier < 1.0 ? 1.0 : typeEff.multiplier;
 
   const typePower = Math.round(rawTeamPower * effectiveMultiplier);
-  const totalTeamPower = isMegaActive ? computeMegaPower(typePower) : typePower;
+  const megaMult = isMegaActive ? 1.3 : 1.0;
+  const teraMult = isTerastalActive ? 1.25 : 1.0;
+  const totalTeamPower = Math.round(typePower * megaMult * teraMult);
 
   function handleUseItem(itemIdx) {
     if (usedItem) return;
@@ -216,6 +219,51 @@ export function BattleScene({
       "🔮 MEGAEVOLUZIONE / GIGAMAX ATTIVA (+30% POTENZA SQUADRA!)"
     ),
 
+    // Terastallizzazione Button / Badge
+    hasTeam && !result && !isTerastalActive && e(
+      "button",
+      {
+        className: "tera-btn",
+        style: {
+          background: "linear-gradient(135deg, #0284c7, #0369a1)",
+          color: "#fff",
+          border: "2px solid #38bdf8",
+          padding: "10px 16px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          cursor: "pointer",
+          margin: "6px 0 10px 0",
+          width: "100%",
+          boxShadow: "0 4px 12px rgba(2, 132, 199, 0.3)",
+        },
+        onClick: () => {
+          playMegaSound();
+          setIsTerastalActive(true);
+          if (onPowerBoost) onPowerBoost({ activeTerastal: true });
+        },
+      },
+      "💎 Attiva TERASTALLIZZAZIONE! (+25% Potenza Tipo Tera)"
+    ),
+
+    hasTeam && isTerastalActive && e(
+      "div",
+      {
+        className: "tera-active-badge",
+        style: {
+          padding: "8px 12px",
+          borderRadius: "8px",
+          background: "rgba(56, 189, 248, 0.25)",
+          border: "1px solid #38bdf8",
+          color: "#7dd3fc",
+          fontWeight: "bold",
+          fontSize: "0.9rem",
+          margin: "6px 0 10px 0",
+          textAlign: "center",
+        },
+      },
+      "💎 TERASTALLIZZAZIONE ATTIVA (+25% POTENZA TIPO TERA!)"
+    ),
+
     // Squadra Avversario
     e(
       "div",
@@ -292,7 +340,7 @@ export function BattleScene({
                 {
                   className: "continue-btn",
                   onClick: () => {
-                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeItemBoost: 0 });
+                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0 });
                     onResolved({ won: true });
                   },
                 },
@@ -305,7 +353,7 @@ export function BattleScene({
                   className: "continue-btn",
                   style: { background: "linear-gradient(135deg, #be123c, #881337)", color: "#fff" },
                   onClick: () => {
-                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeItemBoost: 0 });
+                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0 });
                     onResolved({ won: false });
                   },
                 },
@@ -320,7 +368,7 @@ export function BattleScene({
                     className: "continue-btn",
                     style: { background: "#2c3e4e", color: "#eef3f8" },
                     onClick: () => {
-                      if (onPowerBoost) onPowerBoost({ activeMega: false, activeItemBoost: 0 });
+                      if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0 });
                       onResolved({ won: false });
                     },
                   },

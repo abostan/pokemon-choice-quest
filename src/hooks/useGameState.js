@@ -43,6 +43,7 @@ export function initialState() {
     pokedexRun: {},
     pokedexOpen: false,
     activeMega: false,
+    activeTerastal: false,
     activeItemBoost: 0,
     pendingEvolutions: [],
     caughtLegendaries: [],

@@ -20,6 +20,10 @@ export const ITEM_DESCRIPTIONS = {
   "Pallina Esca": "Strumento di supporto per attirare e pacificare i Pokémon.",
   "Revitalizzante": "Rimedia alle ferite della squadra donando +14 Potenza in battaglia.",
   "Rimedio Finale": "Cura completa che ripristina le energie del team (+14 Potenza).",
+  "Assorbosfera": "Strumento tenuto. Aumenta la potenza di attacco del Pokémon del +20% in battaglia.",
+  "Resti": "Strumento tenuto. Rigenera le forze ad ogni turno donando +10 Potenza passiva.",
+  "Stolascelta": "Strumento tenuto. Aumenta la velocità e la potenza di attacco del +15%.",
+  "Baccamela": "Strumento tenuto. Annulla i malus di tipo e protegge la squadra in battaglia.",
 };
 
 /**
