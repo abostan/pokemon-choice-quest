@@ -5,6 +5,7 @@ import { getItemDescription } from "../data/items.js";
 import { computeTypeEffectiveness } from "../engine/typeMatchup.js";
 import { computeMegaPower } from "../engine/megaLogic.js";
 import { playMegaSound, playVictoryJingle } from "../engine/soundEngine.js";
+import { recordBattle } from "../engine/runRecorder.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 
 const e = React.createElement;
@@ -112,6 +113,7 @@ export function BattleScene({
     const winChance = computeWinChance(totalTeamPower, opponentPower, tactic, teamAbilities);
     const won = rollBattle(winChance);
     if (won) playVictoryJingle();
+    recordBattle({ tactic, winChance, won, opponentTitle });
     setResult({ tactic, won, winChance });
   }
 

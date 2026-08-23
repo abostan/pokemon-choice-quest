@@ -18,16 +18,28 @@ aprendo il file `index.html` direttamente da disco (protocollo `file://`).
 Due modi semplici, scegline uno:
 
 ```bash
-# Opzione A — se hai Node.js installato
+# Opzione A — se hai Node.js installato (consigliata: usa server.mjs,
+# incluso nel progetto, zero dipendenze npm — vedi sotto)
+npm start
+
+# Opzione B — se hai Node.js ma preferisci un server statico generico
 npx serve .
 
-# Opzione B — se hai Python 3 installato
+# Opzione C — se hai Python 3 installato
 python3 -m http.server 5173
 ```
 
-Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
+Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:3000`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
+
+`npm start` lancia `server.mjs`, un server locale minimale (solo moduli
+built-in di Node, nessuna dipendenza da installare) che oltre a servire i
+file del progetto accetta `POST /api/log` — usato da `pcqRunLog.save()`
+nella console DevTools per salvare i log di sessione direttamente nella
+cartella `logs/` del progetto (vedi `src/engine/runRecorder.js` e
+`scripts/analyze-run-log.mjs`). Le opzioni B e C funzionano per giocare, ma
+senza quell'endpoint `pcqRunLog.save()` ripiega sul download dal browser.
 
 ## Cosa contiene questa versione (v8.5)
 

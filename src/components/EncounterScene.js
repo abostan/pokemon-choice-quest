@@ -3,6 +3,7 @@ import { PokemonPreview } from "./PokemonSprite.js";
 import { computeCaptureChance, rollCapture } from "../engine/battleLogic.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 import { playShinySound, playCaptureSound, playMasterBallSound } from "../engine/soundEngine.js";
+import { recordEncounter, recordCapture } from "../engine/runRecorder.js";
 
 const e = React.createElement;
 
@@ -44,6 +45,10 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
     return id;
   }, [safePool]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    recordEncounter({ pokemonId: wildId, isLegendary, isShiny });
+  }, [wildId, isLegendary, isShiny]);
+
   const [result, setResult] = useState(null); // { method, success } | null
 
   // I leggendari hanno un tasso base ridotto e non accettano cibo
@@ -54,6 +59,7 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
   function attemptCapture(method) {
     const chance = computeCaptureChance(method, baseRate, isLegendary, hasSereneGrace);
     const success = rollCapture(chance);
+    recordCapture({ method, chance, success, isLegendary, pokemonId: wildId });
     if (success) {
       if (onCaught) onCaught(wildId, isShiny);
       if (method === "masterball") playMasterBallSound();

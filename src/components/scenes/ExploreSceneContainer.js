@@ -4,6 +4,17 @@ import { getExplorationTier } from "../../data/generations.js";
 import { MAX_LEVEL } from "../../hooks/useGameState.js";
 import { computeExploreSeed, computePostgameSeed, pickWeightedIds, pickTopIds } from "../../engine/explorePicker.js";
 import { EXPLORE_SPECIAL_WEIGHTS } from "../../data/exploreOptions.js";
+import { recordCrossroad, recordChoice } from "../../engine/runRecorder.js";
+
+function withRecordedChoices(choices, phase) {
+  return choices.map((choice) => ({
+    ...choice,
+    onSelect: () => {
+      recordChoice({ phase, id: choice.id });
+      choice.onSelect();
+    },
+  }));
+}
 
 const e = React.createElement;
 
@@ -305,11 +316,18 @@ export function ExploreSceneContainer({ game }) {
       },
     };
 
+    const postgameChoices = [...choicesPool, chaosRouletteChoice];
+    recordCrossroad({
+      phase: state.phase,
+      ids: postgameChoices.map((c) => c.id),
+      seedInputs: { postgameRound: state.postgameRound },
+    });
+
     return e(ChoiceScene, {
       key: `postgame-${state.postgameRound}`,
       title: "Esplorazione libera post-game",
       text: `Continui ad esplorare il mondo Pokémon. I Pokémon selvatici ed avversari sono al massimo della potenza. (Round ${state.postgameRound + 1})`,
-      choices: [...choicesPool, chaosRouletteChoice],
+      choices: withRecordedChoices(postgameChoices, state.phase),
     });
   }
 
@@ -693,6 +711,16 @@ export function ExploreSceneContainer({ game }) {
     chaosRouletteChoice,
   ];
 
+  recordCrossroad({
+    phase: state.phase,
+    ids: exploreChoices.map((c) => c.id),
+    seedInputs: {
+      gymIndex: state.gymIndex || 0,
+      badgesCount: state.badges ? state.badges.length : 0,
+      choicesCount: state.choicesCount || 0,
+    },
+  });
+
   return e(ChoiceScene, {
     key: `explore-${state.gymIndex}`,
     title: state.gymIndex === 0 ? "Il primo bivio" : "Verso la prossima palestra",
@@ -700,6 +728,6 @@ export function ExploreSceneContainer({ game }) {
       state.gymIndex === 0
         ? "Lasci il laboratorio del Professore. Le strade intorno si biforcano in modi inaspettati..."
         : `Ti lasci alle spalle l'ultima palestra. Quali opportunità ti riserva il percorso verso "${nextGymTitle}"?`,
-    choices: exploreChoices,
+    choices: withRecordedChoices(exploreChoices, state.phase),
   });
 }
