@@ -7,9 +7,63 @@
   --text: #eef3f8;
   --text-dim: #9fb0c0;
   --danger: #e0554f;
+  --danger-dark: #881337;
   --success: #4caf7d;
+  /* Token aggiunti per consolidare i colori duplicati con valori leggermente
+     diversi tra i vari componenti (vedi ANALISI_TECNICA.md 4.4) — usati per
+     le feature che ricorrono su più schermate invece di --danger/--success. */
+  --gold: #fbbf24;
+  --gold-light: #fef08a;
+  --mega: #a78bfa;
+  --mega-light: #e9d5ff;
+  --tera: #38bdf8;
+  --tera-light: #7dd3fc;
+  --panel-darker: #0f172a;
   --radius: 14px;
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* === Sistema di livelli visivi (vedi ANALISI_TECNICA.md 4.5) ===
+   3 livelli di enfasi riutilizzabili invece di uno stile inline nuovo per
+   ogni feature. Il colore resta specifico alla feature (via style inline
+   con i token --gold/--mega/--tera/--danger ecc.), ma peso visivo e
+   struttura sono condivisi e coerenti tra le schermate.
+     .badge-status  -> stato permanente per la run/battaglia (Nuzlocke,
+                        Randomizer, Mono-Tipo, Mega/Tera attivi)
+     .control-action -> pulsante che innesca una decisione del giocatore
+                        (attiva Mega, attiva Tera)
+     .info-chip     -> informazione passiva, sola lettura (abilità attive) */
+
+.badge-status {
+  display: block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.control-action {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.info-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid transparent;
 }
 
 * { box-sizing: border-box; }

@@ -283,6 +283,13 @@ migliora sia l'accessibilità sia semplicemente l'usabilità da tastiera.
 
 ### 4.4 🟢 Stile inline pervasivo invece di classi CSS riutilizzabili
 
+> ✅ **Risolto in v8.6 (scope minimo, deciso consapevolmente)** — non una
+> riscrittura completa in classi CSS (troppo rischio/sforzo per una
+> rifinitura), ma consolidati i 16 colori realmente duplicati (stesso
+> concetto, valori leggermente diversi) sulle custom property esistenti o
+> su nuovi token semantici (`--gold`, `--mega`, `--tera`, `--danger-dark`,
+> `--panel-darker`). Zero duplicati rimasti, nessuna differenza visiva.
+
 Componenti come `BattleScene.js`, `TeamPanel.js`, `PokeCenterScene.js`,
 `HallOfFameModal.js`, `ScoreCardModal.js`, `NuzlockeGameOverScreen.js`
 definiscono oggetti `style={{...}}` inline molto estesi, spesso con colori
@@ -296,6 +303,12 @@ introdurre un tema alternativo in futuro.
 
 ### 4.5 🟢 Densità informativa alta, gerarchia visiva piatta
 
+> ✅ **Risolto in v8.6 (scope minimo)** — 3 classi CSS condivise
+> (`.badge-status`, `.control-action`, `.info-chip`) applicate ai badge
+> Nuzlocke/Randomizer/Mono-Tipo, ai pulsanti/badge Mega/Tera e ai chip
+> abilità, senza toccare il layout generale. Stessa resa visiva di prima,
+> struttura ora riutilizzabile invece che duplicata per feature.
+
 Ogni nuova funzionalità (Nuzlocke, Randomizer, Mega, Tera, efficacia di
 tipo, abilità, oggetti, Pokédollari, potenza squadra...) ha introdotto il
 proprio badge/chip colorato con gradiente proprio, senza un sistema di
@@ -308,6 +321,12 @@ fermarsi a definire 2-3 "livelli" di enfasi visiva riutilizzabili invece di
 inventarne uno nuovo per ogni feature.
 
 ### 4.6 🟢 Nessun onboarding per il primo avvio
+
+> ✅ **Risolto in v8.6** — nuovo `OnboardingModal.js`, 4 pannelli (bivi,
+> cattura, tattiche di battaglia, Mega/Tera/Box) mostrati una sola volta al
+> primissimo avvio (flag in `localStorage`, indipendente dagli salvataggi),
+> riapribile in qualsiasi momento dal pulsante "❓ Come si gioca"
+> nell'header.
 
 Il gioco entra direttamente in `generationSelect → starterSelect → explore`
 senza alcuna spiegazione del loop centrale (bivi, cattura, tattiche di
@@ -347,8 +366,12 @@ Se dovessi scegliere un ordine, partirei da qui:
    zero rischio.
 5. 🟡 **Aggiungere qualche breakpoint mobile in più** (4.1) — soprattutto
    per il `TeamPanel`, che è il componente più denso.
-6. ✅ **Icone incoerenti, Iper Pozione, fallback abilità** — risolti in
-   v8.6 (2.5, 2.6, 2.7). Restano da fare, quando serve una pausa dalle
-   feature nuove: 🟢 stile inline pervasivo (4.4), 🟢 densità visiva/gerarchia
-   dei badge (4.5), 🟢 onboarding al primo avvio (4.6), refresh completo di
-   `MANUAL_TECNICO.md` §2/§3 (fuori scope di questo documento).
+6. ✅ **Icone incoerenti, Iper Pozione, fallback abilità, stile inline,
+   gerarchia visiva, onboarding** — tutti i 🟢 risolti in v8.6 (2.5, 2.6,
+   2.7, 4.4, 4.5, 4.6).
+
+Restano da fare: 🟡 testo Nuzlocke fuorviante (3.3), 🟡 breakpoint mobile
+(4.1), 🟡 tooltip invisibili su touch (4.2), 🟡 modali senza accessibilità
+da tastiera (4.3), 🔴 costo del "Riprova la battaglia" (3.1, deliberatamente
+rimandato in fase Alpha), refresh completo di `MANUAL_TECNICO.md` §2/§3
+(fuori scope di questo documento).

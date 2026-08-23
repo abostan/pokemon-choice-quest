@@ -18,15 +18,15 @@ export function NuzlockeGameOverScreen({ lastGenName, badgesCount = 0, onRestart
       style: {
         textAlign: "center",
         padding: "40px 24px",
-        background: "linear-gradient(135deg, #450a0a, #0f172a)",
-        border: "2px solid #ef4444",
+        background: "linear-gradient(135deg, #450a0a, var(--panel-darker))",
+        border: "2px solid var(--danger)",
         borderRadius: "16px",
         boxShadow: "0 0 32px rgba(239, 68, 68, 0.4)",
         color: "#fef2f2",
       },
     },
     e("div", { style: { fontSize: "4rem", marginBottom: "8px" } }, "💀"),
-    e("h2", { className: "scene-title", style: { color: "#f87171", fontSize: "2rem", marginBottom: "12px" } }, "GAME OVER — SFIDA NUZLOCKE FALLITA"),
+    e("h2", { className: "scene-title", style: { color: "var(--danger)", fontSize: "2rem", marginBottom: "12px" } }, "GAME OVER — SFIDA NUZLOCKE FALLITA"),
     e(
       "p",
       { className: "scene-text", style: { fontSize: "1.1rem", maxWidth: "600px", margin: "0 auto 20px auto", color: "#fca5a5" } },
@@ -44,8 +44,8 @@ export function NuzlockeGameOverScreen({ lastGenName, badgesCount = 0, onRestart
           border: "1px solid rgba(239, 68, 68, 0.3)",
         },
       },
-      e("p", { style: { margin: "4px 0", color: "#e2e8f0" } }, `🏅 Medaglie Conquistate: ${badgesCount}`),
-      e("p", { style: { margin: "4px 0", color: "#e2e8f0" } }, `🗺️ Regione Raggiunta: ${lastGenName || "Kanto"}`)
+      e("p", { style: { margin: "4px 0", color: "var(--text)" } }, `🏅 Medaglie Conquistate: ${badgesCount}`),
+      e("p", { style: { margin: "4px 0", color: "var(--text)" } }, `🗺️ Regione Raggiunta: ${lastGenName || "Kanto"}`)
     ),
     e(
       "button",
@@ -57,7 +57,7 @@ export function NuzlockeGameOverScreen({ lastGenName, badgesCount = 0, onRestart
           fontSize: "1.1rem",
           padding: "12px 28px",
           borderRadius: "8px",
-          border: "1px solid #f87171",
+          border: "1px solid var(--danger)",
           cursor: "pointer",
           fontWeight: "bold",
           boxShadow: "0 4px 14px rgba(220, 38, 38, 0.4)",

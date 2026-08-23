@@ -102,7 +102,7 @@ export function TeamPanel({
           borderRadius: "6px",
           fontSize: "0.85rem",
           fontWeight: "bold",
-          color: "#fef08a",
+          color: "var(--gold-light)",
         },
       },
       e("span", null, "💰 Pokédollari:"),
@@ -124,7 +124,7 @@ export function TeamPanel({
           borderRadius: "6px",
           fontSize: "0.85rem",
           fontWeight: "bold",
-          color: bonusDiff > 0 ? "#e9d5ff" : "#7dd3fc",
+          color: bonusDiff > 0 ? "var(--mega-light)" : "var(--tera-light)",
           boxShadow: bonusDiff > 0 ? "0 2px 8px rgba(168, 85, 247, 0.25)" : "none",
         },
       },
@@ -144,52 +144,24 @@ export function TeamPanel({
       isNuzlocke && e(
         "div",
         {
-          className: "nuzlocke-badge-panel",
-          style: {
-            padding: "4px 8px",
-            borderRadius: "6px",
-            background: "linear-gradient(135deg, #be123c, #881337)",
-            color: "#fff",
-            fontSize: "0.75rem",
-            fontWeight: "bold",
-            textAlign: "center",
-            letterSpacing: "0.5px",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-          },
+          className: "nuzlocke-badge-panel badge-status",
+          style: { background: "linear-gradient(135deg, var(--danger), var(--danger-dark))" },
         },
         "💀 NUZLOCKE HARDCORE"
       ),
       isRandomizer && e(
         "div",
         {
-          style: {
-            padding: "4px 8px",
-            borderRadius: "6px",
-            background: "linear-gradient(135deg, #7e22ce, #581c87)",
-            color: "#e9d5ff",
-            fontSize: "0.75rem",
-            fontWeight: "bold",
-            textAlign: "center",
-            letterSpacing: "0.5px",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-          },
+          className: "badge-status",
+          style: { background: "linear-gradient(135deg, #7e22ce, #581c87)", color: "var(--mega-light)" },
         },
         "🎲 RANDOMIZER CAOS MODE"
       ),
       monoType && e(
         "div",
         {
-          style: {
-            padding: "4px 8px",
-            borderRadius: "6px",
-            background: "linear-gradient(135deg, #b45309, #78350f)",
-            color: "#fef3c7",
-            fontSize: "0.75rem",
-            fontWeight: "bold",
-            textAlign: "center",
-            letterSpacing: "0.5px",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-          },
+          className: "badge-status",
+          style: { background: "linear-gradient(135deg, #b45309, #78350f)", color: "#fef3c7" },
         },
         `🎯 MONO-TIPO: ${monoType.toUpperCase()}`
       )
@@ -210,7 +182,7 @@ export function TeamPanel({
       e(
         "div",
         { style: { marginTop: "8px" } },
-        e("span", { style: { fontSize: "0.75rem", fontWeight: "bold", color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.5px" } }, "🌟 Abilità Attive:"),
+        e("span", { style: { fontSize: "0.75rem", fontWeight: "bold", color: "var(--gold)", textTransform: "uppercase", letterSpacing: "0.5px" } }, "🌟 Abilità Attive:"),
         e(
           "div",
           { style: { display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "4px" } },
@@ -220,14 +192,11 @@ export function TeamPanel({
               {
                 key: `${ab.name}-${idx}`,
                 title: ab.description,
+                className: "info-chip",
                 style: {
                   background: "rgba(251, 191, 36, 0.15)",
                   border: "1px solid rgba(251, 191, 36, 0.4)",
-                  color: "#fef08a",
-                  padding: "2px 6px",
-                  borderRadius: "4px",
-                  fontSize: "0.72rem",
-                  fontWeight: "500",
+                  color: "var(--gold-light)",
                   cursor: "help",
                 },
               },

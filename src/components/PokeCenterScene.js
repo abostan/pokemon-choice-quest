@@ -87,8 +87,8 @@ export function PokeCenterScene({
         {
           style: {
             background: "rgba(251, 191, 36, 0.2)",
-            border: "1px solid #fbbf24",
-            color: "#fef08a",
+            border: "1px solid var(--gold)",
+            color: "var(--gold-light)",
             padding: "4px 12px",
             borderRadius: "20px",
             fontWeight: "bold",
@@ -130,7 +130,7 @@ export function PokeCenterScene({
             padding: "10px 14px",
             borderRadius: "8px",
             background: "rgba(34, 197, 94, 0.15)",
-            border: "1px solid #22c55e",
+            border: "1px solid var(--success)",
             color: "#86efac",
             fontSize: "0.9rem",
             marginBottom: "16px",
@@ -148,7 +148,7 @@ export function PokeCenterScene({
         e("h3", { style: { color: "#fff", marginBottom: "8px" } }, "Infermera Joy"),
         e(
           "p",
-          { style: { color: "#cbd5e1", fontSize: "0.95rem", maxWidth: "480px", margin: "0 auto 20px auto" } },
+          { style: { color: "var(--text-dim)", fontSize: "0.95rem", maxWidth: "480px", margin: "0 auto 20px auto" } },
           "«Benvenuto al Centro Pokémon! Possiamo rimettere in sesto la tua squadra ed energizzarla per la prossima palestra!»"
         ),
         e(
@@ -195,7 +195,7 @@ export function PokeCenterScene({
                   "div",
                   null,
                   e("div", { style: { fontWeight: "bold", color: "#fff" } }, item.name),
-                  e("div", { style: { fontSize: "0.8rem", color: "#94a3b8" } }, item.description)
+                  e("div", { style: { fontSize: "0.8rem", color: "var(--text-dim)" } }, item.description)
                 )
               ),
               e(

@@ -30,7 +30,7 @@ export function ScoreCardModal({ gameState, onClose }) {
         className: "modal-content score-modal",
         onClick: (evt) => evt.stopPropagation(),
         style: {
-          background: "linear-gradient(135deg, #1e293b, #0f172a)",
+          background: "linear-gradient(135deg, #1e293b, var(--panel-darker))",
           border: `2px solid ${rank.color}`,
           borderRadius: "16px",
           padding: "24px",
@@ -47,7 +47,7 @@ export function ScoreCardModal({ gameState, onClose }) {
         e("h2", { style: { margin: 0, fontSize: "1.3rem", color: "#fff" } }, "📊 Valutazione & Grado di Vittoria"),
         e(
           "button",
-          { className: "modal-close-btn", onClick: onClose, style: { background: "none", border: "none", color: "#94a3b8", fontSize: "1.4rem", cursor: "pointer" } },
+          { className: "modal-close-btn", onClick: onClose, style: { background: "none", border: "none", color: "var(--text-dim)", fontSize: "1.4rem", cursor: "pointer" } },
           "✕"
         )
       ),
@@ -68,7 +68,7 @@ export function ScoreCardModal({ gameState, onClose }) {
         e("div", { style: { fontSize: "4rem", marginBottom: "4px" } }, rank.trophy),
         e("div", { style: { fontSize: "1.8rem", fontWeight: "bold", color: rank.color } }, `GRADO ${rank.code}`),
         e("div", { style: { fontSize: "1.1rem", fontWeight: "600", color: "#fff", marginTop: "2px" } }, rank.title),
-        e("p", { style: { fontSize: "0.85rem", color: "#cbd5e1", margin: "8px 0 0 0" } }, rank.description)
+        e("p", { style: { fontSize: "0.85rem", color: "var(--text-dim)", margin: "8px 0 0 0" } }, rank.description)
       ),
 
       // Punteggio Totale e Record
@@ -89,27 +89,27 @@ export function ScoreCardModal({ gameState, onClose }) {
         e(
           "div",
           null,
-          e("div", { style: { fontSize: "0.75rem", color: "#94a3b8", textTransform: "uppercase" } }, "Punteggio Corrente"),
-          e("div", { style: { fontSize: "1.5rem", fontWeight: "bold", color: "#fbbf24" } }, `${totalScore.toLocaleString()} pt`)
+          e("div", { style: { fontSize: "0.75rem", color: "var(--text-dim)", textTransform: "uppercase" } }, "Punteggio Corrente"),
+          e("div", { style: { fontSize: "1.5rem", fontWeight: "bold", color: "var(--gold)" } }, `${totalScore.toLocaleString()} pt`)
         ),
         e(
           "div",
           null,
-          e("div", { style: { fontSize: "0.75rem", color: "#94a3b8", textTransform: "uppercase" } }, "Record Personale"),
+          e("div", { style: { fontSize: "0.75rem", color: "var(--text-dim)", textTransform: "uppercase" } }, "Record Personale"),
           e(
             "div",
-            { style: { fontSize: "1.5rem", fontWeight: "bold", color: isNewRecord ? "#4ade80" : "#cbd5e1" } },
+            { style: { fontSize: "1.5rem", fontWeight: "bold", color: isNewRecord ? "var(--success)" : "var(--text-dim)" } },
             `${highScore.toLocaleString()} pt`,
-            isNewRecord && e("span", { style: { fontSize: "0.75rem", marginLeft: "4px", color: "#4ade80" } }, "NEW!")
+            isNewRecord && e("span", { style: { fontSize: "0.75rem", marginLeft: "4px", color: "var(--success)" } }, "NEW!")
           )
         )
       ),
 
       // Dettaglio Punti Breakdown
-      e("h4", { style: { color: "#94a3b8", fontSize: "0.85rem", textTransform: "uppercase", marginBottom: "10px" } }, "Dettaglio Punti:"),
+      e("h4", { style: { color: "var(--text-dim)", fontSize: "0.85rem", textTransform: "uppercase", marginBottom: "10px" } }, "Dettaglio Punti:"),
       e(
         "div",
-        { style: { display: "flex", flexDirection: "column", gap: "8px", fontSize: "0.88rem", color: "#cbd5e1" } },
+        { style: { display: "flex", flexDirection: "column", gap: "8px", fontSize: "0.88rem", color: "var(--text-dim)" } },
         e(
           "div",
           { style: { display: "flex", justifyContent: "space-between" } },
@@ -133,12 +133,12 @@ export function ScoreCardModal({ gameState, onClose }) {
             "div",
             { style: { display: "flex", justifyContent: "space-between" } },
             e("span", null, `✨ Bonus Shiny (${breakdown.shinyCount}):`),
-            e("span", { style: { fontWeight: "bold", color: "#fbbf24" } }, `+${breakdown.shinyPoints}`)
+            e("span", { style: { fontWeight: "bold", color: "var(--gold)" } }, `+${breakdown.shinyPoints}`)
           ),
         breakdown.isNuzlocke &&
           e(
             "div",
-            { style: { display: "flex", justifyContent: "space-between", color: "#f87171" } },
+            { style: { display: "flex", justifyContent: "space-between", color: "var(--danger)" } },
             e("span", null, "💀 Moltiplicatore Nuzlocke:"),
             e("span", { style: { fontWeight: "bold" } }, "x1.5")
           )

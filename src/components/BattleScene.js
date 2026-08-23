@@ -132,7 +132,7 @@ export function BattleScene({
           },
         },
         e("p", { style: { fontWeight: "bold", color: "#fda4af", margin: "0 0 8px 0" } }, "⚠️ Non hai nessun Pokémon attivo in squadra!"),
-        e("p", { style: { fontSize: "0.88rem", color: "#cbd5e1", margin: "0 0 12px 0" } }, "Devi ritirare un Pokémon sano dal Box per poter lottare."),
+        e("p", { style: { fontSize: "0.88rem", color: "var(--text-dim)", margin: "0 0 12px 0" } }, "Devi ritirare un Pokémon sano dal Box per poter lottare."),
         e(
           "button",
           {
@@ -156,8 +156,8 @@ export function BattleScene({
           fontSize: "0.88rem",
           fontWeight: "600",
           background: typeEff.status === "super" ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)",
-          border: typeEff.status === "super" ? "1px solid #22c55e" : "1px solid #ef4444",
-          color: typeEff.status === "super" ? "#4ade80" : "#f87171",
+          border: typeEff.status === "super" ? "1px solid var(--success)" : "1px solid var(--danger)",
+          color: typeEff.status === "super" ? "var(--success)" : "var(--danger)",
         },
       },
       typeEff.message
@@ -167,18 +167,12 @@ export function BattleScene({
     hasTeam && !result && !isMegaActive && !isTerastalActive && e(
       "button",
       {
-        className: "mega-btn",
+        className: "mega-btn control-action",
         style: {
           background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
           color: "#fff",
-          border: "2px solid #a78bfa",
-          padding: "10px 16px",
-          borderRadius: "8px",
-          fontWeight: "bold",
-          cursor: "pointer",
+          border: "2px solid var(--mega)",
           margin: "10px 0",
-          width: "100%",
-          boxShadow: "0 4px 12px rgba(124, 58, 237, 0.3)",
         },
         onClick: () => {
           playMegaSound();
@@ -192,17 +186,15 @@ export function BattleScene({
     hasTeam && isMegaActive && e(
       "div",
       {
-        className: "mega-active-badge",
+        className: "mega-active-badge badge-status",
         style: {
           padding: "8px 12px",
           borderRadius: "8px",
           background: "rgba(124, 58, 237, 0.25)",
-          border: "1px solid #a78bfa",
+          border: "1px solid var(--mega)",
           color: "#c4b5fd",
-          fontWeight: "bold",
           fontSize: "0.9rem",
           margin: "10px 0",
-          textAlign: "center",
         },
       },
       "🔮 MEGAEVOLUZIONE / GIGAMAX ATTIVA (+30% POTENZA SQUADRA!)"
@@ -212,18 +204,12 @@ export function BattleScene({
     hasTeam && !result && !isTerastalActive && !isMegaActive && e(
       "button",
       {
-        className: "tera-btn",
+        className: "tera-btn control-action",
         style: {
           background: "linear-gradient(135deg, #0284c7, #0369a1)",
           color: "#fff",
-          border: "2px solid #38bdf8",
-          padding: "10px 16px",
-          borderRadius: "8px",
-          fontWeight: "bold",
-          cursor: "pointer",
+          border: "2px solid var(--tera)",
           margin: "6px 0 10px 0",
-          width: "100%",
-          boxShadow: "0 4px 12px rgba(2, 132, 199, 0.3)",
         },
         onClick: () => {
           playMegaSound();
@@ -237,17 +223,15 @@ export function BattleScene({
     hasTeam && isTerastalActive && e(
       "div",
       {
-        className: "tera-active-badge",
+        className: "tera-active-badge badge-status",
         style: {
           padding: "8px 12px",
           borderRadius: "8px",
           background: "rgba(56, 189, 248, 0.25)",
-          border: "1px solid #38bdf8",
-          color: "#7dd3fc",
-          fontWeight: "bold",
+          border: "1px solid var(--tera)",
+          color: "var(--tera-light)",
           fontSize: "0.9rem",
           margin: "6px 0 10px 0",
-          textAlign: "center",
         },
       },
       "💎 TERASTALLIZZAZIONE ATTIVA (+25% POTENZA TIPO TERA!)"
@@ -340,7 +324,7 @@ export function BattleScene({
                 "button",
                 {
                   className: "continue-btn",
-                  style: { background: "linear-gradient(135deg, #be123c, #881337)", color: "#fff" },
+                  style: { background: "linear-gradient(135deg, var(--danger), var(--danger-dark))", color: "#fff" },
                   onClick: () => {
                     if (onPowerBoost) onPowerBoost({ activeMega: false, activeTerastal: false, activeItemBoost: 0 });
                     onResolved({ won: false });

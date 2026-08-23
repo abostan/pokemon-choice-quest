@@ -5,6 +5,7 @@ import { EvolutionNotice } from "./components/EvolutionNotice.js";
 import { BoxModal } from "./components/BoxModal.js";
 import { HallOfFameModal } from "./components/HallOfFameModal.js";
 import { ScoreCardModal } from "./components/ScoreCardModal.js";
+import { OnboardingModal } from "./components/OnboardingModal.js";
 import { SceneRouter } from "./components/SceneRouter.js";
 import { useGameState, initialState } from "./hooks/useGameState.js";
 import { updateHistoricPokedex } from "./engine/saveGame.js";
@@ -62,6 +63,28 @@ export default function App() {
     swapPokemon,
     generation,
   } = game;
+
+  // Onboarding: mostrato una sola volta al primissimo avvio (flag globale in
+  // localStorage, indipendente dagli slot di salvataggio — non è uno stato
+  // di gioco, è "hai già visto la spiegazione su questo browser?"). Riapribile
+  // in ogni momento dal pulsante "❓ Come si gioca" nell'header.
+  const [showOnboarding, setShowOnboarding] = React.useState(() => {
+    try {
+      return !localStorage.getItem("pcq_onboarding_seen");
+    } catch {
+      return false;
+    }
+  });
+
+  function dismissOnboarding() {
+    try {
+      localStorage.setItem("pcq_onboarding_seen", "1");
+    } catch {
+      // localStorage non disponibile: va bene lo stesso, semplicemente
+      // ricomparirà al prossimo avvio invece di restare chiuso per sempre.
+    }
+    setShowOnboarding(false);
+  }
 
   // -------------------------------------------------------
   // Barra di avanzamento
@@ -130,6 +153,9 @@ export default function App() {
   return e(
     React.Fragment,
     null,
+
+    // Onboarding modale (primo avvio, o riaperto manualmente)
+    showOnboarding && e(OnboardingModal, { onClose: dismissOnboarding }),
 
     // Overlay Evoluzioni
     state.pendingEvolutions && state.pendingEvolutions.length > 0 &&
@@ -220,6 +246,16 @@ export default function App() {
                 title: "Apri il Pokédex",
               },
               "📖 Pokédex"
+            ),
+            e(
+              "button",
+              {
+                className: "pokedex-header-btn",
+                style: { background: "linear-gradient(135deg, #4b5563, #374151)", border: "1px solid #6b7280" },
+                onClick: () => setShowOnboarding(true),
+                title: "Come si gioca",
+              },
+              "❓ Come si gioca"
             ),
             e(
               "button",
