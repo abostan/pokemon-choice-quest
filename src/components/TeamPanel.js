@@ -4,6 +4,7 @@ import { getItemDescription } from "../data/items.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 import { computeTeamPower } from "../engine/battleLogic.js";
 import { usePokemon } from "../hooks/usePokemon.js";
+import { useMegaSprite } from "../hooks/useMegaSprite.js";
 import { getTypeIcon } from "../data/types.js";
 import { getBadgeType } from "../data/generations.js";
 import { TapTooltip } from "./TapTooltip.js";
@@ -28,7 +29,7 @@ function BadgeItem({ name }) {
   );
 }
 
-function TeamGridSlot({ pokemon }) {
+function TeamGridSlot({ pokemon, activeMega }) {
   if (!pokemon) {
     return e(
       "div",
@@ -39,21 +40,29 @@ function TeamGridSlot({ pokemon }) {
   }
 
   const { data, loading } = usePokemon(pokemon.id);
+  // Sprite reale della forma Mega/Gigamax se la specie ne ha una su PokeAPI
+  // (molte non ce l'hanno, esattamente come nei giochi originali — in quel
+  // caso resta lo sprite normale, il bonus di potenza si applica comunque).
+  const megaSprite = useMegaSprite(pokemon.id, activeMega);
   const name = loading ? "..." : (data?.name ?? `#${pokemon.id}`);
-  const spriteUrl = pokemon.isShiny
+  const isMegaShown = activeMega && !!megaSprite;
+  const spriteUrl = isMegaShown
+    ? megaSprite
+    : pokemon.isShiny
     ? (data?.spriteShiny || data?.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`)
     : (data?.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`);
 
   return e(
     "div",
     {
-      className: `team-grid-slot ${pokemon.isShiny ? "shiny-slot" : ""}`,
-      title: `${name} Lv.${pokemon.level}${pokemon.isShiny ? " ✨ (Shiny)" : ""}`,
+      className: `team-grid-slot ${pokemon.isShiny ? "shiny-slot" : ""} ${isMegaShown ? "mega-slot" : ""}`,
+      title: `${name} Lv.${pokemon.level}${pokemon.isShiny ? " ✨ (Shiny)" : ""}${isMegaShown ? " 🔮 (Mega/Gigamax)" : ""}`,
     },
     e("img", { src: spriteUrl, alt: name, className: "team-slot-img" }),
     e("span", { className: "team-slot-name" }, name),
     e("span", { className: "team-slot-level" }, `Lv.${pokemon.level}`),
-    pokemon.isShiny && e("span", { className: "shiny-sparkle" }, "✨")
+    pokemon.isShiny && e("span", { className: "shiny-sparkle" }, "✨"),
+    isMegaShown && e("span", { className: "mega-sparkle" }, "🔮")
   );
 }
 
@@ -176,7 +185,7 @@ export function TeamPanel({
     e(
       "div",
       { className: "team-matrix-grid" },
-      gridSlots.map((p, idx) => e(TeamGridSlot, { key: `grid-slot-${idx}`, pokemon: p }))
+      gridSlots.map((p, idx) => e(TeamGridSlot, { key: `grid-slot-${idx}`, pokemon: p, activeMega }))
     ),
 
     // Sezione Abilità Passive Attive

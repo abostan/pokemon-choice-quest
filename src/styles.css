@@ -380,6 +380,26 @@ body {
   transform: translateY(-2px);
 }
 
+.team-grid-slot.shiny-slot {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.35);
+}
+
+/* Sprite Mega/Gigamax mostrato quando Mega è attivo in battaglia e la
+   specie ha davvero una forma Mega/Gigamax su PokeAPI (vedi ROADMAP.md
+   Fase 6, "Varianti Regionali & Forme Mega/Gigamax"). */
+.team-grid-slot.mega-slot {
+  border-color: var(--mega);
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.4);
+}
+
+.mega-sparkle {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 0.7rem;
+}
+
 .team-grid-slot.empty {
   border: 1px dashed rgba(148, 163, 184, 0.2);
   background: rgba(15, 23, 42, 0.4);
