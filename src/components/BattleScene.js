@@ -290,14 +290,23 @@ export function BattleScene({
       e(
         "div",
         { className: "choice-list", style: { marginTop: "16px" } },
-        TACTICS.map((t) =>
-          e(
+        TACTICS.map((t) => {
+          const previewChance = computeWinChance(totalTeamPower, opponentPower, t.id, teamAbilities);
+          const pct = Math.round(previewChance * 100);
+          const barColor = previewChance < 0.4 ? "var(--danger)" : previewChance < 0.65 ? "var(--gold)" : "var(--success)";
+          return e(
             "button",
             { key: t.id, className: "choice-btn", onClick: () => fight(t.id) },
             e("span", null, t.label),
-            e("span", { className: "choice-hint" }, t.hint)
-          )
-        )
+            e("span", { className: "choice-hint" }, t.hint),
+            e(
+              "div",
+              { className: "win-chance-bar-track" },
+              e("div", { className: "win-chance-bar-fill", style: { width: `${pct}%`, background: barColor } })
+            ),
+            e("span", { className: "win-chance-bar-label", style: { color: barColor } }, `${pct}% probabilità di vittoria`)
+          );
+        })
       ),
 
     result &&

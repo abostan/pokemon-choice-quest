@@ -172,7 +172,7 @@ Un secondo bug emerso applicando il fix: il filtro veniva applicato anche ai poo
   - 🌋 *"Monte Argento"*: Sconfiggi Rosso Leggendario nel post-game — sbloccato alla vittoria contro l'"Allenatore Leggendario Rosso" in `SceneRouter.js`.
   - 🌍 *"Gran Maestro dei Continenti"*: Conquista tutte e 9 le regioni in una sola run — sbloccato quando `completedGensCount` raggiunge `GENERATIONS.length` al termine dell'ultima regione della catena.
 - [x] **🎨 Carte Bivio in Griglia 2x2 con Border Glow**: layout a griglia con sfondi sfumati a tema per le scelte di esplorazione e bordi illuminati al passaggio del mouse.
-- [ ] **📊 Indicatore Visivo Dinamico Probabilità di Vittoria**: barra a colori cangianti (Rosso/Giallo/Verde) con riempimento animato durante la scelta della tattica di battaglia.
+- [x] **📊 Indicatore Visivo Dinamico Probabilità di Vittoria**: `computeWinChance` (già esistente, prima calcolato solo dopo aver scelto la tattica) ora chiamato in anteprima per tutte e 3 le tattiche mentre sono ancora selezionabili — una barra colorata (rosso <40%, oro 40-65%, verde >65%) con percentuale sotto ciascuna card di `BattleScene.js`, così la scelta è informata invece che alla cieca.
 - [ ] **📱 Header Responsive Compatto Mobile**: raggruppamento dei pulsanti dell'header sotto un menu a tendina "⚙️ Menu / Extra" su schermi piccoli.
 - [ ] **🎉 Effetti Particellari (Sparkles & Confetti)**: animazione con brillantini e coriandoli d'oro durante catture Shiny, evoluzioni e vittorie importanti.
 - [x] **⚡ Display Potenza Complessiva della Squadra**: indicatore visivo "⚡ Potenza Squadra: XXX" nel pannello laterale per confrontarla immediatamente con quella degli avversari.
