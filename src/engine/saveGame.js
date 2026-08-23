@@ -2,6 +2,9 @@
 // Nessuna dipendenza da React — modulo puro, facile da testare.
 
 import { sanitizeGameState } from "./saveSanitizer.js";
+import { unlockAchievement } from "./achievements.js";
+
+const POKEDEX_COMPLETE_THRESHOLD = 151;
 
 const SAVE_VERSION = 1;
 const DEFAULT_SLOTS = [1, 2, 3, 4, 5];
@@ -154,6 +157,10 @@ export function updateHistoricPokedex(pokemonId, caught, isShiny = false) {
       firstCaught: caught && !existing.firstCaught ? new Date().toISOString() : (existing.firstCaught || null),
     };
     localStorage.setItem(POKEDEX_KEY, JSON.stringify(historic));
+    if (caught) {
+      const caughtCount = Object.values(historic).filter((p) => p && p.caught).length;
+      if (caughtCount >= POKEDEX_COMPLETE_THRESHOLD) unlockAchievement("pokedexComplete");
+    }
   } catch (err) {
     console.warn("[updateHistoricPokedex] Errore:", err);
   }

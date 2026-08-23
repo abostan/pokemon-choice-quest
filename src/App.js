@@ -11,6 +11,8 @@ import { AchievementsModal } from "./components/AchievementsModal.js";
 import { SceneRouter } from "./components/SceneRouter.js";
 import { useGameState, initialState } from "./hooks/useGameState.js";
 import { updateHistoricPokedex } from "./engine/saveGame.js";
+import { unlockAchievement } from "./engine/achievements.js";
+import { AchievementToast } from "./components/AchievementToast.js";
 
 const e = React.createElement;
 
@@ -147,6 +149,7 @@ export default function App() {
       const updatedPokedexRun = { ...prev.pokedexRun };
       for (const evo of prev.pendingEvolutions || []) {
         if (!rejectedIds.has(evo.id)) {
+          unlockAchievement("firstEvolution");
           updateHistoricPokedex(evo.id, true, evo.isShiny);
           updatedPokedexRun[evo.id] = {
             seen: true,
@@ -176,6 +179,9 @@ export default function App() {
   return e(
     React.Fragment,
     null,
+
+    // Toast trofei sbloccati, sempre montato indipendentemente dalla scena
+    e(AchievementToast, null),
 
     // Onboarding modale (primo avvio, o riaperto manualmente)
     showOnboarding && e(OnboardingModal, { onClose: dismissOnboarding }),

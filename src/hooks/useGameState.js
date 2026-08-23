@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { logger } from "../engine/logger.js";
 import { getGeneration, getNextGeneration, GENERATIONS } from "../data/generations.js";
-import { unlockAchievement } from "../engine/achievements.js";
+import { unlockAchievement, regionAchievementId } from "../engine/achievements.js";
 import { checkEvolution } from "../data/evolutions.js";
 import { filterEncounterPoolByChallenge } from "../engine/challengeEngine.js";
 import { hasSave } from "../engine/saveGame.js";
@@ -146,6 +146,7 @@ export function useGameState() {
 
   function addItem(item) {
     playItemUseSound();
+    if (item === "Master Ball") unlockAchievement("firstMasterBall");
     setState((prev) => ({ ...prev, items: [...prev.items, item] }));
   }
 
@@ -220,6 +221,7 @@ export function useGameState() {
   }
 
   function resolveBattleWin(badge) {
+    if (badge) unlockAchievement("firstGymBadge");
     addBadge(badge);
     boostTeam(WIN_LEVEL_BOOST);
     setState((prev) => ({ ...prev, coins: (prev.coins || 0) + 4 }));
@@ -272,6 +274,8 @@ export function useGameState() {
     }
 
     if (nextGymIndex >= generation.gymLeaders.length) {
+      unlockAchievement("allGymsCleared");
+      unlockAchievement(regionAchievementId("gyms", generation.id));
       goTo("eliteBattle", { gymIndex: nextGymIndex, eliteIndex: 0 });
       return;
     }

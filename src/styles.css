@@ -672,6 +672,54 @@ body {
 }
 
 /* ------------------------------------------------------------------
+   Toast Trofei sbloccati — vedi ROADMAP.md Fase 11.
+   ------------------------------------------------------------------ */
+.achievement-toast-stack {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.achievement-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(90deg, #2a1f0a, #4a3510);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 10px 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  animation: achievementToastIn 0.3s ease-out;
+}
+
+@keyframes achievementToastIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.achievement-toast-icon {
+  font-size: 1.8rem;
+}
+
+.achievement-toast-label {
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.achievement-toast-title {
+  font-weight: bold;
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------------
    Modali generici (overlay + card)
    ------------------------------------------------------------------ */
 .modal-overlay {

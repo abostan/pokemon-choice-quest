@@ -17,6 +17,7 @@ export function usePokedexState(setState) {
   }
 
   function markCaught(id, isShiny = false) {
+    unlockAchievement("firstCapture");
     if (isShiny) unlockAchievement("firstShiny");
     setState((prev) => {
       const existing = prev.pokedexRun[id] || {};

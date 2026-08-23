@@ -3,7 +3,7 @@ import { BattleScene } from "../BattleScene.js";
 import { NextGenerationScreen } from "../NextGenerationScreen.js";
 import { getGeneration } from "../../data/generations.js";
 import { addHallOfFameEntry } from "../../engine/hallOfFame.js";
-import { unlockAchievement } from "../../engine/achievements.js";
+import { unlockAchievement, regionAchievementId } from "../../engine/achievements.js";
 
 const e = React.createElement;
 
@@ -111,6 +111,8 @@ export function LeagueSceneContainer({ game }) {
         onPowerBoost: update,
         onResolved: ({ won }) => {
           if (won) {
+            unlockAchievement("firstChampion");
+            unlockAchievement(regionAchievementId("champion", generation.id));
             if (state.isNuzlocke) unlockAchievement("nuzlockeMaster");
             resolveBattleWin(champion.badge);
             addItem("Master Ball");

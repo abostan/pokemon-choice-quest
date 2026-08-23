@@ -1,5 +1,6 @@
 import React from "react";
 import { BattleScene } from "../BattleScene.js";
+import { unlockAchievement, regionAchievementId } from "../../engine/achievements.js";
 
 const e = React.createElement;
 
@@ -123,6 +124,7 @@ export function GymBattleSceneContainer({ game }) {
         onPowerBoost: update,
         onResolved: ({ won }) => {
           if (won) {
+            unlockAchievement(regionAchievementId("villain", generation.id));
             resolveBattleWin(null);
             addItem(boss.rewardItem);
             if (boss.rewardItem === "Caramella Rara") {

@@ -13,11 +13,11 @@ import { MerchantScene } from "./MerchantScene.js";
 import { ExploreSceneContainer } from "./scenes/ExploreSceneContainer.js";
 import { GymBattleSceneContainer } from "./scenes/GymBattleSceneContainer.js";
 import { LeagueSceneContainer } from "./scenes/LeagueSceneContainer.js";
-import { getExplorationTier } from "../data/generations.js";
+import { getExplorationTier, GENERATIONS } from "../data/generations.js";
 import { CHAMPIONS_TOURNAMENT } from "../data/championsTournament.js";
 import { filterStartersByChallenge } from "../engine/challengeEngine.js";
 import { addHallOfFameEntry } from "../engine/hallOfFame.js";
-import { unlockAchievement } from "../engine/achievements.js";
+import { unlockAchievement, regionAchievementId } from "../engine/achievements.js";
 import { deleteSave } from "../engine/saveGame.js";
 import { initialState } from "../hooks/useGameState.js";
 
@@ -289,8 +289,13 @@ export function SceneRouter({ game }) {
         if (caught) {
           addToTeam(pokemon);
           if (isLegendary) {
+            unlockAchievement(regionAchievementId("legendary", generation.id));
+            const newCaughtLegendaries = [...state.caughtLegendaries, pokemon.id];
+            if (GENERATIONS.every((gen) => gen.legendaries.some((id) => newCaughtLegendaries.includes(id)))) {
+              unlockAchievement("legendaryCollector");
+            }
             update({
-              caughtLegendaries: [...state.caughtLegendaries, pokemon.id],
+              caughtLegendaries: newCaughtLegendaries,
               postgameRound: state.postgameRound + 1,
             });
           }
