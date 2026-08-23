@@ -8,6 +8,7 @@
     "start": "node server.mjs",
     "test": "node --test tests/*.test.js",
     "test:coverage": "node --test --experimental-test-coverage tests/*.test.js",
-    "logs": "node scripts/analyze-run-log.mjs"
+    "logs": "node scripts/analyze-run-log.mjs",
+    "simulate-pools": "node scripts/simulate-pools.mjs"
   }
 }

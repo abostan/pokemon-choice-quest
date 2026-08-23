@@ -8,6 +8,29 @@ import { EXPLORE_SPECIAL_WEIGHTS } from "../../data/exploreOptions.js";
 import { rollCasinoOutcome } from "../../engine/casinoLogic.js";
 import { rollWeather } from "../../data/weather.js";
 import { recordCrossroad, recordChoice } from "../../engine/runRecorder.js";
+import {
+  FIRE_POOLS_BY_REGION,
+  GHOST_POOLS_BY_REGION,
+  ICE_POOLS_BY_REGION,
+  FIGHTING_POOLS_BY_REGION,
+  EGG_POOLS_BY_REGION,
+  FOSSIL_POOLS_BY_REGION,
+  SAFARI_POOLS_BY_REGION,
+  NPC_TRADE_POOL,
+  POSTGAME_FIRE_POOL,
+  POSTGAME_GHOST_POOL,
+  POSTGAME_ICE_POOL,
+  POSTGAME_FIGHTING_POOL,
+  POSTGAME_SAFARI_POOL,
+  POSTGAME_FOSSIL_POOL,
+  POSTGAME_TRADE_POOL,
+  POSTGAME_EGG_POOL,
+  POSTGAME_ULTRA_POOL,
+  POSTGAME_SEARCH_ITEMS,
+  WEATHER_ITEM_BY_ID,
+  EVOLUTION_STONES,
+  SAFARI_ITEMS,
+} from "../../data/exploreZonePools.js";
 
 function withRecordedChoices(choices, phase) {
   return choices.map((choice) => ({
@@ -18,22 +41,6 @@ function withRecordedChoices(choices, phase) {
     },
   }));
 }
-
-// Oggetti tematici per bivio (ROADMAP.md Fase 7): prima diversi bivi
-// restituivano sempre la stessa "Super Pozione" a prescindere dal contesto
-// narrativo, o (Zona Safari) nessun oggetto affatto nonostante il testo
-// promettesse una riserva naturale da esplorare.
-const WEATHER_ITEM_BY_ID = {
-  sun: "Pietra Solare", // Sole Intenso — corrispondenza diretta col nome
-  rain: "Idropietra", // Pioggia Battente
-  sandstorm: "Pietra Metallica", // Tempesta di Sabbia — minerale/deserto
-  fog: "Pietraluna", // Nebbia Fitta — atmosfera notturna/misteriosa
-};
-const EVOLUTION_STONES = [
-  "Pietra Focaia", "Idropietra", "Pietra Foglia", "Pietra Tuono", "Pietraluna",
-  "Pietra Metallica", "Pietra Solare", "Pietra Idrica", "Pietra Folletto", "Pietra Brillante",
-];
-const SAFARI_ITEMS = ["Miele", "Foglia Strana", "Resti", "Caramella Rara"];
 
 function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -95,8 +102,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🌌 Fenditura Ultra-Varco (Ultra Bestie)",
         hint: "Incontra creature leggendarie provenienti da altre dimensioni",
         onSelect: () => {
-          const ultraPool = [793, 794, 795, 796, 797, 798, 799, 803, 804, 805, 806];
-          const ubId = ultraPool[Math.floor(Math.random() * ultraPool.length)];
+          const ubId = POSTGAME_ULTRA_POOL[Math.floor(Math.random() * POSTGAME_ULTRA_POOL.length)];
           goTo("legendaryEncounter", {
             pendingEncounterPool: [ubId],
             pendingEncounterLevel: Math.min(MAX_LEVEL, 75 + state.postgameRound * 2),
@@ -129,8 +135,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🌾 Parco Safari Esotico Post-Game",
         hint: "Riserva naturale di specie rare di tutte le generazioni",
         onSelect: () => {
-          const safariPool = [123, 128, 147, 246, 371, 443, 610, 696, 782, 885, 996, 142, 193, 359, 472, 571, 707, 866, 952];
-          const chosenId = safariPool[Math.floor(Math.random() * safariPool.length)];
+          const chosenId = POSTGAME_SAFARI_POOL[Math.floor(Math.random() * POSTGAME_SAFARI_POOL.length)];
           addItem(pickRandom(SAFARI_ITEMS));
           goTo("encounter", {
             pendingEncounterPool: [chosenId],
@@ -144,8 +149,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🧪 Laboratorio Fossili Antichi",
         hint: "Rianima e cattura un Pokémon preistorico a Lv 50",
         onSelect: () => {
-          const fossilPool = [138, 140, 142, 345, 347, 408, 410, 564, 566, 696, 698, 880, 881, 882, 883];
-          const fossilId = fossilPool[Math.floor(Math.random() * fossilPool.length)];
+          const fossilId = POSTGAME_FOSSIL_POOL[Math.floor(Math.random() * POSTGAME_FOSSIL_POOL.length)];
           markCaught(fossilId, false);
           addToTeam({ id: fossilId, level: 50 });
           update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
@@ -156,8 +160,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🤝 Allenatore in cerca di Scambi",
         hint: "Scambia un Pokémon per ottenere una specie rara a livello elevato",
         onSelect: () => {
-          const tradePool = [137, 212, 468, 474, 635, 706, 959, 448, 475, 700, 776, 887, 983];
-          const tradeId = tradePool[Math.floor(Math.random() * tradePool.length)];
+          const tradeId = POSTGAME_TRADE_POOL[Math.floor(Math.random() * POSTGAME_TRADE_POOL.length)];
           markCaught(tradeId, false);
           addToTeam({ id: tradeId, level: Math.min(MAX_LEVEL, pgLevel + 5) });
           addItem(pickRandom(EVOLUTION_STONES)); // un allenatore che scambia offre volentieri anche una pietra evolutiva
@@ -192,7 +195,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Pokémon selvatici di tipo Fuoco, Terra e Roccia",
         onSelect: () =>
           goTo("encounter", {
-            pendingEncounterPool: [58, 77, 218, 322, 554, 667, 935, 4, 111, 246, 328, 408, 636, 758, 839, 936],
+            pendingEncounterPool: POSTGAME_FIRE_POOL,
             pendingEncounterLevel: pgLevel,
             pendingEncounterIsLegendary: false,
           }),
@@ -203,7 +206,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Pokémon selvatici di tipo Spettro, Psico, Buio e Fata",
         onSelect: () =>
           goTo("encounter", {
-            pendingEncounterPool: [92, 200, 353, 425, 607, 708, 971, 63, 122, 302, 355, 359, 570, 677, 885],
+            pendingEncounterPool: POSTGAME_GHOST_POOL,
             pendingEncounterLevel: pgLevel,
             pendingEncounterIsLegendary: false,
           }),
@@ -214,7 +217,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Pokémon selvatici di tipo Ghiaccio, Acciaio e Volante",
         onSelect: () =>
           goTo("encounter", {
-            pendingEncounterPool: [131, 225, 363, 459, 613, 712, 974, 87, 124, 215, 220, 361, 471, 582, 873, 996],
+            pendingEncounterPool: POSTGAME_ICE_POOL,
             pendingEncounterLevel: pgLevel,
             pendingEncounterIsLegendary: false,
           }),
@@ -225,7 +228,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Pokémon selvatici di tipo Lotta e Normale",
         onSelect: () =>
           goTo("encounter", {
-            pendingEncounterPool: [66, 106, 296, 447, 532, 759, 921, 56, 107, 236, 448, 619, 701, 979],
+            pendingEncounterPool: POSTGAME_FIGHTING_POOL,
             pendingEncounterLevel: pgLevel,
             pendingEncounterIsLegendary: false,
           }),
@@ -241,8 +244,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🔍 Cercatore di Strumenti & Bacche",
         hint: "Esplora per trovare bacche, pozioni o pietre evolutive",
         onSelect: () => {
-          const pool = ["Super Pozione", "Caramella Rara", "Pietraluna", "Resti"];
-          addItem(pool[Math.floor(Math.random() * pool.length)]);
+          addItem(POSTGAME_SEARCH_ITEMS[Math.floor(Math.random() * POSTGAME_SEARCH_ITEMS.length)]);
           boostTeam(1);
           update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
@@ -252,8 +254,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🐣 Cova un Uovo Misterioso",
         hint: "Ricevi un uovo raro che si schiuderà in un nuovo Pokémon a Lv 5",
         onSelect: () => {
-          const eggPool = [133, 175, 447, 633, 704, 885, 996, 172, 173, 174, 298, 360, 438, 439];
-          const eggId = eggPool[Math.floor(Math.random() * eggPool.length)];
+          const eggId = POSTGAME_EGG_POOL[Math.floor(Math.random() * POSTGAME_EGG_POOL.length)];
           markCaught(eggId, false);
           addToTeam({ id: eggId, level: 5 });
           addItem("Caramella Rara"); // il nuovo nato cresce in fretta
@@ -385,51 +386,6 @@ export function ExploreSceneContainer({ game }) {
     });
   }
 
-  const firePools = {
-    kanto: [37, 58, 100, 81, 77],
-    johto: [155, 179, 218, 228, 239],
-    hoenn: [255, 309, 322, 304, 324],
-    sinnoh: [390, 403, 240, 436, 479],
-    unova: [498, 522, 554, 599, 607],
-    kalos: [653, 667, 694, 679, 669],
-  };
-
-  const ghostPools = {
-    kanto: [92, 63, 96, 35, 39],
-    johto: [200, 198, 215, 280, 175],
-    hoenn: [353, 355, 302, 325, 280],
-    sinnoh: [425, 442, 433, 434, 439],
-    unova: [570, 607, 562, 574, 577],
-    kalos: [708, 710, 677, 682, 684],
-  };
-
-  const icePools = {
-    kanto: [124, 131, 90, 142],
-    johto: [220, 225, 215, 227],
-    hoenn: [361, 363, 378, 374],
-    sinnoh: [459, 361, 436, 447],
-    unova: [582, 613, 615, 624],
-    kalos: [712, 698, 679, 701],
-  };
-
-  const fightingPools = {
-    kanto: [66, 56, 106, 107, 52],
-    johto: [236, 214, 190, 216, 209],
-    hoenn: [296, 307, 335, 287, 300],
-    sinnoh: [447, 453, 427, 417, 422],
-    unova: [532, 559, 619, 572, 506],
-    kalos: [674, 701, 659, 676, 672],
-  };
-
-  const eggPools = {
-    kanto: [133, 131, 147],
-    johto: [175, 172, 246],
-    hoenn: [360, 328, 371],
-    sinnoh: [447, 403, 443],
-    unova: [570, 559, 610],
-    kalos: [677, 704, 714],
-  };
-
   const allSpecialOptions = [
     {
       id: "legendary",
@@ -457,7 +413,7 @@ export function ExploreSceneContainer({ game }) {
       hint: "Pokémon selvatici di tipo Fuoco, Elettrico ed Acciaio",
       onSelect: () =>
         goTo("encounter", {
-          pendingEncounterPool: firePools[state.generationId] || [37, 58, 100],
+          pendingEncounterPool: FIRE_POOLS_BY_REGION[state.generationId] || [37, 58, 100],
           pendingEncounterLevel: tier.level,
           pendingEncounterIsLegendary: false,
         }),
@@ -469,7 +425,7 @@ export function ExploreSceneContainer({ game }) {
       hint: "Pokémon selvatici di tipo Spettro, Psico, Buio e Fata",
       onSelect: () =>
         goTo("encounter", {
-          pendingEncounterPool: ghostPools[state.generationId] || [92, 63, 35],
+          pendingEncounterPool: GHOST_POOLS_BY_REGION[state.generationId] || [92, 63, 35],
           pendingEncounterLevel: tier.level,
           pendingEncounterIsLegendary: false,
         }),
@@ -481,7 +437,7 @@ export function ExploreSceneContainer({ game }) {
       hint: "Pokémon selvatici di tipo Ghiaccio, Acciaio e Volante",
       onSelect: () =>
         goTo("encounter", {
-          pendingEncounterPool: icePools[state.generationId] || [124, 131, 220],
+          pendingEncounterPool: ICE_POOLS_BY_REGION[state.generationId] || [124, 131, 220],
           pendingEncounterLevel: tier.level,
           pendingEncounterIsLegendary: false,
         }),
@@ -493,7 +449,7 @@ export function ExploreSceneContainer({ game }) {
       hint: "Pokémon selvatici di tipo Lotta e Normale",
       onSelect: () =>
         goTo("encounter", {
-          pendingEncounterPool: fightingPools[state.generationId] || [66, 56, 106],
+          pendingEncounterPool: FIGHTING_POOLS_BY_REGION[state.generationId] || [66, 56, 106],
           pendingEncounterLevel: tier.level,
           pendingEncounterIsLegendary: false,
         }),
@@ -547,7 +503,7 @@ export function ExploreSceneContainer({ game }) {
       label: "🐣 Cova un Uovo Misterioso",
       hint: "Ricevi un uovo raro che si schiuderà in un nuovo Pokémon a Lv 5",
       onSelect: () => {
-        const pool = eggPools[state.generationId] || [133, 175, 447];
+        const pool = EGG_POOLS_BY_REGION[state.generationId] || [133, 175, 447];
         const eggId = pool[Math.floor(Math.random() * pool.length)];
         markCaught(eggId, false);
         addToTeam({ id: eggId, level: 5 });
@@ -599,15 +555,7 @@ export function ExploreSceneContainer({ game }) {
       label: "🧪 Laboratorio Fossili Antichi",
       hint: "Consegna un fossile per rianimare e catturare un Pokémon preistorico a Lv 15",
       onSelect: () => {
-        const fossilPools = {
-          kanto: [138, 140, 142],
-          johto: [138, 140, 345, 347],
-          hoenn: [345, 347, 142],
-          sinnoh: [408, 410, 142],
-          unova: [564, 566],
-          kalos: [696, 698],
-        };
-        const pool = fossilPools[state.generationId] || [138, 140, 142, 345, 347];
+        const pool = FOSSIL_POOLS_BY_REGION[state.generationId] || [138, 140, 142, 345, 347];
         const fossilId = pool[Math.floor(Math.random() * pool.length)];
         markCaught(fossilId, false);
         addToTeam({ id: fossilId, level: 15 });
@@ -621,8 +569,7 @@ export function ExploreSceneContainer({ game }) {
       label: "🤝 Allenatore in cerca di Scambi",
       hint: "Un Allenatore del percorso ti offre una specie rara in cambio di una collaborazione",
       onSelect: () => {
-        const tradePool = [83, 122, 124, 127, 131, 214, 303, 441, 538, 677];
-        const tradeId = tradePool[Math.floor(Math.random() * tradePool.length)];
+        const tradeId = NPC_TRADE_POOL[Math.floor(Math.random() * NPC_TRADE_POOL.length)];
         markCaught(tradeId, false);
         const avgLevel = state.team.length > 0
           ? Math.round(state.team.reduce((acc, p) => acc + (p.level || 5), 0) / state.team.length) + 2
@@ -652,15 +599,7 @@ export function ExploreSceneContainer({ game }) {
       label: "🌾 Parco Safari — Riserva Naturale",
       hint: "Entra nella riserva per incontrare ed armarti di Safari Ball contro Pokémon esotici e rari",
       onSelect: () => {
-        const safariPools = {
-          kanto: [123, 127, 128, 115, 113, 147],
-          johto: [214, 225, 234, 246],
-          hoenn: [328, 335, 359, 371],
-          sinnoh: [443, 453, 455],
-          unova: [559, 610, 621],
-          kalos: [704, 708, 712],
-        };
-        const pool = safariPools[state.generationId] || [123, 127, 128, 115, 147];
+        const pool = SAFARI_POOLS_BY_REGION[state.generationId] || [123, 127, 128, 115, 147];
         addItem(pickRandom(SAFARI_ITEMS));
         goTo("encounter", {
           pendingEncounterPool: pool,
