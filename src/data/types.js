@@ -6,6 +6,23 @@ export const TYPE_LIST = [
   "Roccia", "Spettro", "Drago", "Buio", "Acciaio", "Folletto",
 ];
 
+// Icona per tipo, unica fonte di verità condivisa tra TeamPanel.js
+// (medaglie) e BattleScene.js (avatar avversario) — prima ciascuno
+// indovinava l'icona con il proprio string-matching sul nome scelto per la
+// medaglia/il titolo, incoerenti tra loro e fragili verso nomi nuovi (es.
+// "Medaglia Erba"/"Medaglia Fuoco"/"Medaglia Normale Paldea" non
+// matchavano nessuna parola chiave e cadevano sull'icona generica).
+export const TYPE_ICONS = {
+  Normale: "🥛", Fuoco: "🔥", Acqua: "💧", Erba: "🌿", Elettrico: "⚡",
+  Ghiaccio: "❄️", Lotta: "🥊", Veleno: "☠️", Terra: "🏔️", Volante: "🦅",
+  Psico: "🔮", Coleottero: "🐛", Roccia: "🪨", Spettro: "👻", Drago: "🐉",
+  Buio: "🌑", Acciaio: "🗡️", Folletto: "🧚",
+};
+
+export function getTypeIcon(type, fallback = "⚔️") {
+  return TYPE_ICONS[type] || fallback;
+}
+
 export const POKEMON_TYPES = {
   // Gen 1 Starters & iconic
   1: "Erba", 2: "Erba", 3: "Erba",

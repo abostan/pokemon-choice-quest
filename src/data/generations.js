@@ -727,3 +727,27 @@ export function getNextGeneration(currentId) {
   if (idx === -1 || idx + 1 >= GENERATIONS.length) return null;
   return GENERATIONS[idx + 1];
 }
+
+// Costruita una sola volta al caricamento del modulo: nome medaglia -> tipo,
+// ricavato dal titolo del capopalestra ("Capopalestra di tipo X") invece che
+// dal nome estetico della medaglia stesso (che varia liberamente tra
+// generazioni, es. "Medaglia Zanna" per il tipo Coleottero).
+const BADGE_TYPE_BY_NAME = (() => {
+  const map = {};
+  for (const gen of GENERATIONS) {
+    for (const gym of gen.gymLeaders || []) {
+      const match = gym.title?.match(/di tipo (\S+)/);
+      if (gym.badge && match) map[gym.badge] = match[1];
+    }
+  }
+  return map;
+})();
+
+/**
+ * Restituisce il tipo Pokémon associato ad una medaglia di palestra
+ * (es. "Medaglia Zanna" -> "Coleottero"), o null se non è una medaglia di
+ * palestra nota (es. un titolo da Campione, che non ha un tipo singolo).
+ */
+export function getBadgeType(badgeName) {
+  return BADGE_TYPE_BY_NAME[badgeName] ?? null;
+}

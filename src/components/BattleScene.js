@@ -7,6 +7,7 @@ import { computeMegaPower } from "../engine/megaLogic.js";
 import { playMegaSound, playVictoryJingle } from "../engine/soundEngine.js";
 import { recordBattle } from "../engine/runRecorder.js";
 import { computeTeamAbilities } from "../data/abilities.js";
+import { getTypeIcon, TYPE_LIST } from "../data/types.js";
 
 const e = React.createElement;
 
@@ -14,23 +15,8 @@ function getTrainerEmoji(title) {
   if (title.includes("Rivale")) return "🧢";
   if (title.includes("Campione")) return "👑";
   if (title.includes("Alto Comando")) return "⚔️";
-  if (title.includes("Roccia")) return "🪨";
-  if (title.includes("Acqua")) return "💧";
-  if (title.includes("Elettrico")) return "⚡";
-  if (title.includes("Erba")) return "🌿";
-  if (title.includes("Veleno")) return "☠️";
-  if (title.includes("Psico") || title.includes("Spettro")) return "🔮";
-  if (title.includes("Fuoco")) return "🔥";
-  if (title.includes("Terra")) return "🏔️";
-  if (title.includes("Volante")) return "🦅";
-  if (title.includes("Coleottero")) return "🐛";
-  if (title.includes("Normale")) return "🥛";
-  if (title.includes("Lotta")) return "🥊";
-  if (title.includes("Acciaio")) return "🗡️";
-  if (title.includes("Ghiaccio")) return "❄️";
-  if (title.includes("Drago")) return "🐉";
-  if (title.includes("Folletto")) return "🧚";
-  return "👤";
+  const type = TYPE_LIST.find((t) => title.includes(t));
+  return type ? getTypeIcon(type, "👤") : "👤";
 }
 
 /**
@@ -99,7 +85,8 @@ export function BattleScene({
     if (usedItem) return;
     const itemName = items[itemIdx];
     let boost = 10;
-    if (itemName.includes("Iper") || itemName.includes("Super")) boost = 18;
+    if (itemName.includes("Iper")) boost = 24;
+    else if (itemName.includes("Super")) boost = 18;
     else if (itemName.includes("Pozione")) boost = 10;
     else if (itemName.includes("Pietra") || itemName.includes("Rimedio")) boost = 14;
 

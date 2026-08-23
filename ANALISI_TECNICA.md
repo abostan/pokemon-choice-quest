@@ -89,6 +89,17 @@ speciali, minigiochi).
 
 ### 2.5 🟢 Icone assegnate per string-matching sul titolo, non per campo esplicito
 
+> ✅ **Risolto in v8.6** — sostituito con `getTypeIcon()` (`data/types.js`)
+> risolto tramite il tipo reale (`getBadgeType()` in `data/generations.js`,
+> che lo ricava dal titolo del capopalestra, non dal nome estetico della
+> medaglia). Verificando i nomi reali delle medaglie il problema si è
+> rivelato più esteso di questo singolo caso: "Medaglia Erba", "Medaglia
+> Fuoco", "Medaglia Normale Paldea", "Medaglia Buio", "Medaglia Folletto",
+> "Medaglia Lotta" e "Medaglia Ombra" non matchavano **nessuna** parola
+> chiave e cadevano sull'icona generica 🏅 — esattamente il tipo di rottura
+> silenziosa descritto sotto. Spettro ha ora un'icona propria (👻) invece
+> di condividere quella di Psico (🔮).
+
 `TeamPanel.js:getBadgeIcon()` e `BattleScene.js:getTrainerEmoji()`
 indovinano l'icona cercando sottostringhe nel nome (`title.includes("Roccia")`
 ecc.), invece di leggere un campo `type` esplicito già presente nei dati.
@@ -103,6 +114,9 @@ medaglie diversi rompe silenziosamente queste mappe testuali.
 
 ### 2.6 🟢 "Iper Pozione" non è più forte di "Super Pozione"
 
+> ✅ **Risolto in v8.6** — Iper Pozione ora +24 Potenza (era +18, identico
+> alla Super Pozione).
+
 `items.js` (righe 7-8) e `BattleScene.js:handleUseItem` (riga 101) assegnano
 lo stesso bonus (+18 Potenza) a "Super Pozione" e "Iper Pozione", pur
 costando la seconda 50% in più al PokéMart (3 💰 vs 2 💰) ed essendo
@@ -110,6 +124,10 @@ descritta come cura "al massimo". Incoerenza di bilanciamento minore ma
 facilmente notabile da chi gioca con attenzione ai numeri.
 
 ### 2.7 🟢 Abilità passive assegnate con un fallback aritmetico arbitrario
+
+> ✅ **Risolto in v8.6** — aggiunto un commento esplicito nel codice che
+> documenta il fallback come euristica di riempimento arbitraria, non dati
+> ufficiali dei giochi (comportamento invariato, solo documentato).
 
 `data/abilities.js:getPokemonAbility()` ha una whitelist curata per ~30
 specie iconiche, poi un fallback `speciesId % 13 === 0 → Acceleratore`,
@@ -329,6 +347,8 @@ Se dovessi scegliere un ordine, partirei da qui:
    zero rischio.
 5. 🟡 **Aggiungere qualche breakpoint mobile in più** (4.1) — soprattutto
    per il `TeamPanel`, che è il componente più denso.
-6. 🟢 Il resto (icone incoerenti, Iper Pozione, fallback abilità, stile
-   inline, test aggiuntivi) sono rifiniture utili ma non urgenti — buoni
-   candidati per quando serve una pausa dalle feature nuove.
+6. ✅ **Icone incoerenti, Iper Pozione, fallback abilità** — risolti in
+   v8.6 (2.5, 2.6, 2.7). Restano da fare, quando serve una pausa dalle
+   feature nuove: 🟢 stile inline pervasivo (4.4), 🟢 densità visiva/gerarchia
+   dei badge (4.5), 🟢 onboarding al primo avvio (4.6), refresh completo di
+   `MANUAL_TECNICO.md` §2/§3 (fuori scope di questo documento).

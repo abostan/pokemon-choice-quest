@@ -5,7 +5,7 @@ export const ITEM_DESCRIPTIONS = {
   "Caramella Rara": "Caramella prodigiosa ricolma di energia. Aumenta istantaneamente il livello di tutti i Pokémon in squadra di +3!",
   "Pozione": "Strumento curativo base. Aumenta la potenza effettiva della squadra di +10 per la battaglia.",
   "Super Pozione": "Strumento curativo avanzato. Aumenta la potenza effettiva della squadra di +18 per la battaglia.",
-  "Iper Pozione": "Strumento curativo molto potente. Aumenta la potenza effettiva della squadra di +18 per la battaglia.",
+  "Iper Pozione": "Strumento curativo molto potente. Aumenta la potenza effettiva della squadra di +24 per la battaglia.",
   "Antidoto": "Cura i problemi di stato e dona stabilità alla squadra in battaglia (+10 Potenza).",
   "Pietra Metallica": "Minerale raro e resistente. Aumenta la potenza di battaglia di +14.",
   "Pietra Solare": "Pietra mistica riscaldata dal sole. Aumenta la potenza di battaglia di +14.",

@@ -4,28 +4,16 @@ import { getItemDescription } from "../data/items.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 import { computeTeamPower } from "../engine/battleLogic.js";
 import { usePokemon } from "../hooks/usePokemon.js";
+import { getTypeIcon } from "../data/types.js";
+import { getBadgeType } from "../data/generations.js";
 
 const e = React.createElement;
 
 function getBadgeIcon(badgeName) {
-  if (badgeName.includes("Roccia") || badgeName.includes("Carbone") || badgeName.includes("Pietra") || badgeName.includes("Muro")) return "🪨";
-  if (badgeName.includes("Corrente") || badgeName.includes("Acqua") || badgeName.includes("Pioggia") || badgeName.includes("Acstrino")) return "💧";
-  if (badgeName.includes("Voltaggio") || badgeName.includes("Dinamo") || badgeName.includes("Faro") || badgeName.includes("Volt")) return "⚡";
-  if (badgeName.includes("Foglia") || badgeName.includes("Bosco") || badgeName.includes("Pianta")) return "🌿";
-  if (badgeName.includes("Tossica")) return "☠️";
-  if (badgeName.includes("Arcana") || badgeName.includes("Relitto") || badgeName.includes("Mente") || badgeName.includes("Psiche")) return "🔮";
-  if (badgeName.includes("Brace") || badgeName.includes("Fiamma")) return "🔥";
-  if (badgeName.includes("Faglia") || badgeName.includes("Sisma")) return "🏔️";
-  if (badgeName.includes("Ala") || badgeName.includes("Zanna") || badgeName.includes("Piuma") || badgeName.includes("Jet") || badgeName.includes("Insetto") || badgeName.includes("Maggiolino")) return "🦅";
-  if (badgeName.includes("Latte") || badgeName.includes("Armonia") || badgeName.includes("Base")) return "🥛";
-  if (badgeName.includes("Pugno") || badgeName.includes("Ciottolo") || badgeName.includes("Scontro")) return "🥊";
-  if (badgeName.includes("Lama") || badgeName.includes("Cava")) return "🗡️";
-  if (badgeName.includes("Gelo") || badgeName.includes("Ghiaccio") || badgeName.includes("Iceberg") || badgeName.includes("Glacia")) return "❄️";
-  if (badgeName.includes("Squama") || badgeName.includes("Leggenda")) return "🐉";
-  if (badgeName.includes("Fata")) return "🧚";
-  if (badgeName.includes("Tris")) return "🍀";
   if (badgeName.includes("Campione")) return "👑";
-  return "🏅";
+  if (badgeName.includes("Tris")) return "🍀"; // medaglia speciale non legata ad un tipo singolo
+  const type = getBadgeType(badgeName);
+  return type ? getTypeIcon(type) : "🏅";
 }
 
 function BadgeItem({ name }) {

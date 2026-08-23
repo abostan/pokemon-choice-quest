@@ -93,7 +93,11 @@ export function getPokemonAbility(speciesId) {
   if (SPECIES_ABILITIES[speciesId]) {
     return SPECIES_ABILITIES[speciesId];
   }
-  // Determinazione di abilità generica basata sul modulo dell'id per dare un'abilità ad altre specie
+  // Euristica di riempimento (NON dati reali dei giochi): assegna un'abilità
+  // anche alle ~1000 specie non presenti in SPECIES_ABILITIES, per varietà,
+  // usando il resto della divisione dell'id come chiave arbitraria. Non ha
+  // alcun significato narrativo — es. Weedle (id 13) riceve "Acceleratore"
+  // solo perché 13 % 13 === 0, non perché ci sia un legame tematico.
   if (speciesId % 13 === 0) return ABILITIES.speedBoost;
   if (speciesId % 17 === 0) return ABILITIES.intimidate;
   if (speciesId % 19 === 0) return ABILITIES.sereneGrace;

@@ -20,7 +20,7 @@ const SHOP_ITEMS = [
     name: "Iper Pozione",
     price: 3,
     icon: "💊",
-    description: "Ripristina al massimo la potenza della squadra.",
+    description: "Ripristina al massimo la potenza della squadra (+24 Potenza in battaglia).",
   },
   {
     name: "Caramella Rara",
