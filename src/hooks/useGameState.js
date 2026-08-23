@@ -1,12 +1,21 @@
 import { useState, useEffect } from "react";
 import { logger } from "../engine/logger.js";
-import { getGeneration, getNextGeneration, GENERATIONS } from "../data/generations.js";
+import { getGeneration } from "../data/generations.js";
 import { unlockAchievement, regionAchievementId } from "../engine/achievements.js";
 import { checkEvolution } from "../data/evolutions.js";
 import { filterEncounterPoolByChallenge } from "../engine/challengeEngine.js";
 import { hasSave } from "../engine/saveGame.js";
 import { useSaveSlot } from "./useSaveSlot.js";
 import { usePokedexState } from "./usePokedexState.js";
+import {
+  computeIsPostgame,
+  computeDifficultyMultiplier,
+  computeScaledPower,
+  resolveAfterGymBattle,
+  resolveNextGeneration,
+  resolvePostgameExplore,
+  resolveNuzlockeLoss,
+} from "../engine/gameStateTransitions.js";
 import {
   isAudioMuted,
   toggleAudioMute,
@@ -15,10 +24,9 @@ import {
   playItemUseSound,
 } from "../engine/soundEngine.js";
 
+export { MAX_LEVEL } from "../engine/gameStateTransitions.js";
 export const WIN_LEVEL_BOOST = 3;
-export const MAX_LEVEL = 100;
 export const MAX_TEAM_SIZE = 6;
-export const LEGENDARY_CHANCE = 0.05;
 
 export function initialState() {
   return {
@@ -206,19 +214,11 @@ export function useGameState() {
   }
 
   const generation = state.generationId ? getGeneration(state.generationId) : null;
-  const isPostgame =
-    (state.completedGensCount || 0) >= GENERATIONS.length ||
-    (generation && state.gymIndex >= generation.gymLeaders.length) ||
-    (state.phase && state.phase.startsWith("postgame")) ||
-    (state.phase && state.phase.startsWith("champions")) ||
-    (state.phase && state.phase.startsWith("tournament"));
-
-  const completedGens = state.completedGensCount || 0;
-  const nuzlockeBonus = state.isNuzlocke ? 0.1 : 0;
-  const difficultyMult = 1.0 + completedGens * 0.15 + nuzlockeBonus;
+  const isPostgame = computeIsPostgame(state, generation);
+  const difficultyMult = computeDifficultyMultiplier(state);
 
   function getScaledPower(basePower) {
-    return Math.round(basePower * difficultyMult);
+    return computeScaledPower(basePower, state);
   }
 
   function resolveBattleWin(badge) {
@@ -230,87 +230,28 @@ export function useGameState() {
 
   function handleNuzlockeLoss() {
     if (state.team.length === 0) return;
-    setState((prev) => {
-      if (prev.team.length === 0) return prev;
-      const fatigued = prev.teamFatigued ? prev : { ...prev, teamFatigued: true };
-
-      if (!fatigued.isNuzlocke) return fatigued;
-
-      const fainted = { ...fatigued.team[fatigued.team.length - 1], isFainted: true };
-      const nextTeam = fatigued.team.slice(0, fatigued.team.length - 1);
-      const nextBox = [...fatigued.box, fainted];
-      const hasHealthyInBox = nextBox.some((p) => !p.isFainted);
-
-      if (nextTeam.length === 0 && !hasHealthyInBox) {
-        return {
-          ...fatigued,
-          team: nextTeam,
-          box: nextBox,
-          phase: "nuzlockeGameOver",
-        };
-      }
-
-      const shouldOpenBox = nextTeam.length === 0 && hasHealthyInBox;
-      return {
-        ...fatigued,
-        team: nextTeam,
-        box: nextBox,
-        boxModalOpen: shouldOpenBox ? true : fatigued.boxModalOpen,
-      };
-    });
+    setState((prev) => resolveNuzlockeLoss(prev));
   }
 
   function advanceAfterGymBattle() {
-    const finishedGymIndex = state.gymIndex;
-    const nextGymIndex = finishedGymIndex + 1;
-
-    if (generation.rival && !state.rivalDone && generation.rival.afterGymIndex === finishedGymIndex) {
-      goTo("rivalBattle", { gymIndex: nextGymIndex });
-      return;
-    }
-
-    if (generation.villainBoss && !state.villainBossDone && generation.villainBoss.afterGymIndex === finishedGymIndex) {
-      goTo("villainBossBattle", { gymIndex: nextGymIndex });
-      return;
-    }
-
-    if (nextGymIndex >= generation.gymLeaders.length) {
+    const { phase, patch } = resolveAfterGymBattle(state, generation);
+    if (phase === "eliteBattle") {
       unlockAchievement("allGymsCleared");
       unlockAchievement(regionAchievementId("gyms", generation.id));
-      goTo("eliteBattle", { gymIndex: nextGymIndex, eliteIndex: 0 });
-      return;
     }
-
-    goTo("explore", { gymIndex: nextGymIndex });
+    goTo(phase, patch);
   }
 
   function checkNextGeneration() {
-    const nextGen = getNextGeneration(state.generationId);
-    const newCompletedCount = (state.completedGensCount || 0) + 1;
-    if (nextGen) {
-      goTo("nextGenSelect", { nextGenId: nextGen.id, completedGensCount: newCompletedCount });
-    } else {
-      if (newCompletedCount >= GENERATIONS.length) unlockAchievement("grandMaster");
-      goTo("postgame", { completedGensCount: newCompletedCount });
-    }
+    const { phase, patch, isGrandMaster } = resolveNextGeneration(state);
+    if (isGrandMaster) unlockAchievement("grandMaster");
+    goTo(phase, patch);
   }
 
   function startPostgameExplore() {
     const lastGen = generation || getGeneration(state.generationId);
-    const availableLegendaries = (lastGen?.legendaries || []).filter(
-      (id) => !state.caughtLegendaries.includes(id)
-    );
-
-    if (availableLegendaries.length > 0 && Math.random() < LEGENDARY_CHANCE) {
-      const legendaryId = availableLegendaries[Math.floor(Math.random() * availableLegendaries.length)];
-      goTo("legendaryEncounter", {
-        pendingEncounterPool: [legendaryId],
-        pendingEncounterLevel: Math.min(MAX_LEVEL, 60 + state.postgameRound * 2),
-        pendingEncounterIsLegendary: true,
-      });
-    } else {
-      goTo("postgameExplore");
-    }
+    const { phase, patch } = resolvePostgameExplore(state, lastGen);
+    goTo(phase, patch);
   }
 
   return {

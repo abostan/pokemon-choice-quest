@@ -4,8 +4,18 @@
 // Non è un vero test automatizzato del componente React (richiederebbe un
 // browser), ma controlla la logica di transizione che è la parte più a
 // rischio di bug in questa modifica.
+//
+// Il blocco gymBattle chiama la vera resolveAfterGymBattle() di
+// engine/gameStateTransitions.js (Fase 10 di ROADMAP.md) invece di
+// reimplementare la stessa decisione a mano: prima un bug in quella logica
+// (es. il vecchio hardcoded `8` di isPostgame) non sarebbe mai stato
+// scoperto da questo script, perché copiava la sequenza indipendentemente
+// dal codice vero. La progressione Alto Comando/Campione resta simulata a
+// mano qui sotto: quella logica vive in LeagueSceneContainer.js, non in
+// useGameState.js, quindi non è ancora stata estratta in una funzione pura.
 
 import { GENERATIONS, getExplorationTier } from "../src/data/generations.js";
+import { resolveAfterGymBattle } from "../src/engine/gameStateTransitions.js";
 
 for (const generation of GENERATIONS) {
   console.log(`\n=== ${generation.name} ===`);
@@ -29,22 +39,10 @@ for (const generation of GENERATIONS) {
       const gym = generation.gymLeaders[gymIndex];
       if (!gym) throw new Error(`Gym mancante per indice ${gymIndex}`);
       console.log(`  palestra ${gymIndex + 1}: ${gym.title} (potenza ${gym.opponentPower})`);
-      const finishedGymIndex = gymIndex;
-      const nextGymIndex = finishedGymIndex + 1;
-      if (generation.rival && !rivalDone && generation.rival.afterGymIndex === finishedGymIndex) {
-        gymIndex = nextGymIndex;
-        phase = "rivalBattle";
-      } else if (generation.villainBoss && !villainBossDone && generation.villainBoss.afterGymIndex === finishedGymIndex) {
-        gymIndex = nextGymIndex;
-        phase = "villainBossBattle";
-      } else if (nextGymIndex >= generation.gymLeaders.length) {
-        gymIndex = nextGymIndex;
-        eliteIndex = 0;
-        phase = "eliteBattle";
-      } else {
-        gymIndex = nextGymIndex;
-        phase = "explore";
-      }
+      const { phase: nextPhase, patch } = resolveAfterGymBattle({ gymIndex, rivalDone, villainBossDone }, generation);
+      gymIndex = patch.gymIndex;
+      if (patch.eliteIndex != null) eliteIndex = patch.eliteIndex;
+      phase = nextPhase;
     } else if (phase === "rivalBattle") {
       console.log(`  rivale: ${generation.rival.title} (potenza ${generation.rival.opponentPower})`);
       rivalDone = true;
