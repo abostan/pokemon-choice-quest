@@ -30,6 +30,7 @@ import {
   WEATHER_ITEM_BY_ID,
   EVOLUTION_STONES,
   SAFARI_ITEMS,
+  CASINO_JACKPOT_POOL,
 } from "../../data/exploreZonePools.js";
 
 function withRecordedChoices(choices, phase) {
@@ -66,7 +67,7 @@ export function ExploreSceneContainer({ game }) {
   function playCasino(stake, pokemonLevel) {
     const outcome = rollCasinoOutcome(stake);
     if (outcome.tier === "jackpot") {
-      const porygonId = Math.random() < 0.5 ? 137 : 233;
+      const porygonId = pickRandom(CASINO_JACKPOT_POOL);
       markCaught(porygonId, false);
       addToTeam({ id: porygonId, level: pokemonLevel });
       addItem("Master Ball");

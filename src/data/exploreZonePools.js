@@ -5,8 +5,17 @@
 // dati — lo stesso principio già seguito da simulate-flow.mjs, che riusa la
 // logica reale invece di reimplementarla altrove.
 
-// --- Pre-postgame: pool per-regione (solo 6 delle 9 regioni hanno un pool
-// dedicato; le altre 3 ricadono sul fallback passato al sito di chiamata) ---
+// --- Pre-postgame: pool per-regione. Tutte e 9 le regioni hanno ora un pool
+// dedicato (Alola/Galar/Paldea aggiunte in scripts/simulate-pools.mjs Fase
+// 13 — prima ricadevano sul fallback generico Kanto-based passato al sito
+// di chiamata, che resta comunque come rete di sicurezza per eventuali
+// future regioni). Le espansioni su regioni preesistenti (iceZone/mysteryEgg,
+// entrambe risultate sottodimensionate dalla simulazione) sono state
+// aggiunte SEMPRE in coda, senza mai riordinare o rimuovere id esistenti —
+// l'unico punto del codice che legge un indice fisso di questi pool è
+// ExploreSceneContainer.js (nessuno, in realtà: solo tier.grass[0]/tier.cave[0]
+// per gli Allenatori, che non usano questi pool) quindi non c'era comunque
+// alcun rischio, ma si mantiene lo stesso criterio già seguito nelle Fasi 11/12.
 
 export const FIRE_POOLS_BY_REGION = {
   kanto: [37, 58, 100, 81, 77],
@@ -15,6 +24,9 @@ export const FIRE_POOLS_BY_REGION = {
   sinnoh: [390, 403, 240, 436, 479],
   unova: [498, 522, 554, 599, 607],
   kalos: [653, 667, 694, 679, 669],
+  alola: [725, 726, 727, 758, 776], // Litten, Torracat, Incineroar, Salazzle, Turtonator
+  galar: [813, 814, 815, 851, 844], // Scorbunny, Raboot, Cinderace, Centiskorch, Sandaconda
+  paldea: [909, 910, 911, 936, 950], // Fuecoco, Crocalor, Skeledirge, Armarouge, Klawf
 };
 
 export const GHOST_POOLS_BY_REGION = {
@@ -24,15 +36,21 @@ export const GHOST_POOLS_BY_REGION = {
   sinnoh: [425, 442, 433, 434, 439],
   unova: [570, 607, 562, 574, 577],
   kalos: [708, 710, 677, 682, 684],
+  alola: [769, 770, 778, 781, 764], // Sandygast, Palossand, Mimikyu, Dhelmise, Comfey
+  galar: [854, 855, 867, 858, 861], // Sinistea, Polteageist, Runerigus, Hatterene, Grimmsnarl
+  paldea: [971, 972, 956, 942, 958], // Greavard, Houndstone, Espathra, Maschiff, Tinkatuff
 };
 
 export const ICE_POOLS_BY_REGION = {
-  kanto: [124, 131, 90, 142],
-  johto: [220, 225, 215, 227],
-  hoenn: [361, 363, 378, 374],
-  sinnoh: [459, 361, 436, 447],
-  unova: [582, 613, 615, 624],
-  kalos: [712, 698, 679, 701],
+  kanto: [124, 131, 90, 142, 87], // + Dewgong
+  johto: [220, 225, 215, 227, 226], // + Mantine
+  hoenn: [361, 363, 378, 374, 364], // + Sealeo
+  sinnoh: [459, 361, 436, 447, 478], // + Froslass
+  unova: [582, 613, 615, 624, 614], // + Beartic
+  kalos: [712, 698, 679, 701, 713], // + Avalugg
+  alola: [739, 740, 777, 733, 741], // Crabrawler, Crabominable, Togedemaru, Toucannon, Oricorio
+  galar: [872, 873, 875, 884, 823], // Snom, Frosmoth, Eiscue, Duraludon, Corviknight
+  paldea: [974, 975, 941, 962, 968], // Cetoddle, Cetitan, Kilowattrel, Bombirdier, Orthworm
 };
 
 export const FIGHTING_POOLS_BY_REGION = {
@@ -42,36 +60,60 @@ export const FIGHTING_POOLS_BY_REGION = {
   sinnoh: [447, 453, 427, 417, 422],
   unova: [532, 559, 619, 572, 506],
   kalos: [674, 701, 659, 676, 672],
+  alola: [766, 759, 760, 735, 734], // Passimian, Stufful, Bewear, Gumshoos, Yungoos
+  galar: [870, 865, 853, 820, 832], // Falinks, Sirfetch'd, Grapploct, Greedent, Dubwool
+  paldea: [979, 915, 925, 982, 981], // Annihilape, Lechonk, Maushold, Dudunsparce, Farigiraf
 };
 
 export const EGG_POOLS_BY_REGION = {
-  kanto: [133, 131, 147],
-  johto: [175, 172, 246],
-  hoenn: [360, 328, 371],
-  sinnoh: [447, 403, 443],
-  unova: [570, 559, 610],
-  kalos: [677, 704, 714],
+  kanto: [133, 131, 147, 113, 137], // + Chansey, Porygon
+  johto: [175, 172, 246, 179, 183], // + Mareep, Marill
+  hoenn: [360, 328, 371, 298, 349], // + Azurill, Feebas
+  sinnoh: [447, 403, 443, 440, 458], // + Happiny, Mantyke
+  unova: [570, 559, 610, 587, 546], // + Emolga, Cottonee
+  kalos: [677, 704, 714, 669, 682], // + Flabébé, Spritzee
+  alola: [782, 742, 771, 761, 743], // Jangmo-o, Cutiefly, Pyukumuku, Bounsweet, Ribombee
+  galar: [840, 848, 868, 835, 819], // Applin, Toxel, Milcery, Yamper, Skwovet
+  paldea: [926, 924, 919, 953, 960], // Fidough, Tandemaus, Nymble, Rellor, Wiglett
 };
 
 export const FOSSIL_POOLS_BY_REGION = {
-  kanto: [138, 140, 142],
-  johto: [138, 140, 345, 347],
-  hoenn: [345, 347, 142],
-  sinnoh: [408, 410, 142],
-  unova: [564, 566],
-  kalos: [696, 698],
+  kanto: [138, 140, 142, 139, 141], // + Omastar, Kabutops (le evoluzioni dei fossili base già presenti)
+  johto: [138, 140, 345, 347, 142], // + Aerodactyl (completa il trio Kanto, mancante per una svista)
+  hoenn: [345, 347, 142, 346, 348], // + Cradily, Armaldo
+  sinnoh: [408, 410, 142, 409, 411], // + Rampardos, Bastiodon
+  unova: [564, 566, 565, 567, 142], // + Carracosta, Archeops
+  kalos: [696, 698, 697, 699, 142], // + Tyrantrum, Aurorus
+  // Alola non ha fossili propri nel canone (in USUM si recuperano quelli
+  // classici via Poké Pelago): pool a tema "creazione di laboratorio antico"
+  // che combina questa lore con i fossili classici già stabiliti altrove.
+  alola: [772, 773, 138, 140, 142], // Type: Null, Silvally, Omanyte, Kabuto, Aerodactyl
+  galar: [880, 881, 882, 883, 884], // Dracozolt, Arctozolt, Dracovish, Arctovish, Duraludon
+  // Paldea non ha fossili classici: i Pokémon Paradosso "antichi" (creature
+  // preistoriche letteralmente riportate in vita/studiate in laboratorio
+  // nel gioco originale) sono il fit tematico più diretto disponibile.
+  paldea: [984, 985, 986, 987, 988], // Great Tusk, Scream Tail, Brute Bonnet, Flutter Mane, Slither Wing
 };
 
 export const SAFARI_POOLS_BY_REGION = {
   kanto: [123, 127, 128, 115, 113, 147],
-  johto: [214, 225, 234, 246],
-  hoenn: [328, 335, 359, 371],
-  sinnoh: [443, 453, 455],
-  unova: [559, 610, 621],
-  kalos: [704, 708, 712],
+  johto: [214, 225, 234, 246, 241], // + Miltank
+  hoenn: [328, 335, 359, 371, 320], // + Wailmer
+  sinnoh: [443, 453, 455, 424, 415], // + Ambipom, Combee
+  unova: [559, 610, 621, 590, 618], // + Foongus, Stunfisk
+  kalos: [704, 708, 712, 687, 703], // + Malamar, Carbink
+  alola: [746, 748, 750, 774, 775], // Wishiwashi, Toxapex, Mudsdale, Minior, Komala
+  galar: [845, 846, 871, 874, 852], // Cramorant, Arrokuda, Pincurchin, Stonjourner, Clobbopus
+  paldea: [931, 976, 977, 963, 961], // Squawkabilly, Veluza, Dondozo, Finizen, Wugtrio
 };
 
 export const NPC_TRADE_POOL = [83, 122, 124, 127, 131, 214, 303, 441, 538, 677];
+
+// Jackpot del Casinò (playCasino() in ExploreSceneContainer.js): 50/50 tra
+// Porygon e la sua evoluzione Porygon2 — unica fonte di cattura del Casinò,
+// estratta qui per essere inclusa nel controllo di raggiungibilità del
+// Pokédex (scripts/simulate-pools.mjs, Sezione D).
+export const CASINO_JACKPOT_POOL = [137, 233];
 
 // --- Post-game: pool fissi, già multi-generazione ---
 
