@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { CASINO_STAKES } from "../engine/casinoLogic.js";
+import { PokemonChip } from "./PokemonSprite.js";
 
 const e = React.createElement;
 
 const TIER_MESSAGES = {
-  jackpot: (stake) => `🎉 JACKPOT! Hai catturato un Pokémon raro, vinto una Master Ball e ${stake * 3} Pokédollari!`,
+  jackpot: (stake) => `🎉 JACKPOT! Hai vinto una Master Ball, ${stake * 3} Pokédollari e catturato:`,
   mid: (stake) => `✨ Piccola vincita! Hai ottenuto una Caramella Rara e ${Math.round(stake * 0.5)} Pokédollari.`,
   loss: (stake) => `😅 Niente vincita questa volta... hai perso ${stake} Pokédollari, ma la squadra si allena comunque (+1 Livello).`,
 };
@@ -26,7 +27,7 @@ export function CasinoScene({ coins = 0, onPlay, onLeave }) {
   function handlePlay(stake) {
     if (coins < stake) return;
     const result = onPlay(stake);
-    setOutcome({ tier: result.tier, stake });
+    setOutcome({ tier: result.tier, stake, pokemonId: result.pokemonId });
   }
 
   return e(
@@ -95,7 +96,10 @@ export function CasinoScene({ coins = 0, onPlay, onLeave }) {
                 marginBottom: "16px",
               },
             },
-            TIER_MESSAGES[outcome.tier](outcome.stake)
+            TIER_MESSAGES[outcome.tier](outcome.stake),
+            outcome.tier === "jackpot" &&
+              outcome.pokemonId != null &&
+              e("div", { style: { marginTop: "10px" } }, e(PokemonChip, { id: outcome.pokemonId }))
           ),
           e(
             "div",

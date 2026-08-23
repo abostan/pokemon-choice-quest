@@ -44,6 +44,7 @@ export function ExploreSceneContainer({ game }) {
       markCaught(porygonId, false);
       addToTeam({ id: porygonId, level: pokemonLevel });
       addItem("Master Ball");
+      outcome.pokemonId = porygonId;
     } else if (outcome.tier === "mid") {
       addItem("Caramella Rara");
       boostTeam(1);
