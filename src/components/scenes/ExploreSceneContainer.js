@@ -19,6 +19,26 @@ function withRecordedChoices(choices, phase) {
   }));
 }
 
+// Oggetti tematici per bivio (ROADMAP.md Fase 7): prima diversi bivi
+// restituivano sempre la stessa "Super Pozione" a prescindere dal contesto
+// narrativo, o (Zona Safari) nessun oggetto affatto nonostante il testo
+// promettesse una riserva naturale da esplorare.
+const WEATHER_ITEM_BY_ID = {
+  sun: "Pietra Solare", // Sole Intenso — corrispondenza diretta col nome
+  rain: "Idropietra", // Pioggia Battente
+  sandstorm: "Pietra Metallica", // Tempesta di Sabbia — minerale/deserto
+  fog: "Pietraluna", // Nebbia Fitta — atmosfera notturna/misteriosa
+};
+const EVOLUTION_STONES = [
+  "Pietra Focaia", "Idropietra", "Pietra Foglia", "Pietra Tuono", "Pietraluna",
+  "Pietra Metallica", "Pietra Solare", "Pietra Idrica", "Pietra Folletto", "Pietra Brillante",
+];
+const SAFARI_ITEMS = ["Miele", "Foglia Strana", "Resti", "Caramella Rara"];
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 const e = React.createElement;
 
 export function ExploreSceneContainer({ game }) {
@@ -111,6 +131,7 @@ export function ExploreSceneContainer({ game }) {
         onSelect: () => {
           const safariPool = [123, 128, 147, 246, 371, 443, 610, 696, 782, 885, 996, 142, 193, 359, 472, 571, 707, 866, 952];
           const chosenId = safariPool[Math.floor(Math.random() * safariPool.length)];
+          addItem(pickRandom(SAFARI_ITEMS));
           goTo("encounter", {
             pendingEncounterPool: [chosenId],
             pendingEncounterLevel: pgLevel,
@@ -139,7 +160,7 @@ export function ExploreSceneContainer({ game }) {
           const tradeId = tradePool[Math.floor(Math.random() * tradePool.length)];
           markCaught(tradeId, false);
           addToTeam({ id: tradeId, level: Math.min(MAX_LEVEL, pgLevel + 5) });
-          addItem("Super Pozione");
+          addItem(pickRandom(EVOLUTION_STONES)); // un allenatore che scambia offre volentieri anche una pietra evolutiva
           update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
       },
@@ -161,7 +182,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Tempesta o sole intenso: influenzerà la tua prossima battaglia in base al tipo della squadra",
         onSelect: () => {
           const weather = rollWeather();
-          addItem("Super Pozione");
+          addItem(WEATHER_ITEM_BY_ID[weather.id] || "Super Pozione");
           update({ activeWeather: weather, postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
       },
@@ -220,7 +241,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🔍 Cercatore di Strumenti & Bacche",
         hint: "Esplora per trovare bacche, pozioni o pietre evolutive",
         onSelect: () => {
-          const pool = ["Super Pozione", "Caramella Rara", "Pietra Lunare", "Resti"];
+          const pool = ["Super Pozione", "Caramella Rara", "Pietraluna", "Resti"];
           addItem(pool[Math.floor(Math.random() * pool.length)]);
           boostTeam(1);
           update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
@@ -235,7 +256,7 @@ export function ExploreSceneContainer({ game }) {
           const eggId = eggPool[Math.floor(Math.random() * eggPool.length)];
           markCaught(eggId, false);
           addToTeam({ id: eggId, level: 5 });
-          addItem("Super Pozione");
+          addItem("Caramella Rara"); // il nuovo nato cresce in fretta
           update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
       },
@@ -530,7 +551,7 @@ export function ExploreSceneContainer({ game }) {
         const eggId = pool[Math.floor(Math.random() * pool.length)];
         markCaught(eggId, false);
         addToTeam({ id: eggId, level: 5 });
-        addItem("Super Pozione");
+        addItem("Caramella Rara"); // il nuovo nato cresce in fretta
         goTo("gymBattle");
       },
     },
@@ -607,7 +628,7 @@ export function ExploreSceneContainer({ game }) {
           ? Math.round(state.team.reduce((acc, p) => acc + (p.level || 5), 0) / state.team.length) + 2
           : 12;
         addToTeam({ id: tradeId, level: Math.min(MAX_LEVEL, avgLevel) });
-        addItem("Super Pozione");
+        addItem(pickRandom(EVOLUTION_STONES)); // un allenatore che scambia offre volentieri anche una pietra evolutiva
         goTo("gymBattle");
       },
     },
@@ -640,6 +661,7 @@ export function ExploreSceneContainer({ game }) {
           kalos: [704, 708, 712],
         };
         const pool = safariPools[state.generationId] || [123, 127, 128, 115, 147];
+        addItem(pickRandom(SAFARI_ITEMS));
         goTo("encounter", {
           pendingEncounterPool: pool,
           pendingEncounterLevel: tier.level + 2,
@@ -654,7 +676,7 @@ export function ExploreSceneContainer({ game }) {
       hint: "Venti sabbiosi, piogge o sole intenso: influenzeranno la prossima battaglia in base al tipo della squadra",
       onSelect: () => {
         const weather = rollWeather();
-        addItem("Super Pozione");
+        addItem(WEATHER_ITEM_BY_ID[weather.id] || "Super Pozione");
         update({ activeWeather: weather });
         goTo("gymBattle");
       },
