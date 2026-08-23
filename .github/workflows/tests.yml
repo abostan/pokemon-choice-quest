@@ -1,0 +1,26 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Nessuna dipendenza npm da installare (React è caricato via CDN,
+      # nessun package-lock.json) — coerente con la filosofia "zero build"
+      # del progetto, vedi package.json.
+
+      - name: Unit test (node --test)
+        run: npm test
+
+      - name: Simulazione a secco della macchina a stati (tutte le regioni)
+        run: node scripts/simulate-flow.mjs
