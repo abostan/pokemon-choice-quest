@@ -1,6 +1,8 @@
 // Logica di gioco pura (nessuna dipendenza da React), così è facile da
 // testare e da modificare in isolamento.
 
+import { getPokemonNature, computeNatureMultiplier } from "../data/natures.js";
+
 /**
  * Calcola la probabilità di cattura (0..1) in base al metodo scelto
  * dal giocatore e a un tasso di base del Pokémon selvatico.
@@ -72,14 +74,16 @@ export function computeStatMultiplier(bst) {
 
 /**
  * Potenza complessiva di una squadra, usata per stimare l'esito delle
- * battaglie. Più Pokémon, livelli più alti e specie con statistiche base
- * migliori della media (`statsById`, mappa id → BST) = squadra più forte.
+ * battaglie. Più Pokémon, livelli più alti, specie con statistiche base
+ * migliori della media (`statsById`, mappa id → BST) e Nature offensive
+ * (vedi data/natures.js, ±10% per Pokémon) = squadra più forte.
  */
 export function computeTeamPower(team, statsById = {}) {
   if (!team || team.length === 0) return 0;
   const totalLevels = team.reduce((sum, p) => {
-    const mult = computeStatMultiplier(statsById[p.id]);
-    return sum + Math.min(p.level, MAX_LEVEL) * mult;
+    const statMult = computeStatMultiplier(statsById[p.id]);
+    const natureMult = computeNatureMultiplier(getPokemonNature(p.id));
+    return sum + Math.min(p.level, MAX_LEVEL) * statMult * natureMult;
   }, 0);
   const countBonus = team.length * 2; // avere più Pokémon aiuta comunque
   return Math.round(totalLevels + countBonus);

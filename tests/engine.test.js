@@ -21,9 +21,11 @@ test("battleLogic - computeTeamPower", () => {
     { id: 1, level: 10 },
     { id: 4, level: 20 },
   ];
-  // 10 + 20 + (2 * 2) = 34 (nessuna statsById => moltiplicatore neutro 1.0 per ognuno)
+  // Nessuna statsById => moltiplicatore statistiche neutro 1.0 per ognuno.
+  // Id 1 e 4 hanno entrambi Natura "positive" (+10%, vedi data/natures.js):
+  // (10*1.1) + (20*1.1) + (2*2) = 11 + 22 + 4 = 37
   const power = computeTeamPower(team);
-  assert.strictEqual(power, 34);
+  assert.strictEqual(power, 37);
 });
 
 test("battleLogic - computeStatMultiplier: nella media 1.0, forte/debole entro i limiti 0.7..1.4", () => {

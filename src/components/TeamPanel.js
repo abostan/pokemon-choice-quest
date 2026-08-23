@@ -8,6 +8,7 @@ import { useMegaSprite } from "../hooks/useMegaSprite.js";
 import { useTeamStats } from "../hooks/useTeamStats.js";
 import { getTypeIcon } from "../data/types.js";
 import { computeWeatherEffect } from "../engine/weatherLogic.js";
+import { getPokemonNature, computeNatureMultiplier } from "../data/natures.js";
 import { getBadgeType } from "../data/generations.js";
 import { TapTooltip } from "./TapTooltip.js";
 import { ItemIcon } from "./ItemIcon.js";
@@ -54,12 +55,16 @@ function TeamGridSlot({ pokemon, activeMega }) {
     ? (data?.spriteShiny || data?.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`)
     : (data?.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`);
   const bstHint = data?.bst ? ` | BST: ${data.bst}` : "";
+  const nature = getPokemonNature(pokemon.id);
+  const natureMult = computeNatureMultiplier(nature);
+  const natureHint =
+    natureMult > 1 ? ` | Natura: ${nature.name} (+10% Potenza)` : natureMult < 1 ? ` | Natura: ${nature.name} (-10% Potenza)` : ` | Natura: ${nature.name}`;
 
   return e(
     "div",
     {
       className: `team-grid-slot ${pokemon.isShiny ? "shiny-slot" : ""} ${isMegaShown ? "mega-slot" : ""}`,
-      title: `${name} Lv.${pokemon.level}${bstHint}${pokemon.isShiny ? " ✨ (Shiny)" : ""}${isMegaShown ? " 🔮 (Mega/Gigamax)" : ""}`,
+      title: `${name} Lv.${pokemon.level}${bstHint}${natureHint}${pokemon.isShiny ? " ✨ (Shiny)" : ""}${isMegaShown ? " 🔮 (Mega/Gigamax)" : ""}`,
     },
     e("img", { src: spriteUrl, alt: name, className: "team-slot-img" }),
     e("span", { className: "team-slot-name" }, name),
