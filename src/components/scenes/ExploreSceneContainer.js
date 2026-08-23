@@ -2,6 +2,8 @@ import React from "react";
 import { ChoiceScene } from "../ChoiceScene.js";
 import { getExplorationTier } from "../../data/generations.js";
 import { MAX_LEVEL } from "../../hooks/useGameState.js";
+import { computeExploreSeed, computePostgameSeed, pickWeightedIds, pickTopIds } from "../../engine/explorePicker.js";
+import { EXPLORE_SPECIAL_WEIGHTS } from "../../data/exploreOptions.js";
 
 const e = React.createElement;
 
@@ -274,13 +276,10 @@ export function ExploreSceneContainer({ game }) {
     ];
 
     // Shuffle deterministico basato su postgameRound (nessun Math.random() in render → no loop infinito)
-    const seed = (state.postgameRound || 0) * 1013 + 7;
-    const shuffled = [...postgameSpecialPool].sort((a, b) => {
-      const ha = ((a.id.charCodeAt(0) * 31 + seed) * 17) % 97;
-      const hb = ((b.id.charCodeAt(0) * 31 + seed) * 17) % 97;
-      return ha - hb;
-    });
-    const rolledSpecials = shuffled.slice(0, 4);
+    const postgameSeed = computePostgameSeed({ postgameRound: state.postgameRound });
+    const postgameById = new Map(postgameSpecialPool.map((o) => [o.id, o]));
+    const rolledSpecials = pickTopIds(postgameSpecialPool.map((o) => o.id), postgameSeed, 4)
+      .map((id) => postgameById.get(id));
 
     const baseGrassChoice = {
       id: "grass",
@@ -366,7 +365,7 @@ export function ExploreSceneContainer({ game }) {
   const allSpecialOptions = [
     {
       id: "legendary",
-      weight: 0.06,
+      weight: EXPLORE_SPECIAL_WEIGHTS.legendary,
       label: "⭐ Santuario Antico (Incontro Leggendario)",
       hint: "Segui antichi segni per scovare un Pokémon Leggendario della regione!",
       onSelect: () => {
@@ -385,7 +384,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "fireZone",
-      weight: 0.20,
+      weight: EXPLORE_SPECIAL_WEIGHTS.fireZone,
       label: "🌋 Vulcano & Centrale Elettrica",
       hint: "Pokémon selvatici di tipo Fuoco, Elettrico ed Acciaio",
       onSelect: () =>
@@ -397,7 +396,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "ghostZone",
-      weight: 0.20,
+      weight: EXPLORE_SPECIAL_WEIGHTS.ghostZone,
       label: "👻 Foresta Stregata & Rovine Antiche",
       hint: "Pokémon selvatici di tipo Spettro, Psico, Buio e Fata",
       onSelect: () =>
@@ -409,7 +408,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "iceZone",
-      weight: 0.15,
+      weight: EXPLORE_SPECIAL_WEIGHTS.iceZone,
       label: "❄️ Vetta Innevata & Ghiacciaio",
       hint: "Pokémon selvatici di tipo Ghiaccio, Acciaio e Volante",
       onSelect: () =>
@@ -421,7 +420,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "fightingZone",
-      weight: 0.20,
+      weight: EXPLORE_SPECIAL_WEIGHTS.fightingZone,
       label: "🥊 Dojo dei Combattenti & Arena",
       hint: "Pokémon selvatici di tipo Lotta e Normale",
       onSelect: () =>
@@ -433,7 +432,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "fish",
-      weight: 0.30,
+      weight: EXPLORE_SPECIAL_WEIGHTS.fish,
       label: "🎣 Vai a pescare sul fiume",
       hint: "Pokémon d'acqua e acquatici rari",
       onSelect: () =>
@@ -445,7 +444,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "cave",
-      weight: 0.30,
+      weight: EXPLORE_SPECIAL_WEIGHTS.cave,
       label: "🦇 Esplora una grotta misteriosa",
       hint: "Pokémon di tipo Roccia, Terra e Buio + minerale regalo",
       onSelect: () => {
@@ -460,7 +459,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "enemyTeam",
-      weight: 0.20,
+      weight: EXPLORE_SPECIAL_WEIGHTS.enemyTeam,
       label: "🕵️‍♂️ Incursione del Team Nemico",
       hint: "Sconfiggi le reclute del Team malvagio per liberare la strada e vincere un premio",
       onSelect: () => {
@@ -476,7 +475,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "mysteryEgg",
-      weight: 0.12,
+      weight: EXPLORE_SPECIAL_WEIGHTS.mysteryEgg,
       label: "🐣 Cova un Uovo Misterioso",
       hint: "Ricevi un uovo raro che si schiuderà in un nuovo Pokémon a Lv 5",
       onSelect: () => {
@@ -490,7 +489,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "trainer",
-      weight: 0.25,
+      weight: EXPLORE_SPECIAL_WEIGHTS.trainer,
       label: "⚔️ Sfida un Allenatore del percorso",
       hint: "Battaglia rapida per XP della squadra ed un premio",
       onSelect: () => {
@@ -506,14 +505,14 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "pokecenterMarket",
-      weight: 0.22,
+      weight: EXPLORE_SPECIAL_WEIGHTS.pokecenterMarket,
       label: "🏥 Centro Pokémon & Mercatino di Città",
       hint: "Cura i Pokémon feriti e acquista strumenti utili con i Pokédollari!",
       onSelect: () => goTo("pokecenter"),
     },
     {
       id: "searchItems",
-      weight: 0.25,
+      weight: EXPLORE_SPECIAL_WEIGHTS.searchItems,
       label: "🔍 Cercatore di Strumenti & Bacche",
       hint: "Esplora per trovare bacche, pozioni o pietre evolutive",
       onSelect: () => {
@@ -528,7 +527,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "fossilRevival",
-      weight: 0.20,
+      weight: EXPLORE_SPECIAL_WEIGHTS.fossilRevival,
       label: "🧪 Laboratorio Fossili Antichi",
       hint: "Consegna un fossile per rianimare e catturare un Pokémon preistorico a Lv 15",
       onSelect: () => {
@@ -550,7 +549,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "npcTrade",
-      weight: 0.20,
+      weight: EXPLORE_SPECIAL_WEIGHTS.npcTrade,
       label: "🤝 Allenatore in cerca di Scambi",
       hint: "Un Allenatore del percorso ti offre una specie rara in cambio di una collaborazione",
       onSelect: () => {
@@ -567,7 +566,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "wanderingMerchant",
-      weight: 0.22,
+      weight: EXPLORE_SPECIAL_WEIGHTS.wanderingMerchant,
       label: "🛒 Mercante Ambulante di Strumenti",
       hint: "Acquista pietre evolutive rare o Caramelle Rare con i tuoi Pokédollari",
       onSelect: () => {
@@ -584,7 +583,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "casinoGameCorner",
-      weight: 0.22,
+      weight: EXPLORE_SPECIAL_WEIGHTS.casinoGameCorner,
       label: "🎰 Casinò Razzo & Sala Giochi",
       hint: "Scommetti le tue monete alle slot machine per tentare di vincere Porygon, Master Ball o Pokédollari!",
       onSelect: () => {
@@ -608,7 +607,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "safariZone",
-      weight: 0.22,
+      weight: EXPLORE_SPECIAL_WEIGHTS.safariZone,
       label: "🌾 Parco Safari — Riserva Naturale",
       hint: "Entra nella riserva per incontrare ed armarti di Safari Ball contro Pokémon esotici e rari",
       onSelect: () => {
@@ -630,7 +629,7 @@ export function ExploreSceneContainer({ game }) {
     },
     {
       id: "weatherCondition",
-      weight: 0.25,
+      weight: EXPLORE_SPECIAL_WEIGHTS.weatherCondition,
       label: "☀️ micro-Clima & Evento Atmosferico",
       hint: "Venti sabbiosi, piogge o sole intenso sferzano il percorso potenziando la squadra",
       onSelect: () => {
@@ -645,35 +644,14 @@ export function ExploreSceneContainer({ game }) {
   // ricalcoli instabili tra un render e l'altro). Il seed incorpora choicesCount, che
   // avanza ad ogni transizione di stato (goTo), così il bivio varia visita dopo visita
   // invece di ripetersi identico finché gymIndex/badges non cambiano.
-  const explSeed = (state.gymIndex || 0) * 1013
-    + (state.badges ? state.badges.length * 37 : 0)
-    + (state.choicesCount || 0) * 151
-    + 7;
-  function seededRandom(extra) {
-    return ((explSeed + extra) * 1664525 + 1013904223) % 2147483647 / 2147483647;
-  }
-
-  const rolledSpecials = [];
-  const shuffled = [...allSpecialOptions].sort((a, b) => {
-    const ha = ((a.id.charCodeAt(0) * 31 + explSeed) * 17) % 97;
-    const hb = ((b.id.charCodeAt(0) * 31 + explSeed) * 17) % 97;
-    return ha - hb;
+  const explSeed = computeExploreSeed({
+    gymIndex: state.gymIndex || 0,
+    badgesCount: state.badges ? state.badges.length : 0,
+    choicesCount: state.choicesCount || 0,
   });
-  let extraSeed = 0;
-  for (const opt of shuffled) {
-    if (seededRandom(++extraSeed) < opt.weight) {
-      rolledSpecials.push(opt);
-      if (rolledSpecials.length >= 6) break;
-    }
-  }
-  if (rolledSpecials.length < 6) {
-    for (const opt of shuffled) {
-      if (!rolledSpecials.some((o) => o.id === opt.id)) {
-        rolledSpecials.push(opt);
-        if (rolledSpecials.length >= 6) break;
-      }
-    }
-  }
+  const specialsById = new Map(allSpecialOptions.map((o) => [o.id, o]));
+  const rolledSpecials = pickWeightedIds(allSpecialOptions, explSeed, 6)
+    .map((id) => specialsById.get(id));
 
   const baseGrassChoice = {
     id: "grass",
