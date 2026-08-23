@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { playHealJingle } from "../engine/soundEngine.js";
+import { ItemIcon } from "./ItemIcon.js";
 
 const e = React.createElement;
 
@@ -190,7 +191,7 @@ export function PokeCenterScene({
               e(
                 "div",
                 { style: { display: "flex", alignItems: "center", gap: "10px" } },
-                e("span", { style: { fontSize: "1.5rem" } }, item.icon),
+                e("span", { style: { fontSize: "1.5rem" } }, e(ItemIcon, { name: item.name, fallbackEmoji: item.icon, size: 28 })),
                 e(
                   "div",
                   null,

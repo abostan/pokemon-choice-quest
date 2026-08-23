@@ -7,6 +7,7 @@ import { usePokemon } from "../hooks/usePokemon.js";
 import { getTypeIcon } from "../data/types.js";
 import { getBadgeType } from "../data/generations.js";
 import { TapTooltip } from "./TapTooltip.js";
+import { ItemIcon } from "./ItemIcon.js";
 
 const e = React.createElement;
 
@@ -255,7 +256,7 @@ export function TeamPanel({
                 className: "inventory-item-row",
                 title: `${it}: ${desc}`,
               },
-              e("span", { className: "inventory-item-name" }, `🧪 ${it}`),
+              e("span", { className: "inventory-item-name" }, e(ItemIcon, { name: it }), ` ${it}`),
               e("span", { className: "inventory-item-tooltip" }, desc)
             );
           })

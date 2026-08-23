@@ -26,6 +26,32 @@ export const ITEM_DESCRIPTIONS = {
   "Baccamela": "Strumento tenuto. Annulla i malus di tipo e protegge la squadra in battaglia.",
 };
 
+// Mappa nome italiano -> slug ufficiale PokeAPI (per lo sprite pixel reale
+// in /item/{slug}). Solo per gli strumenti di cui sono ragionevolmente
+// sicuro corrispondano davvero a un oggetto reale dei giochi: diversi nomi
+// in questo gioco sono invenzioni di sapore (es. "Biscotto Lavarone",
+// "Galletta di Yantar", "Pietra Metallica") senza un equivalente ufficiale
+// certo — per quelli niente slug, restano con l'icona emoji esistente
+// invece di rischiare uno sprite sbagliato/fuorviante.
+export const ITEM_POKEAPI_SLUGS = {
+  "Master Ball": "master-ball",
+  "Pozione": "potion",
+  "Super Pozione": "super-potion",
+  "Iper Pozione": "hyper-potion",
+  "Caramella Rara": "rare-candy",
+  "Antidoto": "antidote",
+  "Pietra Solare": "sun-stone",
+  "Pietra Idrica": "water-stone",
+  "Pietra Brillante": "shiny-stone",
+  "Pallina Esca": "poke-toy",
+  "Resti": "leftovers",
+  "Revitalizzante": "revive",
+  "Rimedio Finale": "full-restore",
+  "Stolascelta": "choice-scarf",
+  "Assorbosfera": "absorb-bulb",
+  "Miele": "honey",
+};
+
 /**
  * Restituisce la descrizione di uno strumento dato il suo nome.
  * @param {string} name

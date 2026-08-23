@@ -8,6 +8,7 @@ import { playMegaSound, playVictoryJingle } from "../engine/soundEngine.js";
 import { recordBattle } from "../engine/runRecorder.js";
 import { TapTooltip } from "./TapTooltip.js";
 import { ParticleBurst } from "./ParticleBurst.js";
+import { ItemIcon } from "./ItemIcon.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 import { getTypeIcon, TYPE_LIST } from "../data/types.js";
 
@@ -274,7 +275,8 @@ export function BattleScene({
                   title: `${itemName}: ${desc}`,
                   onClick: () => handleUseItem(idx),
                 },
-                `🧪 ${itemName}`
+                e(ItemIcon, { name: itemName, size: 16 }),
+                ` ${itemName}`
               ),
               e(TapTooltip, { text: `${itemName}: ${desc}`, as: "span", className: "battle-item-info" }, "ⓘ")
             );
