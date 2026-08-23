@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useModalA11y } from "../hooks/useModalA11y.js";
 import { usePokemon } from "../hooks/usePokemon.js";
+import { usePokemonSpecies } from "../hooks/usePokemonSpecies.js";
 import { loadHistoricPokedex } from "../engine/saveGame.js";
 
 const e = React.createElement;
@@ -23,7 +24,7 @@ const REGIONS = [
 /**
  * Singolo slot della griglia album del Pokédex.
  */
-function PokedexGridCard({ pokemonId, status, hasShiny }) {
+function PokedexGridCard({ pokemonId, status, hasShiny, onSelect }) {
   const isDiscovered = status === "caught" || status === "seen";
   const { data, loading } = usePokemon(isDiscovered ? pokemonId : null);
 
@@ -52,6 +53,8 @@ function PokedexGridCard({ pokemonId, status, hasShiny }) {
     {
       className: `pokedex-grid-card ${status} ${hasShiny ? "shiny" : ""}`,
       title: tooltipText,
+      onClick: () => onSelect(pokemonId, hasShiny),
+      style: { cursor: "pointer" },
     },
     e("span", { className: "pokedex-grid-id" }, formattedId),
     e(
@@ -72,7 +75,7 @@ function PokedexGridCard({ pokemonId, status, hasShiny }) {
 /**
  * Singola riga della vista lista estesa.
  */
-function PokedexListRow({ pokemonId, status, hasShiny }) {
+function PokedexListRow({ pokemonId, status, hasShiny, onSelect }) {
   const isDiscovered = status === "caught" || status === "seen";
   const { data, loading } = usePokemon(isDiscovered ? pokemonId : null);
   const formattedId = `#${String(pokemonId).padStart(3, "0")}`;
@@ -97,7 +100,11 @@ function PokedexListRow({ pokemonId, status, hasShiny }) {
 
   return e(
     "div",
-    { className: `pokedex-entry ${status} ${hasShiny ? "pokedex-shiny" : ""}` },
+    {
+      className: `pokedex-entry ${status} ${hasShiny ? "pokedex-shiny" : ""}`,
+      onClick: () => onSelect(pokemonId, hasShiny),
+      style: { cursor: "pointer" },
+    },
     e(
       "div",
       { className: "pokedex-sprite" },
@@ -129,6 +136,54 @@ function PokedexListRow({ pokemonId, status, hasShiny }) {
   );
 }
 
+/**
+ * Pannello dettaglio: sprite, nome, tipi e descrizione Pokédex ufficiale in
+ * italiano (da PokeAPI /pokemon-species), apribile cliccando una entry
+ * scoperta. Caricata su richiesta invece che per tutte le 1025 specie in
+ * una volta, per non intasare PokeAPI di chiamate inutili.
+ */
+function PokedexDetailPanel({ pokemonId, hasShiny, onClose }) {
+  const { data: pokeData, loading: pokeLoading } = usePokemon(pokemonId);
+  const { data: speciesData, loading: speciesLoading } = usePokemonSpecies(pokemonId);
+  const formattedId = `#${String(pokemonId).padStart(3, "0")}`;
+  const sprite = hasShiny ? (pokeData?.spriteShiny || pokeData?.sprite) : pokeData?.sprite;
+
+  return e(
+    "div",
+    { className: "pokedex-detail-panel" },
+    e("button", { className: "modal-close-btn pokedex-detail-close", onClick: onClose, "aria-label": "Chiudi dettaglio" }, "✕"),
+    e(
+      "div",
+      { className: "pokedex-detail-sprite" },
+      sprite ? e("img", { src: sprite, alt: pokeData?.name }) : e("span", { className: "pokedex-no-sprite" }, "?")
+    ),
+    e(
+      "div",
+      { className: "pokedex-detail-info" },
+      e(
+        "h3",
+        { style: { margin: "0 0 2px" } },
+        `${formattedId} ${pokeLoading ? "..." : (pokeData?.name ?? "")}`,
+        hasShiny && " ✨"
+      ),
+      speciesData?.genus && e("p", { className: "pokedex-detail-genus" }, speciesData.genus),
+      pokeData?.types &&
+        e(
+          "div",
+          { className: "types", style: { marginBottom: "8px" } },
+          pokeData.types.map((t) => e("span", { key: t, className: `type-pill type-${t}` }, t))
+        ),
+      e(
+        "p",
+        { className: "pokedex-detail-description" },
+        speciesLoading
+          ? "Caricamento descrizione..."
+          : speciesData?.description || "Nessuna descrizione italiana disponibile per questa specie."
+      )
+    )
+  );
+}
+
 // -------------------------------------------------------------------
 // Componente principale Pokédex
 // -------------------------------------------------------------------
@@ -140,6 +195,11 @@ export function PokedexModal({ pokedexRun, onClose }) {
   const [statusFilter, setStatusFilter] = useState("all"); // "all" | "registered" | "caught" | "unseen"
   const [search, setSearch] = useState("");
   const [historic, setHistoric] = useState({});
+  const [selectedEntry, setSelectedEntry] = useState(null); // { id, hasShiny } | null
+
+  function handleSelectEntry(id, hasShiny) {
+    setSelectedEntry({ id, hasShiny });
+  }
 
   useEffect(() => {
     if (tab === "historic") {
@@ -302,20 +362,28 @@ export function PokedexModal({ pokedexRun, onClose }) {
         })
       ),
 
+      // Pannello dettaglio (sprite, tipi, descrizione italiana) della entry selezionata
+      selectedEntry &&
+        e(PokedexDetailPanel, {
+          pokemonId: selectedEntry.id,
+          hasShiny: selectedEntry.hasShiny,
+          onClose: () => setSelectedEntry(null),
+        }),
+
       // Vista Griglia o Lista
       viewMode === "grid"
         ? e(
             "div",
             { className: "pokedex-grid-container" },
             filteredEntries.map((en) =>
-              e(PokedexGridCard, { key: en.id, pokemonId: en.id, status: en.status, hasShiny: en.hasShiny })
+              e(PokedexGridCard, { key: en.id, pokemonId: en.id, status: en.status, hasShiny: en.hasShiny, onSelect: handleSelectEntry })
             )
           )
         : e(
             "div",
             { className: "pokedex-list" },
             filteredEntries.map((en) =>
-              e(PokedexListRow, { key: en.id, pokemonId: en.id, status: en.status, hasShiny: en.hasShiny })
+              e(PokedexListRow, { key: en.id, pokemonId: en.id, status: en.status, hasShiny: en.hasShiny, onSelect: handleSelectEntry })
             )
           )
     )

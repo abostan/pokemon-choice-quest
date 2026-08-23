@@ -185,7 +185,7 @@ Un secondo bug emerso applicando il fix: il filtro veniva applicato anche ai poo
 
 ### 📡 Fase 6: Integrazione Avanzata PokéAPI & Caching Locale (Offline-First)
 - [ ] **🔊 Versi Audio Ufficiali dei Pokémon (`cries`)**: riproduzione del ruggito/verso originale del Pokémon (formato `.ogg` da `PokeAPI/cries`) ad ogni incontro, cattura ed evoluzione.
-- [ ] **📖 Voci del Pokédex e Descrizioni in Italiano (`/pokemon-species`)**: descrizioni enciclopediche ufficiali in lingua italiana consultabili nel modale Pokédex.
+- [x] **📖 Voci del Pokédex e Descrizioni in Italiano (`/pokemon-species`)**: nuovo `hooks/usePokemonSpecies.js` (stesso pattern cache-in-memoria di `usePokemon.js`) + pannello dettaglio in `PokedexModal.js`, apribile cliccando una specie già scoperta (griglia o lista). Mostra sprite, tipi, "genus" (es. "Pokémon Seme") e la descrizione Pokédex ufficiale in italiano più recente tra quelle disponibili per la specie. Caricata su richiesta per la sola specie selezionata, non per tutte le 1025 in una volta, per non intasare PokeAPI. Verificato con dati reali da PokeAPI (Bulbasaur, Charmander).
 - [ ] **🎒 Sprite Pixel Ufficiali degli Strumenti & Bacche (`/item`)**: visualizzazione degli sprite pixel ufficiali di Poké Ball, Pozioni, Pietre Evolutive e Caramelle Rare nel PokéMart ed Inventario.
 - [ ] **🌴 Varianti Regionali & Forme Mega/Gigamax (`/pokemon-form`)**: supporto completo agli sprite e dati per forme d'Alola, Galar, Hisui e Paldea.
 - [ ] **⚡ Dettaglio Mosse & Icone Tipi (`/type` & `/move`)**: visualizzazione icone tipi e mosse firma in battaglia con potenza e precisione.
