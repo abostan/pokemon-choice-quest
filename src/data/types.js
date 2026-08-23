@@ -169,16 +169,26 @@ export const POKEMON_TYPES = {
 };
 
 /**
- * Restituisce il tipo primario di un Pokémon dato il suo ID.
+ * Restituisce il tipo primario di un Pokémon dato il suo ID, o `null` se non
+ * è presente in `POKEMON_TYPES` (che copre bene solo Kanto + starter/iconici
+ * delle altre generazioni, non l'intero roster usato nei pool di incontro).
+ *
+ * IMPORTANTE: prima questa funzione inventava un tipo per gli id non
+ * mappati tramite un fallback euristico `id % 8`, scollegato dal tipo reale
+ * della specie — rendeva il filtro Mono-Type Challenge silenziosamente
+ * scorretto da Johto in poi (filtrava su un tipo fittizio invece che su
+ * quello vero, lasciando passare Pokémon di tipo sbagliato). Restituire
+ * `null` per gli id sconosciuti è corretto in tutti i punti che chiamano
+ * questa funzione: il confronto `=== monoType` fallisce correttamente
+ * (escludendoli, invece di farli passare per errore) e le tabelle di
+ * efficacia di tipo/meteo trattano `null` come "nessun match" (vedi
+ * `TYPE_SUPER_EFFECTIVE[type] || []` in typeMatchup.js e `boostTypes.includes(t)`
+ * in weatherLogic.js, entrambe sicure con `null`).
+ *
  * @param {number} pokemonId
- * @returns {string} tipo (es. "Fuoco", "Acqua", "Erba", etc.)
+ * @returns {string | null} tipo (es. "Fuoco", "Acqua", "Erba", etc.) o null se sconosciuto
  */
 export function getPokemonType(pokemonId) {
   if (!pokemonId) return "Normale";
-  if (POKEMON_TYPES[pokemonId]) return POKEMON_TYPES[pokemonId];
-
-  // Regola di fallback euristica basata sull'ID se non specificato
-  const mod = pokemonId % 8;
-  const fallbackTypes = ["Normale", "Erba", "Fuoco", "Acqua", "Elettrico", "Roccia", "Psico", "Lotta"];
-  return fallbackTypes[mod];
+  return POKEMON_TYPES[pokemonId] || null;
 }
