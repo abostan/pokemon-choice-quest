@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { pickSignatureMove } from "../data/movePicker.js";
 
 // Cache in memoria condivisa: se più componenti chiedono lo stesso Pokémon
 // non rifacciamo la stessa chiamata a PokeAPI più volte.
@@ -38,6 +39,7 @@ async function fetchPokemon(id) {
         cry: data.cries?.latest || data.cries?.legacy || null,
         stats,
         bst,
+        signatureMoveRef: pickSignatureMove(data.moves),
       };
     });
 

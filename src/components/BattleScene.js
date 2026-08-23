@@ -251,7 +251,7 @@ export function BattleScene({
       e(
         "div",
         { className: "team-list", style: { marginTop: "8px" } },
-        (opponentTeamIds || []).map((id, idx) => e(PokemonChip, { key: `${id}-${idx}`, id }))
+        (opponentTeamIds || []).map((id, idx) => e(PokemonChip, { key: `${id}-${idx}`, id, showMove: true }))
       )
     ),
 

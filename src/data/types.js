@@ -23,6 +23,22 @@ export function getTypeIcon(type, fallback = "⚔️") {
   return TYPE_ICONS[type] || fallback;
 }
 
+// Stessa icona per tipo, ma indicizzata sullo slug inglese così come lo
+// restituisce PokeAPI (`pokemon.types[].type.name`, es. "fire"/"water") —
+// usata per i tipi letti dal vivo da PokeAPI (PokemonChip, mosse firma),
+// distinta da TYPE_ICONS che è indicizzata sui nomi italiani già in uso nei
+// dati locali (badge, medaglie).
+const ENGLISH_TYPE_ICONS = {
+  normal: "🥛", fire: "🔥", water: "💧", grass: "🌿", electric: "⚡",
+  ice: "❄️", fighting: "🥊", poison: "☠️", ground: "🏔️", flying: "🦅",
+  psychic: "🔮", bug: "🐛", rock: "🪨", ghost: "👻", dragon: "🐉",
+  dark: "🌑", steel: "🗡️", fairy: "🧚",
+};
+
+export function getTypeIconFromSlug(slug, fallback = "⚔️") {
+  return ENGLISH_TYPE_ICONS[slug] || fallback;
+}
+
 export const POKEMON_TYPES = {
   // Gen 1 Starters & iconic
   1: "Erba", 2: "Erba", 3: "Erba",

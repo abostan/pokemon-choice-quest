@@ -478,6 +478,13 @@ body {
   font-size: 0.7rem;
 }
 
+/* Icona tipo + mossa firma al tap, mostrata solo dove PokemonChip riceve
+   showMove=true (squadra avversaria in battaglia) — vedi ROADMAP.md Fase 6. */
+.chip-type-icon {
+  margin-left: 2px;
+  font-size: 0.95rem;
+}
+
 .badge-chip {
   background: linear-gradient(135deg, var(--accent), #b98a00);
   color: #1a1a1a;

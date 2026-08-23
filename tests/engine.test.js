@@ -13,6 +13,7 @@ import {
 import { computeVictoryScore, RANKS } from "../src/engine/scoreLogic.js";
 import { computeTypeEffectiveness } from "../src/engine/typeMatchup.js";
 import { sanitizeGameState } from "../src/engine/saveSanitizer.js";
+import { pickSignatureMove } from "../src/data/movePicker.js";
 
 test("battleLogic - computeTeamPower", () => {
   const team = [
@@ -117,4 +118,27 @@ test("saveSanitizer - sanitizeGameState cleans corrupt data", () => {
   assert.deepStrictEqual(clean.team, []);
   assert.strictEqual(clean.coins, 0);
   assert.strictEqual(clean.gymIndex, 0);
+});
+
+test("movePicker - pickSignatureMove sceglie la mossa level-up al livello più alto", () => {
+  // Forma semi-reale ridotta della risposta PokeAPI per pokemon.moves
+  const moves = [
+    { move: { name: "scratch", url: "u1" }, version_group_details: [{ level_learned_at: 1, move_learn_method: { name: "level-up" } }] },
+    { move: { name: "flamethrower", url: "u2" }, version_group_details: [{ level_learned_at: 46, move_learn_method: { name: "level-up" } }] },
+    { move: { name: "flare-blitz", url: "u3" }, version_group_details: [{ level_learned_at: 66, move_learn_method: { name: "level-up" } }] },
+    // Mossa insegnabile solo via smeriglio/TM, non level-up: non deve mai vincere anche se "level" fittizio è alto
+    { move: { name: "solar-beam", url: "u4" }, version_group_details: [{ level_learned_at: 0, move_learn_method: { name: "machine" } }] },
+  ];
+  const result = pickSignatureMove(moves);
+  assert.deepStrictEqual(result, { name: "flare-blitz", url: "u3" });
+});
+
+test("movePicker - pickSignatureMove: nessuna mossa level-up o input non valido => null", () => {
+  assert.strictEqual(pickSignatureMove([]), null);
+  assert.strictEqual(pickSignatureMove(null), null);
+  assert.strictEqual(pickSignatureMove(undefined), null);
+  const onlyMachine = [
+    { move: { name: "solar-beam", url: "u4" }, version_group_details: [{ level_learned_at: 0, move_learn_method: { name: "machine" } }] },
+  ];
+  assert.strictEqual(pickSignatureMove(onlyMachine), null);
 });
