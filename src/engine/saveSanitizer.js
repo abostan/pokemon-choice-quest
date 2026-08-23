@@ -8,6 +8,7 @@ export function sanitizeGameState(raw) {
   return {
     phase: typeof raw.phase === "string" ? raw.phase : "generationSelect",
     generationId: typeof raw.generationId === "string" ? raw.generationId : null,
+    nextGenId: typeof raw.nextGenId === "string" ? raw.nextGenId : null,
     gymIndex: typeof raw.gymIndex === "number" && !isNaN(raw.gymIndex) ? Math.max(0, raw.gymIndex) : 0,
     eliteIndex: typeof raw.eliteIndex === "number" && !isNaN(raw.eliteIndex) ? Math.max(0, raw.eliteIndex) : 0,
     rivalDone: !!raw.rivalDone,

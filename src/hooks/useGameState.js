@@ -23,6 +23,7 @@ export function initialState() {
   return {
     phase: "generationSelect",
     generationId: null,
+    nextGenId: null,
     gymIndex: 0,
     eliteIndex: 0,
     rivalDone: false,

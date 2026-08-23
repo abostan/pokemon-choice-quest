@@ -21,9 +21,16 @@ export function LeagueSceneContainer({ game }) {
 
   if (state.phase === "nextGenSelect") {
     const nextGen = getGeneration(state.nextGenId);
+    if (!nextGen) {
+      // Stato inconsistente (es. salvataggio corrotto senza nextGenId): non
+      // c'è una regione valida verso cui procedere, meglio tornare al menu
+      // che crashare su un generationId inesistente in starterSelect.
+      goTo("resume");
+      return null;
+    }
     return e(NextGenerationScreen, {
       currentGenName: generation?.name ?? "Pokémon",
-      nextGenName: nextGen?.name ?? "Prossima Regione",
+      nextGenName: nextGen.name,
       team: state.team,
       onContinue: () =>
         goTo("starterSelect", {
