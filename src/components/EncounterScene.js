@@ -22,8 +22,9 @@ const e = React.createElement;
  *  - onSeen(id, isShiny): chiamata quando il Pokémon è rivelato (per il Pokédex)
  *  - onCaught(id, isShiny): chiamata quando il Pokémon è catturato (per il Pokédex)
  *  - onResolved({ caught, pokemon }): chiamata quando la scena finisce
+ *  - pokedexRun: { [id]: { seen, caught, shiny } } — usato per mostrare il badge "già catturato"
  */
-export function EncounterScene({ title, text, pool = [], level = 4, isLegendary = false, hasMasterBall = false, team = [], onSeen, onCaught, onResolved }) {
+export function EncounterScene({ title, text, pool = [], level = 4, isLegendary = false, hasMasterBall = false, team = [], pokedexRun = {}, onSeen, onCaught, onResolved }) {
   const isShiny = useMemo(() => {
     return Math.random() < getShinyChance(isLegendary);
   }, [isLegendary]);
@@ -57,6 +58,8 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
   useEffect(() => {
     if (wildData?.cry) playPokemonCry(wildData.cry);
   }, [wildData?.cry]);
+
+  const alreadyCaught = !!pokedexRun[wildId]?.caught;
 
   const [result, setResult] = useState(null); // { method, success } | null
 
@@ -96,7 +99,7 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
       { className: "legendary-badge" },
       "⭐ Incontro leggendario — probabilità di cattura ridotta!"
     ),
-    e(PokemonPreview, { id: wildId, isShiny }),
+    e(PokemonPreview, { id: wildId, isShiny, alreadyCaught }),
     !result &&
       e(
         "div",

@@ -1133,6 +1133,17 @@ body {
   letter-spacing: 1px;
 }
 
+.caught-badge {
+  background: linear-gradient(90deg, #2f3b52, #4a5a78, #2f3b52);
+  color: #e2e8f0;
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
 .shiny-sparkle-inline {
   color: #ffd700;
 }

@@ -59,7 +59,7 @@ export function PokemonChip({ id, level, isShiny, showMove = false }) {
  * Mostra lo sprite + nome + tipi di un Pokémon in formato card più grande.
  * Usato nell'EncounterScene e nella StartScreen.
  */
-export function PokemonPreview({ id, isShiny }) {
+export function PokemonPreview({ id, isShiny, alreadyCaught = false }) {
   const { data, loading, error } = usePokemon(id);
 
   if (loading) return e("div", { className: "pokemon-preview" }, e("p", { className: "loading-text" }, "Caricamento…"));
@@ -71,6 +71,7 @@ export function PokemonPreview({ id, isShiny }) {
     "div",
     { className: `pokemon-preview ${isShiny ? "shiny-preview" : ""}` },
     isShiny && e("div", { className: "shiny-badge" }, "✨ SHINY ✨"),
+    alreadyCaught && e("div", { className: "caught-badge", title: "Hai già catturato questa specie in questa run" }, "⚪ Già catturato"),
     e("img", { src: sprite, alt: data.name }),
     e("span", { className: "name" }, isShiny ? `✨ ${data.name}` : data.name),
     e(

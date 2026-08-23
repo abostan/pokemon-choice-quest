@@ -278,6 +278,7 @@ export function SceneRouter({ game }) {
       level: state.pendingEncounterLevel,
       isLegendary: isLegendary || state.pendingEncounterIsLegendary,
       hasMasterBall: hasMb,
+      pokedexRun: state.pokedexRun,
       onSeen: markSeen,
       onCaught: markCaught,
       onResolved: ({ caught, pokemon, usedMasterBall }) => {
