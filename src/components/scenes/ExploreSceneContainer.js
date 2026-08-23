@@ -32,7 +32,6 @@ export function ExploreSceneContainer({ game }) {
     addItem,
     markCaught,
     addToTeam,
-    startPostgameExplore,
   } = game;
 
   const [casinoOpen, setCasinoOpen] = useState(false);
@@ -128,8 +127,7 @@ export function ExploreSceneContainer({ game }) {
           const fossilId = fossilPool[Math.floor(Math.random() * fossilPool.length)];
           markCaught(fossilId, false);
           addToTeam({ id: fossilId, level: 50 });
-          update({ postgameRound: state.postgameRound + 1 });
-          setTimeout(() => startPostgameExplore(), 0);
+          update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
       },
       {
@@ -142,8 +140,7 @@ export function ExploreSceneContainer({ game }) {
           markCaught(tradeId, false);
           addToTeam({ id: tradeId, level: Math.min(MAX_LEVEL, pgLevel + 5) });
           addItem("Super Pozione");
-          update({ postgameRound: state.postgameRound + 1 });
-          setTimeout(() => startPostgameExplore(), 0);
+          update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
       },
       {
@@ -165,8 +162,7 @@ export function ExploreSceneContainer({ game }) {
         onSelect: () => {
           const weather = rollWeather();
           addItem("Super Pozione");
-          update({ activeWeather: weather, postgameRound: state.postgameRound + 1 });
-          setTimeout(() => startPostgameExplore(), 0);
+          update({ activeWeather: weather, postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
       },
       {
@@ -227,8 +223,7 @@ export function ExploreSceneContainer({ game }) {
           const pool = ["Super Pozione", "Caramella Rara", "Pietra Lunare", "Resti"];
           addItem(pool[Math.floor(Math.random() * pool.length)]);
           boostTeam(1);
-          update({ postgameRound: state.postgameRound + 1 });
-          setTimeout(() => startPostgameExplore(), 0);
+          update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
       },
       {
@@ -241,8 +236,7 @@ export function ExploreSceneContainer({ game }) {
           markCaught(eggId, false);
           addToTeam({ id: eggId, level: 5 });
           addItem("Super Pozione");
-          update({ postgameRound: state.postgameRound + 1 });
-          setTimeout(() => startPostgameExplore(), 0);
+          update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
       },
       {
@@ -342,8 +336,7 @@ export function ExploreSceneContainer({ game }) {
         onPlay: (stake) => playCasino(stake, pgLevel),
         onLeave: () => {
           setCasinoOpen(false);
-          update({ postgameRound: state.postgameRound + 1 });
-          setTimeout(() => startPostgameExplore(), 0);
+          update({ postgameRound: state.postgameRound + 1, phase: "postgameExplore" });
         },
       });
     }

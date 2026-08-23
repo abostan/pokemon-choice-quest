@@ -101,7 +101,25 @@ export function useGameState() {
   }, [state.isNuzlocke, state.team, state.box, state.phase]);
 
   function update(patch) {
-    setState((prev) => ({ ...prev, ...patch }));
+    setState((prev) => {
+      // Centralizzato qui (non in goTo) perché il ritorno a "postgameExplore"
+      // avviene sia tramite goTo() (bivi scelti direttamente dal giocatore)
+      // sia tramite update() diretto dopo una battaglia risolta altrove
+      // (SceneRouter.js, GymBattleSceneContainer.js) — un fix messo solo in
+      // goTo() avrebbe lasciato scoperta quest'ultima classe di transizioni,
+      // che nella pratica sono la maggioranza delle azioni post-game
+      // (allenatori, zone a tema, Rosso, torneo...). Prima il roll del
+      // leggendario ambientale scattava solo per le 6 azioni "istantanee"
+      // (fossile, scambio, meteo, cerca oggetti, uovo, casinò) che
+      // richiamavano esplicitamente startPostgameExplore() — segnalato da
+      // un giocatore reale che non vedeva mai comparire un leggendario.
+      if (patch.phase === "postgameExplore") {
+        const merged = { ...prev, ...patch };
+        const rolled = resolvePostgameExplore(merged);
+        return { ...prev, ...patch, phase: rolled.phase, ...rolled.patch };
+      }
+      return { ...prev, ...patch };
+    });
   }
 
   function swapTeamPosition(fromIdx, toIdx) {
@@ -249,11 +267,6 @@ export function useGameState() {
     goTo(phase, patch);
   }
 
-  function startPostgameExplore() {
-    const { phase, patch } = resolvePostgameExplore(state);
-    goTo(phase, patch);
-  }
-
   return {
     state,
     setState,
@@ -280,6 +293,5 @@ export function useGameState() {
     handleNuzlockeLoss,
     advanceAfterGymBattle,
     checkNextGeneration,
-    startPostgameExplore,
   };
 }
