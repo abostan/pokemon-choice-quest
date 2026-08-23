@@ -27,6 +27,11 @@ const e = React.createElement;
  *    escluso dall'estrazione se il pool ha altre opzioni, per non rivedere subito lo stesso
  *  - hasBallLure: bool — se true, mostra il bottone per usare una Pallina Esca dallo zaino
  *    (+8% probabilità di cattura con Poké Ball/Cibo, consumata all'uso)
+ *
+ * Le specie mai catturate in questa run (assenti/`caught: false` in `pokedexRun`)
+ * ricevono +5% probabilità di cattura (dimezzato sui leggendari, stesso
+ * trattamento di Leggiadria/Pallina Esca) — premia meccanicamente il
+ * completamento del Pokédex, non solo esteticamente (ROADMAP.md Fase 11).
  */
 export function EncounterScene({ title, text, pool = [], level = 4, isLegendary = false, hasMasterBall = false, hasBallLure = false, team = [], pokedexRun = {}, lastEncounterId = null, onSeen, onCaught, onResolved }) {
   const isShiny = useMemo(() => {
@@ -74,6 +79,7 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
   }, [wildData?.cry]);
 
   const alreadyCaught = !!pokedexRun[wildId]?.caught;
+  const isNewSpecies = !alreadyCaught;
 
   const [result, setResult] = useState(null); // { method, success } | null
   const [ballLureActive, setBallLureActive] = useState(false);
@@ -84,7 +90,7 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
   const hasSereneGrace = teamAbilities.some((a) => a.name === "Leggiadria");
 
   function attemptCapture(method) {
-    const chance = computeCaptureChance(method, baseRate, isLegendary, hasSereneGrace, ballLureActive);
+    const chance = computeCaptureChance(method, baseRate, isLegendary, hasSereneGrace, ballLureActive, isNewSpecies);
     const success = rollCapture(chance);
     recordCapture({ method, chance, success, isLegendary, pokemonId: wildId });
     if (success) {
@@ -118,6 +124,11 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
       "div",
       { className: "ball-lure-badge" },
       "🎯 Pallina Esca attiva — +8% probabilità di cattura con Poké Ball/Cibo"
+    ),
+    isNewSpecies && e(
+      "div",
+      { className: "new-species-badge" },
+      "🆕 Specie mai vista nel tuo Pokédex — +5% probabilità di cattura!"
     ),
     e(PokemonPreview, { id: wildId, isShiny, alreadyCaught }),
     !result &&

@@ -1162,6 +1162,18 @@ body {
   text-align: center;
 }
 
+.new-species-badge {
+  background: linear-gradient(90deg, #14532d, #166534);
+  border: 1px solid var(--success);
+  border-radius: 8px;
+  color: #bbf7d0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding: 8px 14px;
+  text-align: center;
+}
+
 /* ------------------------------------------------------------------
    Shiny Pokémon Effects & Badges
    ------------------------------------------------------------------ */

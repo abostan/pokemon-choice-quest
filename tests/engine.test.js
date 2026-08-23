@@ -88,6 +88,23 @@ test("battleLogic - computeCaptureChance con Pallina Esca (+8%, dimezzato sui le
   assert.strictEqual(computeCaptureChance("masterball", 0.5, false, false, true), 1.0);
 });
 
+test("battleLogic - computeCaptureChance bonus specie mai vista (+5%, dimezzato sui leggendari)", () => {
+  const seenBefore = computeCaptureChance("ball", 0.5, false, false, false, false);
+  const neverSeen = computeCaptureChance("ball", 0.5, false, false, false, true);
+  assert.ok(Math.abs(neverSeen - (seenBefore + 0.05)) < 1e-9);
+
+  const legSeenBefore = computeCaptureChance("ball", 0.5, true, false, false, false);
+  const legNeverSeen = computeCaptureChance("ball", 0.5, true, false, false, true);
+  assert.ok(Math.abs(legNeverSeen - (legSeenBefore + 0.025)) < 1e-9, "sui leggendari il bonus è dimezzato, come Leggiadria/Pallina Esca");
+
+  // I bonus si sommano: Leggiadria + Pallina Esca + specie mai vista
+  const allBonuses = computeCaptureChance("ball", 0.5, false, true, true, true);
+  assert.ok(Math.abs(allBonuses - (seenBefore + 0.10 + 0.08 + 0.05)) < 1e-9);
+
+  // Master Ball resta garanzia 100% indipendentemente dal bonus
+  assert.strictEqual(computeCaptureChance("masterball", 0.5, false, false, false, true), 1.0);
+});
+
 test("battleLogic - rollBattle: rng iniettabile, esito deterministico in entrambe le direzioni", () => {
   assert.strictEqual(rollBattle(0.5, () => 0.4), true);
   assert.strictEqual(rollBattle(0.5, () => 0.6), false);
