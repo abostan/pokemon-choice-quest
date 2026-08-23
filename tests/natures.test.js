@@ -25,6 +25,16 @@ test("natures - computeNatureMultiplier: +10% positive, 0% neutral, -10% negativ
   assert.strictEqual(computeNatureMultiplier(null), 1.0);
 });
 
+test("natures - computeNatureMultiplier: fascia sconosciuta ricade su 0% (nessun bonus/malus)", () => {
+  assert.strictEqual(computeNatureMultiplier({ tier: "fascia-inventata" }), 1.0);
+});
+
+test("natures - getPokemonNature: id assente/0 ricade sulla prima Natura della lista", () => {
+  assert.strictEqual(getPokemonNature(0).name, NATURES[0].name);
+  assert.strictEqual(getPokemonNature(undefined).name, NATURES[0].name);
+  assert.strictEqual(getPokemonNature(null).name, NATURES[0].name);
+});
+
 test("battleLogic - computeTeamPower incorpora la Natura per Pokémon (una squadra con nature positive supera la stessa squadra con nature negative)", () => {
   // Trova un id di ogni fascia entro il range NATURES.length per un confronto pulito
   let positiveId = null;

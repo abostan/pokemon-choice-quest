@@ -7,6 +7,7 @@ import {
   computeCaptureChance,
   computeStatMultiplier,
   computeFatigueMultiplier,
+  rollBattle,
   clampLevel,
   clamp,
 } from "../src/engine/battleLogic.js";
@@ -85,6 +86,42 @@ test("battleLogic - computeCaptureChance con Pallina Esca (+8%, dimezzato sui le
 
   // Master Ball resta garanzia 100% indipendentemente dalla Pallina Esca
   assert.strictEqual(computeCaptureChance("masterball", 0.5, false, false, true), 1.0);
+});
+
+test("battleLogic - rollBattle: rng iniettabile, esito deterministico in entrambe le direzioni", () => {
+  assert.strictEqual(rollBattle(0.5, () => 0.4), true);
+  assert.strictEqual(rollBattle(0.5, () => 0.6), false);
+});
+
+test("battleLogic - computeWinChance: le tattiche non-Bilanciate producono una probabilità diversa da Bilanciata", () => {
+  // A parità di potenza (100 vs 100) Bilanciata è sempre esattamente 0.5
+  // (teamMult e opponentMult si annullano a vicenda). Sia Aggressiva
+  // (team +15%, avversario +5%) sia Difensiva (team -10%, avversario -15%)
+  // riducono la potenza *avversaria* proporzionalmente più di quanto
+  // riducano la propria, quindi entrambe superano Bilanciata — Aggressiva
+  // di più, essendo il suo margine (+15% vs +5%) maggiore di quello di
+  // Difensiva (-10% vs -15%).
+  const balanced = computeWinChance(100, 100, "balanced", []);
+  const aggressive = computeWinChance(100, 100, "aggressive", []);
+  const defensive = computeWinChance(100, 100, "defensive", []);
+  assert.strictEqual(balanced, 0.5);
+  assert.ok(aggressive > defensive && defensive > balanced, `atteso aggressive(${aggressive}) > defensive(${defensive}) > balanced(${balanced})`);
+});
+
+test("battleLogic - computeWinChance: tattica sconosciuta ricade su Bilanciata", () => {
+  const balanced = computeWinChance(100, 100, "balanced", []);
+  const unknown = computeWinChance(100, 100, "tattica-inventata", []);
+  assert.strictEqual(unknown, balanced);
+});
+
+test("battleLogic - computeWinChance: abilità passive Prepotenza/Pressione/Acceleratore aumentano la probabilità di vittoria", () => {
+  const base = computeWinChance(100, 100, "balanced", []);
+  const withIntimidate = computeWinChance(100, 100, "balanced", [{ name: "Prepotenza" }]);
+  const withPressure = computeWinChance(100, 100, "balanced", [{ name: "Pressione" }]);
+  const withSpeedBoost = computeWinChance(100, 100, "balanced", [{ name: "Acceleratore" }]);
+  assert.ok(withIntimidate > base, "Prepotenza riduce la potenza avversaria del 10%, quindi aumenta la propria probabilità");
+  assert.ok(withPressure > base, "Pressione aggiunge +8% diretto alla probabilità");
+  assert.ok(withSpeedBoost > base, "Acceleratore aggiunge +5% diretto alla probabilità");
 });
 
 test("battleLogic - clampLevel", () => {
