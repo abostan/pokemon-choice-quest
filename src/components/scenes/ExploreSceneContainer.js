@@ -293,7 +293,7 @@ export function ExploreSceneContainer({ game }) {
     // Shuffle deterministico basato su postgameRound (nessun Math.random() in render → no loop infinito)
     const postgameSeed = computePostgameSeed({ postgameRound: state.postgameRound });
     const postgameById = new Map(postgameSpecialPool.map((o) => [o.id, o]));
-    const rolledSpecials = pickTopIds(postgameSpecialPool.map((o) => o.id), postgameSeed, 4)
+    const rolledSpecials = pickTopIds(postgameSpecialPool.map((o) => o.id), postgameSeed, 6)
       .map((id) => postgameById.get(id));
 
     const baseGrassChoice = {
