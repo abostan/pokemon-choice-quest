@@ -31,6 +31,13 @@ import {
   importSlotJSON,
   updateHistoricPokedex,
 } from "./engine/saveGame.js";
+import {
+  isAudioMuted,
+  toggleAudioMute,
+  playButtonClickSound,
+  playLevelUpSound,
+  playItemUseSound,
+} from "./engine/soundEngine.js";
 
 const e = React.createElement;
 
@@ -137,6 +144,12 @@ class ErrorBoundary extends React.Component {
 export default function App() {
   const [activeSlotId, setActiveSlotId] = useState(1);
   const [slotsData, setSlotsData] = useState(() => loadAllSlots());
+  const [muted, setMuted] = useState(() => isAudioMuted());
+
+  function handleToggleAudio() {
+    const nextMuted = toggleAudioMute();
+    setMuted(nextMuted);
+  }
 
   const [state, setState] = useState(() => {
     if (hasSave()) {
@@ -200,6 +213,7 @@ export default function App() {
   }
 
   function addItem(item) {
+    playItemUseSound();
     setState((prev) => ({ ...prev, items: [...prev.items, item] }));
   }
 
@@ -215,6 +229,7 @@ export default function App() {
    * Aumenta il livello della squadra clampando a MAX_LEVEL (100).
    */
   function boostTeam(amount) {
+    playLevelUpSound();
     setState((prev) => {
       const newTeam = prev.team.map((p) => {
         const boostedLevel = Math.min(MAX_LEVEL, p.level + amount);
@@ -243,6 +258,7 @@ export default function App() {
   }
 
   function goTo(phase, patch = {}) {
+    playButtonClickSound();
     update({ phase, ...patch });
   }
 
@@ -334,6 +350,10 @@ export default function App() {
     (state.phase && state.phase.startsWith("postgame")) ||
     (state.phase && state.phase.startsWith("champions")) ||
     (state.phase && state.phase.startsWith("tournament"));
+
+  const completedGens = state.completedGensCount || 0;
+  const nuzlockeBonus = state.isNuzlocke ? 0.1 : 0;
+  const difficultyMult = 1.0 + completedGens * 0.15 + nuzlockeBonus;
 
   function getScaledPower(basePower) {
     return Math.round(basePower * difficultyMult);
@@ -624,6 +644,34 @@ export default function App() {
           },
         },
         {
+          id: "ultraWormhole",
+          label: "🌌 Fenditura Ultra-Varco (Ultra Bestie)",
+          hint: "Incontra creature leggendarie provenienti da altre dimensioni",
+          onSelect: () => {
+            const ultraPool = [793, 794, 795, 796, 797, 798, 799, 803, 804, 805, 806];
+            const ubId = ultraPool[Math.floor(Math.random() * ultraPool.length)];
+            goTo("legendaryEncounter", {
+              pendingEncounterPool: [ubId],
+              pendingEncounterLevel: Math.min(MAX_LEVEL, 75 + state.postgameRound * 2),
+              pendingEncounterIsLegendary: true,
+            });
+          },
+        },
+        {
+          id: "redBoss",
+          label: "👑 Sfida Rosso sul Monte Argento",
+          hint: "Lo scontro leggendario definitivo (Potenza 200) per ricompense epiche",
+          onSelect: () => {
+            goTo("trainerBattle", {
+              pendingTrainer: {
+                title: "Allenatore Leggendario Rosso",
+                teamIds: [25, 131, 143, 6, 9, 3],
+                power: getScaledPower(200),
+              },
+            });
+          },
+        },
+        {
           id: "trainer",
           label: "⚔️ Sfida un Allenatore di passaggio",
           hint: "Battaglia rapida per XP extra e strumenti",
@@ -650,11 +698,15 @@ export default function App() {
 
   } else if (state.phase === "legendaryEncounter") {
     const hasMb = state.items.includes("Master Ball");
+    const legPool = (state.pendingEncounterPool && state.pendingEncounterPool.length > 0)
+      ? state.pendingEncounterPool
+      : (generation?.legendaries || [150]);
+
     content = e(EncounterScene, {
-      key: `legendary-${state.pendingEncounterPool?.[0]}`,
+      key: `legendary-${legPool[0]}`,
       title: "⭐ Incontro leggendario!",
       text: "Un Pokémon leggendario ti appare davanti! È un momento irripetibile...",
-      pool: state.pendingEncounterPool,
+      pool: legPool,
       level: state.pendingEncounterLevel,
       isLegendary: true,
       hasMasterBall: hasMb,
@@ -980,11 +1032,16 @@ export default function App() {
 
   } else if (state.phase === "encounter") {
     const hasMb = state.items.includes("Master Ball");
+    const tier = getExplorationTier(generation, state.gymIndex);
+    const encPool = (state.pendingEncounterPool && state.pendingEncounterPool.length > 0)
+      ? state.pendingEncounterPool
+      : (tier?.grass || [25]);
+
     content = e(EncounterScene, {
       key: `encounter-${state.gymIndex}`,
       title: "Incontro selvaggio",
       text: "Qualcosa si muove tra i cespugli...",
-      pool: state.pendingEncounterPool,
+      pool: encPool,
       level: state.pendingEncounterLevel,
       isLegendary: state.pendingEncounterIsLegendary,
       hasMasterBall: hasMb,
@@ -1345,11 +1402,24 @@ export default function App() {
             ? `${generation.name} — guidato dalle tue scelte`
             : "Ispirato a Pokemon Roulette, ma guidato dalle tue scelte"
         ),
-        // Pulsanti Header: Home, Pokédex, Sala della Fama e Punteggio
+        // Pulsanti Header: Audio, Home, Pokédex, Sala della Fama e Punteggio
         state.phase !== "generationSelect" && state.phase !== "resume" &&
           e(
             "div",
             { style: { display: "flex", gap: "8px" } },
+            e(
+              "button",
+              {
+                className: "pokedex-header-btn",
+                style: {
+                  background: muted ? "linear-gradient(135deg, #881337, #4c0519)" : "linear-gradient(135deg, #15803d, #14532d)",
+                  border: muted ? "1px solid #f43f5e" : "1px solid #4ade80",
+                },
+                onClick: handleToggleAudio,
+                title: muted ? "Attiva audio retro 8-bit" : "Disattiva audio retro 8-bit",
+              },
+              muted ? "🔇 Audio Off" : "🔊 Audio On"
+            ),
             e(
               "button",
               {

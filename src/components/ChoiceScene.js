@@ -17,7 +17,7 @@ export function ChoiceScene({ title, text, choices }) {
     e(
       "div",
       { className: "choice-list" },
-      choices.map((choice) =>
+      (choices || []).map((choice) =>
         e(
           "button",
           { key: choice.id, className: "choice-btn", onClick: choice.onSelect },

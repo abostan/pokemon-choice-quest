@@ -186,7 +186,10 @@ export function BattleScene({
           width: "100%",
           boxShadow: "0 4px 12px rgba(124, 58, 237, 0.3)",
         },
-        onClick: () => setIsMegaActive(true),
+        onClick: () => {
+          playMegaSound();
+          setIsMegaActive(true);
+        },
       },
       "🔮 Attiva MEGAEVOLUZIONE / GIGAMAX! (+30% Potenza Squadra)"
     ),
@@ -217,7 +220,7 @@ export function BattleScene({
       e(
         "div",
         { className: "team-list", style: { marginTop: "8px" } },
-        opponentTeamIds.map((id, idx) => e(PokemonChip, { key: `${id}-${idx}`, id }))
+        (opponentTeamIds || []).map((id, idx) => e(PokemonChip, { key: `${id}-${idx}`, id }))
       )
     ),
 

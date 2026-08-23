@@ -142,3 +142,25 @@ export function playGameOverSound() {
     setTimeout(() => playNote(freq, 250, "sawtooth", 0.22), idx * 200);
   });
 }
+
+// 🔘 Suono di click sui pulsanti (blip corto)
+export function playButtonClickSound() {
+  if (isMuted) return;
+  playNote(800, 40, "square", 0.08);
+}
+
+// 🧪 Suono di utilizzo strumento / cura
+export function playItemUseSound() {
+  if (isMuted) return;
+  playNote(587.33, 90, "sine", 0.15);
+  setTimeout(() => playNote(880, 120, "sine", 0.18), 70);
+}
+
+// 📈 Suono di Level Up della squadra
+export function playLevelUpSound() {
+  if (isMuted) return;
+  const notes = [440, 554.37, 659.25, 880];
+  notes.forEach((freq, idx) => {
+    setTimeout(() => playNote(freq, 100, "triangle", 0.18), idx * 60);
+  });
+}

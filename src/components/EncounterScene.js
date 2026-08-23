@@ -19,7 +19,7 @@ const e = React.createElement;
  *  - onCaught(id, isShiny): chiamata quando il Pokémon è catturato (per il Pokédex)
  *  - onResolved({ caught, pokemon }): chiamata quando la scena finisce
  */
-export function EncounterScene({ title, text, pool, level = 4, isLegendary = false, hasMasterBall = false, team = [], onSeen, onCaught, onResolved }) {
+export function EncounterScene({ title, text, pool = [], level = 4, isLegendary = false, hasMasterBall = false, team = [], onSeen, onCaught, onResolved }) {
   const isShiny = useMemo(() => {
     // 1/500 chance per i selvatici normali (0.002), 1/20 (0.05) per i leggendari
     const chance = isLegendary ? 0.05 : 0.002;
@@ -32,12 +32,17 @@ export function EncounterScene({ title, text, pool, level = 4, isLegendary = fal
     }
   }, [isShiny, isLegendary]);
 
+  const safePool = useMemo(() => {
+    if (Array.isArray(pool) && pool.length > 0) return pool;
+    return [25];
+  }, [pool]);
+
   const wildId = useMemo(() => {
-    const id = pool[Math.floor(Math.random() * pool.length)];
+    const id = safePool[Math.floor(Math.random() * safePool.length)];
     // Notifica Pokédex: visto
     if (onSeen) onSeen(id, isShiny);
     return id;
-  }, [pool]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [safePool]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [result, setResult] = useState(null); // { method, success } | null
 
