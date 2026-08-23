@@ -67,6 +67,21 @@ export function resolveAfterGymBattle(state, generation) {
 }
 
 /**
+ * Decide la prossima fase dopo aver affrontato un membro dell'Alto Comando:
+ * il prossimo membro, o la sfida al Campione se era l'ultimo. Richiede solo
+ * { eliteIndex } da state, oltre alla generation corrente.
+ * @returns {{ phase: string, patch: object }}
+ */
+export function resolveAfterEliteBattle(state, generation) {
+  const nextEliteIndex = state.eliteIndex + 1;
+  const totalMembers = generation?.eliteFour?.length ?? 4;
+  if (nextEliteIndex >= totalMembers) {
+    return { phase: "championBattle", patch: {} };
+  }
+  return { phase: "eliteBattle", patch: { eliteIndex: nextEliteIndex } };
+}
+
+/**
  * Decide la prossima fase dopo aver completato una regione (Alto Comando +
  * Campione battuti). `isGrandMaster` è true solo quando il conteggio
  * raggiunge GENERATIONS.length — il chiamante decide se sbloccare l'achievement.

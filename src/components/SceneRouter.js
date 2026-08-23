@@ -20,6 +20,7 @@ import { addHallOfFameEntry } from "../engine/hallOfFame.js";
 import { unlockAchievement, regionAchievementId } from "../engine/achievements.js";
 import { deleteSave } from "../engine/saveGame.js";
 import { initialState } from "../hooks/useGameState.js";
+import { resolveSceneForPhase } from "../engine/sceneRouting.js";
 
 const e = React.createElement;
 
@@ -50,7 +51,9 @@ export function SceneRouter({ game }) {
     addToTeam,
   } = game;
 
-  if (state.phase === "resume") {
+  const sceneKey = resolveSceneForPhase(state.phase);
+
+  if (sceneKey === "resume") {
     return e(ResumeScreen, {
       slots: slotsData,
       selectedSlotId: activeSlotId,
@@ -63,7 +66,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "generationSelect") {
+  if (sceneKey === "generationSelect") {
     return e(GenerationSelectScreen, {
       boxCount: state.box.length,
       onChooseGeneration: (generationId, challengeOptions = {}) =>
@@ -71,7 +74,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "starterSelect") {
+  if (sceneKey === "starterSelect") {
     return e(StartScreen, {
       starterIds: filterStartersByChallenge(generation.starterIds, state),
       generationName: generation.name,
@@ -101,7 +104,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "pokecenter") {
+  if (sceneKey === "pokecenter") {
     return e(PokeCenterScene, {
       coins: state.coins || 0,
       team: state.team,
@@ -125,7 +128,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "merchant") {
+  if (sceneKey === "merchant") {
     const pool = isPostgame
       ? [
           { name: "Caramella Rara", price: 5 },
@@ -157,7 +160,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "postgame") {
+  if (sceneKey === "postgame") {
     return e(PostgameScreen, {
       lastGenName: generation?.name ?? "Pokémon",
       team: state.team,
@@ -167,7 +170,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "championsTournament") {
+  if (sceneKey === "championsTournament") {
     return e(TournamentScene, {
       currentRound: state.tournamentRound,
       onStartMatch: () => goTo("tournamentBattle"),
@@ -175,7 +178,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "tournamentBattle") {
+  if (sceneKey === "tournamentBattle") {
     const champ = CHAMPIONS_TOURNAMENT[state.tournamentRound] || CHAMPIONS_TOURNAMENT[0];
     const scaledPower = getScaledPower(champ.opponentPower);
     return e(BattleScene, {
@@ -217,19 +220,19 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "explore" || state.phase === "postgameExplore") {
+  if (sceneKey === "explore") {
     return e(ExploreSceneContainer, { game });
   }
 
-  if (state.phase === "gymBattle" || state.phase === "rivalBattle" || state.phase === "villainBossBattle") {
+  if (sceneKey === "gymBattleContainer") {
     return e(GymBattleSceneContainer, { game });
   }
 
-  if (state.phase === "nextGenSelect" || state.phase === "eliteBattle" || state.phase === "championBattle") {
+  if (sceneKey === "leagueContainer") {
     return e(LeagueSceneContainer, { game });
   }
 
-  if (state.phase === "trainerBattle") {
+  if (sceneKey === "trainerBattle") {
     const tr = state.pendingTrainer || { title: "Allenatore", teamIds: [16, 19], power: 15 };
     return e(BattleScene, {
       key: "trainer-battle",
@@ -260,7 +263,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "encounter" || state.phase === "legendaryEncounter") {
+  if (sceneKey === "encounter") {
     const isLegendary = state.phase === "legendaryEncounter";
     const hasMb = state.items.includes("Master Ball");
     const hasLure = state.items.includes("Pallina Esca");
@@ -327,7 +330,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "nuzlockeGameOver") {
+  if (sceneKey === "nuzlockeGameOver") {
     return e(NuzlockeGameOverScreen, {
       lastGenName: generation?.name ?? "Pokémon",
       badgesCount: state.badges.length,
@@ -338,7 +341,7 @@ export function SceneRouter({ game }) {
     });
   }
 
-  if (state.phase === "end") {
+  if (sceneKey === "end") {
     return e(EndScreen, {
       team: state.team,
       badges: state.badges,

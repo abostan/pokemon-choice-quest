@@ -4,6 +4,7 @@ import { NextGenerationScreen } from "../NextGenerationScreen.js";
 import { getGeneration } from "../../data/generations.js";
 import { addHallOfFameEntry } from "../../engine/hallOfFame.js";
 import { unlockAchievement, regionAchievementId } from "../../engine/achievements.js";
+import { resolveAfterEliteBattle } from "../../engine/gameStateTransitions.js";
 
 const e = React.createElement;
 
@@ -73,13 +74,8 @@ export function LeagueSceneContainer({ game }) {
         onResolved: ({ won }) => {
           if (won) resolveBattleWin(null);
           else handleNuzlockeLoss();
-          const nextEliteIndex = state.eliteIndex + 1;
-          const totalMembers = generation?.eliteFour?.length ?? 4;
-          if (nextEliteIndex >= totalMembers) {
-            goTo("championBattle");
-          } else {
-            goTo("eliteBattle", { eliteIndex: nextEliteIndex });
-          }
+          const { phase, patch } = resolveAfterEliteBattle(state, generation);
+          goTo(phase, patch);
         },
       });
     }

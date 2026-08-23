@@ -5,17 +5,15 @@
 // browser), ma controlla la logica di transizione che è la parte più a
 // rischio di bug in questa modifica.
 //
-// Il blocco gymBattle chiama la vera resolveAfterGymBattle() di
-// engine/gameStateTransitions.js (Fase 10 di ROADMAP.md) invece di
-// reimplementare la stessa decisione a mano: prima un bug in quella logica
-// (es. il vecchio hardcoded `8` di isPostgame) non sarebbe mai stato
-// scoperto da questo script, perché copiava la sequenza indipendentemente
-// dal codice vero. La progressione Alto Comando/Campione resta simulata a
-// mano qui sotto: quella logica vive in LeagueSceneContainer.js, non in
-// useGameState.js, quindi non è ancora stata estratta in una funzione pura.
+// I blocchi gymBattle ed eliteBattle chiamano le vere resolveAfterGymBattle()/
+// resolveAfterEliteBattle() di engine/gameStateTransitions.js (Fase 10 di
+// ROADMAP.md) invece di reimplementare la stessa decisione a mano: prima un
+// bug in quella logica (es. il vecchio hardcoded `8` di isPostgame) non
+// sarebbe mai stato scoperto da questo script, perché copiava la sequenza
+// indipendentemente dal codice vero.
 
 import { GENERATIONS, getExplorationTier } from "../src/data/generations.js";
-import { resolveAfterGymBattle } from "../src/engine/gameStateTransitions.js";
+import { resolveAfterGymBattle, resolveAfterEliteBattle } from "../src/engine/gameStateTransitions.js";
 
 for (const generation of GENERATIONS) {
   console.log(`\n=== ${generation.name} ===`);
@@ -55,12 +53,9 @@ for (const generation of GENERATIONS) {
       const member = generation.eliteFour[eliteIndex];
       if (!member) throw new Error(`Membro Alto Comando mancante per indice ${eliteIndex}`);
       console.log(`  alto comando ${eliteIndex + 1}: ${member.title} (potenza ${member.opponentPower})`);
-      const nextEliteIndex = eliteIndex + 1;
-      if (nextEliteIndex >= generation.eliteFour.length) {
-        phase = "championBattle";
-      } else {
-        eliteIndex = nextEliteIndex;
-      }
+      const { phase: nextPhase, patch } = resolveAfterEliteBattle({ eliteIndex }, generation);
+      if (patch.eliteIndex != null) eliteIndex = patch.eliteIndex;
+      phase = nextPhase;
     } else if (phase === "championBattle") {
       console.log(`  campione: ${generation.champion.title} (potenza ${generation.champion.opponentPower})`);
       phase = "end";

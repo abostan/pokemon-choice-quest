@@ -7,6 +7,7 @@ import {
   computeDifficultyMultiplier,
   computeScaledPower,
   resolveAfterGymBattle,
+  resolveAfterEliteBattle,
   resolveNextGeneration,
   resolvePostgameExplore,
   resolveNuzlockeLoss,
@@ -89,6 +90,25 @@ test("resolveAfterGymBattle - se rivale e boss cadono sullo stesso afterGymIndex
   const genBothSameIndex = { id: "x", gymLeaders: [{}, {}], rival: { afterGymIndex: 0 }, villainBoss: { afterGymIndex: 0 } };
   const result = resolveAfterGymBattle({ gymIndex: 0, rivalDone: false, villainBossDone: false }, genBothSameIndex);
   assert.strictEqual(result.phase, "rivalBattle");
+});
+
+// --- resolveAfterEliteBattle -----------------------------------------------
+
+const fakeGenWithEliteFour = { eliteFour: [{}, {}, {}, {}] };
+
+test("resolveAfterEliteBattle - membri rimanenti => passa al prossimo membro", () => {
+  const result = resolveAfterEliteBattle({ eliteIndex: 0 }, fakeGenWithEliteFour);
+  assert.deepStrictEqual(result, { phase: "eliteBattle", patch: { eliteIndex: 1 } });
+});
+
+test("resolveAfterEliteBattle - ultimo membro sconfitto => sfida al Campione", () => {
+  const result = resolveAfterEliteBattle({ eliteIndex: 3 }, fakeGenWithEliteFour);
+  assert.deepStrictEqual(result, { phase: "championBattle", patch: {} });
+});
+
+test("resolveAfterEliteBattle - eliteFour assente/malformato ricade sul default di 4 membri", () => {
+  const result = resolveAfterEliteBattle({ eliteIndex: 3 }, {});
+  assert.strictEqual(result.phase, "championBattle");
 });
 
 // --- resolveNextGeneration ------------------------------------------------
