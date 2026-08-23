@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
 import { computeTeamPower, computeWinChance, rollBattle, computeFatigueMultiplier, TACTICS } from "../engine/battleLogic.js";
 import { useTeamStats } from "../hooks/useTeamStats.js";
+import { useTeamMegaCapability } from "../hooks/useMegaSprite.js";
 import { getItemDescription, groupItemsByName } from "../data/items.js";
 import { computeItemEffect } from "../engine/itemEffects.js";
 import { computeTypeEffectiveness, computeTeraEffect } from "../engine/typeMatchup.js";
@@ -73,6 +74,8 @@ export function BattleScene({
 
   const hasTeam = team && team.length > 0;
   const teamAbilities = computeTeamAbilities(team);
+  const { capableIds: megaCapableIds, ready: megaCapabilityReady } = useTeamMegaCapability(team);
+  const hasMegaCapableMember = hasTeam && team.some((p) => megaCapableIds.has(p.id));
 
   // Estrae il tipo avversario dal titolo se non passato esplicitamente (es. "Capopalestra di tipo Roccia")
   const detectedType = opponentType || (opponentTitle.match(/tipo ([A-Za-z]+)/)?.[1] ?? "");
@@ -229,8 +232,12 @@ export function BattleScene({
       "😓 Squadra Affaticata da una sconfitta recente (-10% Potenza): passa dal Centro Pokémon per curarla!"
     ),
 
-    // Megaevoluzione Button / Badge (esclusiva con la Terastallizzazione)
-    hasTeam && !result && !isMegaActive && !isTerastalActive && e(
+    // Megaevoluzione Button / Badge (esclusiva con la Terastallizzazione).
+    // Disponibile solo se almeno un membro della squadra ha davvero una
+    // forma Mega/Gigamax reale (verificato dal vivo su PokeAPI, stessa
+    // fonte dello sprite in TeamPanel.js) — prima era sempre disponibile
+    // per qualunque squadra, dando +30% flat a prescindere.
+    hasTeam && !result && !isMegaActive && !isTerastalActive && hasMegaCapableMember && e(
       "button",
       {
         className: "mega-btn control-action",
@@ -247,6 +254,12 @@ export function BattleScene({
         },
       },
       "🔮 Attiva MEGAEVOLUZIONE / GIGAMAX! (+30% Potenza Squadra)"
+    ),
+
+    hasTeam && !result && !isMegaActive && !isTerastalActive && megaCapabilityReady && !hasMegaCapableMember && e(
+      "p",
+      { className: "scene-text", style: { fontSize: "0.8rem", color: "var(--text-dim)", margin: "6px 0" } },
+      "🔮 Nessun Pokémon della tua squadra ha una forma Mega/Gigamax reale: Megaevoluzione non disponibile in questa battaglia."
     ),
 
     hasTeam && isMegaActive && e(

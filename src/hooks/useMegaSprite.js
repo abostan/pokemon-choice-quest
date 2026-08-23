@@ -66,3 +66,56 @@ export function useMegaSprite(speciesId, active) {
 
   return sprite;
 }
+
+async function hasMegaOrGmaxVariety(id) {
+  const varieties = await fetchVarieties(id);
+  return FORM_SUFFIXES.some((suffix) => varieties.some((v) => v.pokemon.name.endsWith(suffix)));
+}
+
+/**
+ * Insieme (Set) degli id specie in squadra che hanno davvero una forma
+ * Mega/Gigamax su PokeAPI — interrogato sempre (non solo quando Mega è già
+ * attivo, a differenza di useMegaSprite sopra), per poter mostrare/nascondere
+ * il bottone Mega PRIMA che il giocatore lo attivi (vedi ROADMAP.md Fase 7:
+ * prima il bottone era sempre disponibile per qualunque squadra). Stessa
+ * fonte dati e stessa cache di useMegaSprite, quindi nessuna richiesta
+ * doppia se poi Mega viene davvero attivato.
+ *
+ * `ready` diventa true solo a fetch completato: usarlo per evitare di
+ * mostrare per un istante "nessun Pokémon Mega-capace" prima ancora di
+ * saperlo davvero (falso negativo temporaneo durante il caricamento).
+ * @returns {{ capableIds: Set<number>, ready: boolean }}
+ */
+export function useTeamMegaCapability(team) {
+  const ids = (team || []).map((p) => p.id).filter((id) => id != null);
+  const key = ids.join(",");
+  const [capableIds, setCapableIds] = useState(() => new Set());
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    setReady(false);
+    if (ids.length === 0) {
+      setCapableIds(new Set());
+      setReady(true);
+      return;
+    }
+    let cancelled = false;
+
+    Promise.all(
+      ids.map((id) =>
+        hasMegaOrGmaxVariety(id)
+          .then((isCapable) => (isCapable ? id : null))
+          .catch(() => null)
+      )
+    ).then((results) => {
+      if (cancelled) return;
+      setCapableIds(new Set(results.filter((id) => id != null)));
+      setReady(true);
+    });
+
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+  return { capableIds, ready };
+}
