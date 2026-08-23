@@ -128,3 +128,20 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
   - 👑 *"Master Nuzlocke"*: Completa una regione in modalità Nuzlocke senza perdere l'intera squadra.
   - 🌋 *"Monte Argento"*: Sconfiggi Rosso Leggendario nel post-game.
   - 🌍 *"Gran Maestro dei Continenti"*: Conquista tutte e 9 le regioni in una sola run.
+
+---
+
+### 📡 Fase 6: Integrazione Avanzata PokéAPI & Caching Locale (Offline-First)
+- [ ] **🔊 Versi Audio Ufficiali dei Pokémon (`cries`)**: riproduzione del ruggito/verso originale del Pokémon (formato `.ogg` da `PokeAPI/cries`) ad ogni incontro, cattura ed evoluzione.
+- [ ] **📖 Voci del Pokédex e Descrizioni in Italiano (`/pokemon-species`)**: descrizioni enciclopediche ufficiali in lingua italiana consultabili nel modale Pokédex.
+- [ ] **🎒 Sprite Pixel Ufficiali degli Strumenti & Bacche (`/item`)**: visualizzazione degli sprite pixel ufficiali di Poké Ball, Pozioni, Pietre Evolutive e Caramelle Rare nel PokéMart ed Inventario.
+- [ ] **🌴 Varianti Regionali & Forme Mega/Gigamax (`/pokemon-form`)**: supporto completo agli sprite e dati per forme d'Alola, Galar, Hisui e Paldea.
+- [ ] **⚡ Dettaglio Mosse & Icone Tipi (`/type` & `/move`)**: visualizzazione icone tipi e mosse firma in battaglia con potenza e precisione.
+- [ ] **📊 Base Stats Ufficiali (`/pokemon`)**: integrazione delle 6 statistiche base (PS, Attacco, Difesa, SpAtk, SpDef, Velocità) e Somma Statistiche (BST) per un calcolo di potenza ancora più accurato.
+- [ ] **🎭 Nature dei Pokémon (`/nature`)**: assegnazione della Natura (es. *Decisa*, *Modesta*, *Timida*, *Sicura*) con un bonus/malus passivo del +10%/-10% alla potenza in battaglia.
+- [ ] **♂️ Genere & Differenze di Forma (`/pokemon-species`)**: visualizzazione del genere ♂️ / ♀️ nella squadra e supporto alle varianti visive basate sul genere (es. Pikachu coda a cuore ♀️, Pyroar ♂️/♀️).
+- [ ] **🌌 Condizioni di Evoluzione Avanzate (`/evolution-chain`)**: evoluzioni legate al ciclo Giorno/Notte (Espeon/Umbreon), Felicità o Pietre Evolutive specifiche.
+- [ ] **📖 Numerazione Pokédex Regionale (`/pokedex`)**: visualizzazione del numero Pokédex ufficiale della regione attiva (es. Kanto #001-#151, Paldea #001-#400) oltre al numero Nazionale.
+- [ ] **🚀 Architettura Caching Locale & Offline-First**:
+  - Script Node `scripts/fetch-pokeapi-assets.js` per pre-scaricare periodicamente le descrizioni in italiano ed i dati in file JSON locali.
+  - Caching intelligente nel browser tramite `CacheStorage` / `IndexedDB` per azzerare le chiamate di rete ripetute, garantire caricamenti istantanei a latenza zero e rendere il gioco 100% giocabile offline.
