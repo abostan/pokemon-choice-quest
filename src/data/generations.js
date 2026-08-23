@@ -714,9 +714,12 @@ export function getGeneration(id) {
   return GENERATIONS.find((g) => g.id === id) ?? null;
 }
 
-export function getExplorationTier(generation, gymIndex) {
+export function getExplorationTier(generation, gymIndex = 0) {
+  if (!generation || !generation.explorationTiers || generation.explorationTiers.length === 0) {
+    return { level: 6, grass: [25, 39, 52], fishing: [129, 60], cave: [41, 74], grass2: [63, 92] };
+  }
   const tierIndex = Math.min(Math.floor(gymIndex / 3), generation.explorationTiers.length - 1);
-  return generation.explorationTiers[tierIndex];
+  return generation.explorationTiers[Math.max(0, tierIndex)];
 }
 
 export function getNextGeneration(currentId) {

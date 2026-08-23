@@ -1,0 +1,271 @@
+import { useState, useEffect } from "react";
+import { getGeneration, getNextGeneration } from "../data/generations.js";
+import { checkEvolution } from "../data/evolutions.js";
+import { hasSave } from "../engine/saveGame.js";
+import { useSaveSlot } from "./useSaveSlot.js";
+import { usePokedexState } from "./usePokedexState.js";
+import {
+  isAudioMuted,
+  toggleAudioMute,
+  playButtonClickSound,
+  playLevelUpSound,
+  playItemUseSound,
+} from "../engine/soundEngine.js";
+
+export const WIN_LEVEL_BOOST = 3;
+export const MAX_LEVEL = 100;
+export const MAX_TEAM_SIZE = 6;
+export const LEGENDARY_CHANCE = 0.05;
+
+export function initialState() {
+  return {
+    phase: "generationSelect",
+    generationId: null,
+    gymIndex: 0,
+    eliteIndex: 0,
+    rivalDone: false,
+    villainBossDone: false,
+    team: [],
+    box: [],
+    badges: [],
+    items: [],
+    coins: 5,
+    pendingEncounterPool: null,
+    pendingEncounterLevel: 4,
+    pendingEncounterIsLegendary: false,
+    pendingTrainer: null,
+    multiGenRun: false,
+    completedGensCount: 0,
+    postgameRound: 0,
+    tournamentRound: 0,
+    isNuzlocke: false,
+    pokedexRun: {},
+    pokedexOpen: false,
+    pendingEvolutions: [],
+    caughtLegendaries: [],
+    boxModalOpen: false,
+    hallOfFameOpen: false,
+    scoreModalOpen: false,
+  };
+}
+
+export function useGameState() {
+  const [muted, setMuted] = useState(() => isAudioMuted());
+
+  function handleToggleAudio() {
+    const nextMuted = toggleAudioMute();
+    setMuted(nextMuted);
+  }
+
+  const [state, setState] = useState(() => {
+    if (hasSave()) {
+      return { ...initialState(), phase: "resume" };
+    }
+    return initialState();
+  });
+
+  const slotSave = useSaveSlot(state, setState, initialState);
+  const pokedexState = usePokedexState(setState);
+
+  // Controllo globale Nuzlocke Game Over
+  useEffect(() => {
+    if (!state.isNuzlocke || state.phase === "nuzlockeGameOver" || state.phase === "generationSelect" || state.phase === "starterSelect" || state.phase === "resume") return;
+    const hasHealthyInTeam = state.team.some((p) => !p.isFainted);
+    const hasHealthyInBox = state.box.some((p) => !p.isFainted);
+
+    if (!hasHealthyInTeam && !hasHealthyInBox) {
+      update({ phase: "nuzlockeGameOver" });
+    }
+  }, [state.isNuzlocke, state.team, state.box, state.phase]);
+
+  function update(patch) {
+    setState((prev) => ({ ...prev, ...patch }));
+  }
+
+  function addToTeam(pokemon) {
+    setState((prev) => {
+      if (prev.team.length < MAX_TEAM_SIZE) {
+        return { ...prev, team: [...prev.team, pokemon] };
+      } else {
+        return { ...prev, box: [...prev.box, pokemon] };
+      }
+    });
+  }
+
+  function addBadge(badge) {
+    if (!badge) return;
+    setState((prev) => ({ ...prev, badges: [...prev.badges, badge] }));
+  }
+
+  function addItem(item) {
+    playItemUseSound();
+    setState((prev) => ({ ...prev, items: [...prev.items, item] }));
+  }
+
+  function useItem(itemIndex) {
+    setState((prev) => {
+      const nextItems = [...prev.items];
+      nextItems.splice(itemIndex, 1);
+      return { ...prev, items: nextItems };
+    });
+  }
+
+  function boostTeam(amount) {
+    playLevelUpSound();
+    setState((prev) => {
+      const newTeam = prev.team.map((p) => {
+        const boostedLevel = Math.min(MAX_LEVEL, p.level + amount);
+        const boosted = { ...p, level: boostedLevel };
+        return checkEvolution(boosted);
+      });
+      const evolutions = newTeam.filter((p) => p.evolvedFrom != null);
+      const cleanTeam = newTeam.map(({ evolvedFrom, ...rest }) => rest);
+      return {
+        ...prev,
+        team: cleanTeam,
+        pendingEvolutions: evolutions,
+      };
+    });
+  }
+
+  function swapPokemon(teamIdx, boxIdx) {
+    setState((prev) => {
+      const newTeam = [...prev.team];
+      const newBox = [...prev.box];
+      const temp = newTeam[teamIdx];
+      newTeam[teamIdx] = newBox[boxIdx];
+      newBox[boxIdx] = temp;
+      return { ...prev, team: newTeam, box: newBox };
+    });
+  }
+
+  function goTo(phase, patch = {}) {
+    playButtonClickSound();
+    update({ phase, ...patch });
+  }
+
+  const generation = state.generationId ? getGeneration(state.generationId) : null;
+  const isPostgame =
+    (state.completedGensCount || 0) >= 8 ||
+    (generation && state.gymIndex >= generation.gymLeaders.length) ||
+    (state.phase && state.phase.startsWith("postgame")) ||
+    (state.phase && state.phase.startsWith("champions")) ||
+    (state.phase && state.phase.startsWith("tournament"));
+
+  const completedGens = state.completedGensCount || 0;
+  const nuzlockeBonus = state.isNuzlocke ? 0.1 : 0;
+  const difficultyMult = 1.0 + completedGens * 0.15 + nuzlockeBonus;
+
+  function getScaledPower(basePower) {
+    return Math.round(basePower * difficultyMult);
+  }
+
+  function resolveBattleWin(badge) {
+    addBadge(badge);
+    boostTeam(WIN_LEVEL_BOOST);
+    setState((prev) => ({ ...prev, coins: (prev.coins || 0) + 4 }));
+  }
+
+  function handleNuzlockeLoss() {
+    if (!state.isNuzlocke || state.team.length === 0) return;
+    setState((prev) => {
+      if (!prev.isNuzlocke || prev.team.length === 0) return prev;
+      const fainted = { ...prev.team[prev.team.length - 1], isFainted: true };
+      const nextTeam = prev.team.slice(0, prev.team.length - 1);
+      const nextBox = [...prev.box, fainted];
+      const hasHealthyInBox = nextBox.some((p) => !p.isFainted);
+
+      if (nextTeam.length === 0 && !hasHealthyInBox) {
+        return {
+          ...prev,
+          team: nextTeam,
+          box: nextBox,
+          phase: "nuzlockeGameOver",
+        };
+      }
+
+      const shouldOpenBox = nextTeam.length === 0 && hasHealthyInBox;
+      return {
+        ...prev,
+        team: nextTeam,
+        box: nextBox,
+        boxModalOpen: shouldOpenBox ? true : prev.boxModalOpen,
+      };
+    });
+  }
+
+  function advanceAfterGymBattle() {
+    const finishedGymIndex = state.gymIndex;
+    const nextGymIndex = finishedGymIndex + 1;
+
+    if (generation.rival && !state.rivalDone && generation.rival.afterGymIndex === finishedGymIndex) {
+      goTo("rivalBattle", { gymIndex: nextGymIndex });
+      return;
+    }
+
+    if (generation.villainBoss && !state.villainBossDone && generation.villainBoss.afterGymIndex === finishedGymIndex) {
+      goTo("villainBossBattle", { gymIndex: nextGymIndex });
+      return;
+    }
+
+    if (nextGymIndex >= generation.gymLeaders.length) {
+      goTo("eliteBattle", { gymIndex: nextGymIndex, eliteIndex: 0 });
+      return;
+    }
+
+    goTo("explore", { gymIndex: nextGymIndex });
+  }
+
+  function checkNextGeneration() {
+    const nextGen = getNextGeneration(state.generationId);
+    if (nextGen) {
+      goTo("nextGenSelect", { nextGenId: nextGen.id, completedGensCount: (state.completedGensCount || 0) + 1 });
+    } else {
+      goTo("postgame", { completedGensCount: (state.completedGensCount || 0) + 1 });
+    }
+  }
+
+  function startPostgameExplore() {
+    const lastGen = generation || getGeneration(state.generationId);
+    const availableLegendaries = (lastGen?.legendaries || []).filter(
+      (id) => !state.caughtLegendaries.includes(id)
+    );
+
+    if (availableLegendaries.length > 0 && Math.random() < LEGENDARY_CHANCE) {
+      const legendaryId = availableLegendaries[Math.floor(Math.random() * availableLegendaries.length)];
+      goTo("legendaryEncounter", {
+        pendingEncounterPool: [legendaryId],
+        pendingEncounterLevel: Math.min(MAX_LEVEL, 60 + state.postgameRound * 2),
+        pendingEncounterIsLegendary: true,
+      });
+    } else {
+      goTo("postgameExplore");
+    }
+  }
+
+  return {
+    state,
+    setState,
+    update,
+    goTo,
+    ...slotSave,
+    ...pokedexState,
+    muted,
+    handleToggleAudio,
+    addToTeam,
+    addBadge,
+    addItem,
+    useItem,
+    boostTeam,
+    swapPokemon,
+    generation,
+    isPostgame,
+    difficultyMult,
+    getScaledPower,
+    resolveBattleWin,
+    handleNuzlockeLoss,
+    advanceAfterGymBattle,
+    checkNextGeneration,
+    startPostgameExplore,
+  };
+}

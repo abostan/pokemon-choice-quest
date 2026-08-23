@@ -1,6 +1,8 @@
 // Gestione del salvataggio multi-slot e Pokédex storico su localStorage.
 // Nessuna dipendenza da React — modulo puro, facile da testare.
 
+import { sanitizeGameState } from "./saveSanitizer.js";
+
 const SAVE_VERSION = 1;
 const DEFAULT_SLOTS = [1, 2, 3];
 
@@ -55,9 +57,11 @@ export function loadGame(slotId = 1) {
     if (!raw) return null;
     const payload = JSON.parse(raw);
     if (!payload || payload.version !== SAVE_VERSION || !payload.state) return null;
-    if (!payload.state.phase || !payload.state.generationId) return null;
+    
+    const sanitized = sanitizeGameState(payload.state);
+    if (!sanitized || !sanitized.generationId) return null;
 
-    return { state: payload.state, savedAt: payload.savedAt, slotId };
+    return { state: sanitized, savedAt: payload.savedAt, slotId };
   } catch (err) {
     console.warn(`[loadGame] Salvataggio corrotto nello slot ${slotId}, ignorato:`, err);
     return null;
