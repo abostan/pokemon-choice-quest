@@ -11,7 +11,16 @@ export function sanitizeGameState(raw) {
     nextGenId: typeof raw.nextGenId === "string" ? raw.nextGenId : null,
     gymIndex: typeof raw.gymIndex === "number" && !isNaN(raw.gymIndex) ? Math.max(0, raw.gymIndex) : 0,
     eliteIndex: typeof raw.eliteIndex === "number" && !isNaN(raw.eliteIndex) ? Math.max(0, raw.eliteIndex) : 0,
-    rivalDone: !!raw.rivalDone,
+    // Era un booleano prima che il Rivale diventasse ricorrente (Fase 7): ora
+    // è un contatore di stage già affrontati. Un salvataggio vecchio con
+    // `true` migra a 1 (il giocatore ha già affrontato "il rivale" una
+    // volta, i nuovi stage restano da scoprire), `false`/assente a 0.
+    rivalDone:
+      typeof raw.rivalDone === "number" && !isNaN(raw.rivalDone)
+        ? Math.max(0, raw.rivalDone)
+        : raw.rivalDone === true
+        ? 1
+        : 0,
     villainBossDone: !!raw.villainBossDone,
 
     team: Array.isArray(raw.team) ? raw.team.filter((p) => p && typeof p.id === "number") : [],

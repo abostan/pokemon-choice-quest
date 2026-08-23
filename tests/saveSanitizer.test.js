@@ -52,6 +52,19 @@ test("sanitizeGameState - gymIndex/eliteIndex: numero valido clampato a >=0, alt
   assert.strictEqual(sanitizeGameState({ eliteIndex: NaN }).eliteIndex, 0);
 });
 
+test("sanitizeGameState - rivalDone: era un booleano prima che il Rivale diventasse ricorrente, ora è un contatore di stage", () => {
+  // Numero valido (salvataggi nuovi): passa clampato a >=0, come gymIndex/eliteIndex.
+  assert.strictEqual(sanitizeGameState({ rivalDone: 2 }).rivalDone, 2);
+  assert.strictEqual(sanitizeGameState({ rivalDone: -1 }).rivalDone, 0);
+  assert.strictEqual(sanitizeGameState({ rivalDone: NaN }).rivalDone, 0);
+  // Retrocompatibilità con i vecchi salvataggi booleani: true migra a 1 (il
+  // giocatore ha già affrontato "il rivale" una volta, i nuovi stage restano
+  // da scoprire), false/assente migra a 0.
+  assert.strictEqual(sanitizeGameState({ rivalDone: true }).rivalDone, 1);
+  assert.strictEqual(sanitizeGameState({ rivalDone: false }).rivalDone, 0);
+  assert.strictEqual(sanitizeGameState({}).rivalDone, 0);
+});
+
 test("sanitizeGameState - coins: numero valido clampato a >=0, altrimenti 5 (saldo di partenza)", () => {
   assert.strictEqual(sanitizeGameState({ coins: 20 }).coins, 20);
   assert.strictEqual(sanitizeGameState({ coins: -50 }).coins, 0, "negativo clampato a 0, non al default 5");
@@ -91,8 +104,7 @@ test("sanitizeGameState - completedGensCount/postgameRound/tournamentRound/choic
 });
 
 test("sanitizeGameState - flag booleani: coercizzati con !! qualunque sia il valore grezzo", () => {
-  const truthy = sanitizeGameState({ rivalDone: 1, villainBossDone: "yes", multiGenRun: {}, isNuzlocke: true, isRandomizer: [], teamFatigued: "x", pendingEncounterIsLegendary: 1 });
-  assert.strictEqual(truthy.rivalDone, true);
+  const truthy = sanitizeGameState({ villainBossDone: "yes", multiGenRun: {}, isNuzlocke: true, isRandomizer: [], teamFatigued: "x", pendingEncounterIsLegendary: 1 });
   assert.strictEqual(truthy.villainBossDone, true);
   assert.strictEqual(truthy.multiGenRun, true);
   assert.strictEqual(truthy.isNuzlocke, true);
@@ -100,8 +112,7 @@ test("sanitizeGameState - flag booleani: coercizzati con !! qualunque sia il val
   assert.strictEqual(truthy.teamFatigued, true);
   assert.strictEqual(truthy.pendingEncounterIsLegendary, true);
 
-  const falsy = sanitizeGameState({ rivalDone: 0, villainBossDone: undefined, multiGenRun: null, isNuzlocke: false, isRandomizer: "" });
-  assert.strictEqual(falsy.rivalDone, false);
+  const falsy = sanitizeGameState({ villainBossDone: undefined, multiGenRun: null, isNuzlocke: false, isRandomizer: "" });
   assert.strictEqual(falsy.villainBossDone, false);
   assert.strictEqual(falsy.multiGenRun, false);
   assert.strictEqual(falsy.isNuzlocke, false);

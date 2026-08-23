@@ -89,14 +89,42 @@ test("data integrity - starter, leggendari e Pokédex regionale definiti per ogn
   }
 });
 
-test("data integrity - Rivale e Boss del team nemico, quando presenti, hanno teamIds validi e afterGymIndex nel range delle palestre", () => {
+test("data integrity - Boss del team nemico, quando presente, ha teamIds validi e afterGymIndex nel range delle palestre", () => {
   for (const gen of GENERATIONS) {
-    for (const [label, event] of [["rival", gen.rival], ["villainBoss", gen.villainBoss]]) {
-      if (!event) continue;
-      assert.ok(isValidTeamIds(event.teamIds), `${gen.id}/${label}: teamIds mancante o non valido`);
+    const event = gen.villainBoss;
+    if (!event) continue;
+    assert.ok(isValidTeamIds(event.teamIds), `${gen.id}/villainBoss: teamIds mancante o non valido`);
+    assert.ok(
+      Number.isInteger(event.afterGymIndex) && event.afterGymIndex >= 0 && event.afterGymIndex < gen.gymLeaders.length,
+      `${gen.id}/villainBoss: afterGymIndex ${event.afterGymIndex} fuori dal range delle palestre (0-${gen.gymLeaders.length - 1})`
+    );
+  }
+});
+
+test("data integrity - il Rivale è un array di 3 stage per regione, con squadra e potenza strettamente crescenti", () => {
+  for (const gen of GENERATIONS) {
+    assert.ok(Array.isArray(gen.rival), `${gen.id}: rival deve essere un array (il Rivale ricompare più volte)`);
+    assert.strictEqual(gen.rival.length, 3, `${gen.id}: attesi 3 stage del Rivale`);
+
+    gen.rival.forEach((stage, i) => {
+      assert.ok(isValidTeamIds(stage.teamIds), `${gen.id}/rival[${i}]: teamIds mancante o non valido`);
       assert.ok(
-        Number.isInteger(event.afterGymIndex) && event.afterGymIndex >= 0 && event.afterGymIndex < gen.gymLeaders.length,
-        `${gen.id}/${label}: afterGymIndex ${event.afterGymIndex} fuori dal range delle palestre (0-${gen.gymLeaders.length - 1})`
+        Number.isInteger(stage.afterGymIndex) && stage.afterGymIndex >= 0 && stage.afterGymIndex < gen.gymLeaders.length,
+        `${gen.id}/rival[${i}]: afterGymIndex ${stage.afterGymIndex} fuori dal range delle palestre (0-${gen.gymLeaders.length - 1})`
+      );
+      if (i > 0) {
+        const prev = gen.rival[i - 1];
+        assert.ok(stage.afterGymIndex > prev.afterGymIndex, `${gen.id}: rival[${i}].afterGymIndex non successivo al precedente`);
+        assert.ok(stage.teamIds.length > prev.teamIds.length, `${gen.id}: la squadra del Rivale allo stage ${i} non è cresciuta rispetto allo stage precedente`);
+        assert.ok(stage.opponentPower > prev.opponentPower, `${gen.id}: la potenza del Rivale allo stage ${i} non è cresciuta rispetto allo stage precedente`);
+      }
+    });
+
+    if (gen.villainBoss) {
+      const rivalIndices = gen.rival.map((s) => s.afterGymIndex);
+      assert.ok(
+        !rivalIndices.includes(gen.villainBoss.afterGymIndex),
+        `${gen.id}: uno stage del Rivale collide con l'afterGymIndex del villainBoss (${gen.villainBoss.afterGymIndex}) — uno dei due non scatterebbe mai`
       );
     }
   }

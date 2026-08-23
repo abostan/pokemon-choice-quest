@@ -36,7 +36,7 @@ export function initialState() {
     nextGenId: null,
     gymIndex: 0,
     eliteIndex: 0,
-    rivalDone: false,
+    rivalDone: 0, // contatore di stage del Rivale già affrontati (era booleano)
     villainBossDone: false,
     team: [],
     box: [],

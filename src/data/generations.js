@@ -72,13 +72,14 @@ export const GENERATIONS = [
       opponentPower: 175,
     },
 
-    // Battaglia speciale a metà avventura, non legata a nessuna palestra.
-    rival: {
-      title: "Il tuo Rivale",
-      teamIds: [16, 129, 74],
-      opponentPower: 34,
-      afterGymIndex: 2, // compare dopo la 3a palestra (indice 0-based 2)
-    },
+    // Il Rivale ricompare 3 volte lungo la regione (indici 0-based dopo le
+    // palestre 1/5/7), con una squadra che cresce e si evolve ad ogni
+    // incontro — mai sullo stesso afterGymIndex del villainBoss (fisso a 3).
+    rival: [
+      { title: "Il tuo Rivale", teamIds: [16, 129], opponentPower: 20, afterGymIndex: 0 },
+      { title: "Il tuo Rivale", teamIds: [17, 130, 75, 25], opponentPower: 62, afterGymIndex: 4 },
+      { title: "Il tuo Rivale", teamIds: [18, 130, 76, 26, 65, 59], opponentPower: 94, afterGymIndex: 6 },
+    ],
 
     // Battaglia Boss Narrativa contro il Capo del Team malvagio dopo la 4a palestra
     villainBoss: {
@@ -153,12 +154,11 @@ export const GENERATIONS = [
       opponentPower: 175,
     },
 
-    rival: {
-      title: "Il tuo Rivale",
-      teamIds: [163, 168, 41],
-      opponentPower: 34,
-      afterGymIndex: 2,
-    },
+    rival: [
+      { title: "Il tuo Rivale", teamIds: [163, 168], opponentPower: 20, afterGymIndex: 0 },
+      { title: "Il tuo Rivale", teamIds: [164, 168, 42, 180], opponentPower: 62, afterGymIndex: 4 },
+      { title: "Il tuo Rivale", teamIds: [164, 168, 169, 181, 211, 229], opponentPower: 94, afterGymIndex: 6 },
+    ],
 
     villainBoss: {
       title: "Capo Reclute Team Rocket — Archer",
@@ -232,12 +232,11 @@ export const GENERATIONS = [
       opponentPower: 175,
     },
 
-    rival: {
-      title: "Il tuo Rivale",
-      teamIds: [263, 276, 255],
-      opponentPower: 34,
-      afterGymIndex: 2,
-    },
+    rival: [
+      { title: "Il tuo Rivale", teamIds: [263, 276], opponentPower: 20, afterGymIndex: 0 },
+      { title: "Il tuo Rivale", teamIds: [264, 277, 256, 304], opponentPower: 62, afterGymIndex: 4 },
+      { title: "Il tuo Rivale", teamIds: [264, 277, 257, 306, 335, 359], opponentPower: 94, afterGymIndex: 6 },
+    ],
 
     villainBoss: {
       title: "Capo Team Magma/Aqua — Max & Archie",
@@ -310,12 +309,11 @@ export const GENERATIONS = [
       opponentPower: 175,
     },
 
-    rival: {
-      title: "Il tuo Rivale",
-      teamIds: [397, 404, 391],
-      opponentPower: 34,
-      afterGymIndex: 2,
-    },
+    rival: [
+      { title: "Il tuo Rivale", teamIds: [396, 403], opponentPower: 20, afterGymIndex: 0 },
+      { title: "Il tuo Rivale", teamIds: [397, 404, 391, 453], opponentPower: 62, afterGymIndex: 4 },
+      { title: "Il tuo Rivale", teamIds: [398, 405, 392, 454, 428, 466], opponentPower: 94, afterGymIndex: 6 },
+    ],
 
     villainBoss: {
       title: "Capo Team Galassia — Cyrus",
@@ -388,12 +386,11 @@ export const GENERATIONS = [
       opponentPower: 175,
     },
 
-    rival: {
-      title: "Il tuo Rivale",
-      teamIds: [507, 519, 499],
-      opponentPower: 34,
-      afterGymIndex: 2,
-    },
+    rival: [
+      { title: "Il tuo Rivale", teamIds: [506, 519], opponentPower: 20, afterGymIndex: 0 },
+      { title: "Il tuo Rivale", teamIds: [507, 520, 499, 543], opponentPower: 62, afterGymIndex: 4 },
+      { title: "Il tuo Rivale", teamIds: [508, 521, 500, 545, 553, 561], opponentPower: 94, afterGymIndex: 6 },
+    ],
 
     villainBoss: {
       title: "Capo Team Plasma — Ghetsis",
@@ -469,12 +466,11 @@ export const GENERATIONS = [
       opponentPower: 175,
     },
 
-    rival: {
-      title: "Il tuo Rivale",
-      teamIds: [662, 678, 654],
-      opponentPower: 34,
-      afterGymIndex: 2,
-    },
+    rival: [
+      { title: "Il tuo Rivale", teamIds: [661, 677], opponentPower: 20, afterGymIndex: 0 },
+      { title: "Il tuo Rivale", teamIds: [662, 678, 654, 686], opponentPower: 62, afterGymIndex: 4 },
+      { title: "Il tuo Rivale", teamIds: [663, 678, 655, 687, 700, 701], opponentPower: 94, afterGymIndex: 6 },
+    ],
 
     villainBoss: {
       title: "Capo Team Flare — Lysandre",
@@ -547,12 +543,11 @@ export const GENERATIONS = [
       opponentPower: 175,
     },
 
-    rival: {
-      title: "Il tuo Rivale",
-      teamIds: [772, 773, 745],
-      opponentPower: 34,
-      afterGymIndex: 2,
-    },
+    rival: [
+      { title: "Il tuo Rivale", teamIds: [744, 772], opponentPower: 20, afterGymIndex: 0 },
+      { title: "Il tuo Rivale", teamIds: [745, 772, 761, 742], opponentPower: 62, afterGymIndex: 4 },
+      { title: "Il tuo Rivale", teamIds: [745, 773, 763, 743, 758, 769], opponentPower: 94, afterGymIndex: 6 },
+    ],
 
     villainBoss: {
       title: "Capo Team Skull — Guzma",
@@ -625,12 +620,11 @@ export const GENERATIONS = [
       opponentPower: 175,
     },
 
-    rival: {
-      title: "Il tuo Rivale",
-      teamIds: [819, 822, 810],
-      opponentPower: 34,
-      afterGymIndex: 2,
-    },
+    rival: [
+      { title: "Il tuo Rivale", teamIds: [819, 821], opponentPower: 20, afterGymIndex: 0 },
+      { title: "Il tuo Rivale", teamIds: [820, 822, 811, 835], opponentPower: 62, afterGymIndex: 4 },
+      { title: "Il tuo Rivale", teamIds: [820, 823, 812, 836, 850, 859], opponentPower: 94, afterGymIndex: 6 },
+    ],
 
     villainBoss: {
       title: "Presidente Macro Cosmos — Rose",
@@ -703,12 +697,11 @@ export const GENERATIONS = [
       opponentPower: 175,
     },
 
-    rival: {
-      title: "La tua Rivale",
-      teamIds: [921, 935, 906],
-      opponentPower: 34,
-      afterGymIndex: 2,
-    },
+    rival: [
+      { title: "La tua Rivale", teamIds: [921, 935], opponentPower: 20, afterGymIndex: 0 },
+      { title: "La tua Rivale", teamIds: [922, 935, 907, 944], opponentPower: 62, afterGymIndex: 4 },
+      { title: "La tua Rivale", teamIds: [923, 936, 908, 945, 956, 969], opponentPower: 94, afterGymIndex: 6 },
+    ],
 
     villainBoss: {
       title: "Capo Team Star — Eri & Cassiopea",

@@ -59,36 +59,50 @@ test("computeScaledPower - applica il moltiplicatore arrotondando", () => {
 
 // --- resolveAfterGymBattle -----------------------------------------------
 
+// Il Rivale è un array di stage (ricompare più volte, vedi ROADMAP.md Fase 7):
+// stage0 su afterGymIndex 0, stage1 su afterGymIndex 2, il villainBoss su 3
+// (distinti tra loro, altrimenti un test collide con l'altro). gymLeaders a
+// 4 slot per lasciare l'indice 1 libero da qualunque evento.
 const fakeGenWithEvents = {
   id: "testgen",
-  gymLeaders: [{}, {}, {}],
-  rival: { afterGymIndex: 1 },
-  villainBoss: { afterGymIndex: 2 },
+  gymLeaders: [{}, {}, {}, {}],
+  rival: [{ afterGymIndex: 0 }, { afterGymIndex: 2 }],
+  villainBoss: { afterGymIndex: 3 },
 };
 
 test("resolveAfterGymBattle - nessun evento, palestre rimanenti => explore", () => {
-  const result = resolveAfterGymBattle({ gymIndex: 0, rivalDone: false, villainBossDone: false }, fakeGenWithEvents);
-  assert.deepStrictEqual(result, { phase: "explore", patch: { gymIndex: 1 } });
+  const result = resolveAfterGymBattle({ gymIndex: 1, rivalDone: 0, villainBossDone: false }, fakeGenWithEvents);
+  assert.deepStrictEqual(result, { phase: "explore", patch: { gymIndex: 2 } });
 });
 
-test("resolveAfterGymBattle - rivale sul suo afterGymIndex => rivalBattle", () => {
-  const result = resolveAfterGymBattle({ gymIndex: 1, rivalDone: false, villainBossDone: false }, fakeGenWithEvents);
-  assert.deepStrictEqual(result, { phase: "rivalBattle", patch: { gymIndex: 2 } });
+test("resolveAfterGymBattle - primo stage del rivale sul suo afterGymIndex => rivalBattle", () => {
+  const result = resolveAfterGymBattle({ gymIndex: 0, rivalDone: 0, villainBossDone: false }, fakeGenWithEvents);
+  assert.deepStrictEqual(result, { phase: "rivalBattle", patch: { gymIndex: 1 } });
 });
 
-test("resolveAfterGymBattle - boss sul suo afterGymIndex (rivale già fatto) => villainBossBattle", () => {
-  const result = resolveAfterGymBattle({ gymIndex: 2, rivalDone: true, villainBossDone: false }, fakeGenWithEvents);
-  assert.deepStrictEqual(result, { phase: "villainBossBattle", patch: { gymIndex: 3 } });
+test("resolveAfterGymBattle - regressione: dopo il primo stage, il secondo scatta al SUO afterGymIndex (il Rivale ricompare)", () => {
+  const result = resolveAfterGymBattle({ gymIndex: 2, rivalDone: 1, villainBossDone: false }, fakeGenWithEvents);
+  assert.deepStrictEqual(result, { phase: "rivalBattle", patch: { gymIndex: 3 } });
+});
+
+test("resolveAfterGymBattle - boss sul suo afterGymIndex (tutti gli stage del rivale fatti) => villainBossBattle", () => {
+  const result = resolveAfterGymBattle({ gymIndex: 3, rivalDone: 2, villainBossDone: false }, fakeGenWithEvents);
+  assert.deepStrictEqual(result, { phase: "villainBossBattle", patch: { gymIndex: 4 } });
+});
+
+test("resolveAfterGymBattle - regressione: con tutti gli stage del rivale già fatti, non scatta mai più (anche su un afterGymIndex che un tempo combaciava)", () => {
+  const result = resolveAfterGymBattle({ gymIndex: 0, rivalDone: 2, villainBossDone: false }, fakeGenWithEvents);
+  assert.strictEqual(result.phase, "explore");
 });
 
 test("resolveAfterGymBattle - ultima palestra, tutti gli eventi fatti => eliteBattle", () => {
-  const result = resolveAfterGymBattle({ gymIndex: 2, rivalDone: true, villainBossDone: true }, fakeGenWithEvents);
-  assert.deepStrictEqual(result, { phase: "eliteBattle", patch: { gymIndex: 3, eliteIndex: 0 } });
+  const result = resolveAfterGymBattle({ gymIndex: 3, rivalDone: 2, villainBossDone: true }, fakeGenWithEvents);
+  assert.deepStrictEqual(result, { phase: "eliteBattle", patch: { gymIndex: 4, eliteIndex: 0 } });
 });
 
 test("resolveAfterGymBattle - se rivale e boss cadono sullo stesso afterGymIndex, vince il rivale", () => {
-  const genBothSameIndex = { id: "x", gymLeaders: [{}, {}], rival: { afterGymIndex: 0 }, villainBoss: { afterGymIndex: 0 } };
-  const result = resolveAfterGymBattle({ gymIndex: 0, rivalDone: false, villainBossDone: false }, genBothSameIndex);
+  const genBothSameIndex = { id: "x", gymLeaders: [{}, {}], rival: [{ afterGymIndex: 0 }], villainBoss: { afterGymIndex: 0 } };
+  const result = resolveAfterGymBattle({ gymIndex: 0, rivalDone: 0, villainBossDone: false }, genBothSameIndex);
   assert.strictEqual(result.phase, "rivalBattle");
 });
 

@@ -40,7 +40,7 @@ export function LeagueSceneContainer({ game }) {
           generationId: state.nextGenId,
           gymIndex: 0,
           eliteIndex: 0,
-          rivalDone: false,
+          rivalDone: 0,
           badges: [],
           multiGenRun: true,
         }),

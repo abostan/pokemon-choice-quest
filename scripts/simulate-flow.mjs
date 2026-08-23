@@ -19,7 +19,7 @@ for (const generation of GENERATIONS) {
   console.log(`\n=== ${generation.name} ===`);
   let gymIndex = 0;
   let eliteIndex = 0;
-  let rivalDone = false;
+  let rivalDone = 0; // contatore di stage del Rivale già affrontati (il Rivale ricompare 3 volte, vedi ROADMAP.md Fase 7)
   let villainBossDone = false;
   let phase = "explore";
   let steps = 0;
@@ -42,8 +42,10 @@ for (const generation of GENERATIONS) {
       if (patch.eliteIndex != null) eliteIndex = patch.eliteIndex;
       phase = nextPhase;
     } else if (phase === "rivalBattle") {
-      console.log(`  rivale: ${generation.rival.title} (potenza ${generation.rival.opponentPower})`);
-      rivalDone = true;
+      const rivalStage = generation.rival[rivalDone];
+      if (!rivalStage) throw new Error(`Stage del Rivale mancante per indice ${rivalDone}`);
+      console.log(`  rivale (stage ${rivalDone + 1}/${generation.rival.length}): ${rivalStage.title} (potenza ${rivalStage.opponentPower}, squadra ${rivalStage.teamIds.length})`);
+      rivalDone += 1;
       phase = "explore";
     } else if (phase === "villainBossBattle") {
       console.log(`  capo team: ${generation.villainBoss.title} (potenza ${generation.villainBoss.opponentPower}, premio: ${generation.villainBoss.rewardItem})`);

@@ -68,16 +68,25 @@ export function GymBattleSceneContainer({ game }) {
   }
 
   if (state.phase === "rivalBattle") {
-    const rival = generation?.rival;
+    const rivalStageIndex = state.rivalDone || 0;
+    const rival = generation?.rival?.[rivalStageIndex];
     if (!rival) {
-      update({ rivalDone: true, phase: "explore" });
+      update({ rivalDone: rivalStageIndex + 1, phase: "explore" });
       return null;
     } else {
       const scaledPower = getScaledPower(rival.opponentPower);
+      // 3 varianti di testo in base allo stage (0/1/2), non duplicate nei
+      // dati di ogni regione — danno la sensazione di una rivalità che
+      // cresce lungo la run invece del solito scontro anonimo.
+      const rivalIntro = [
+        `${rival.title} ti blocca la strada per una battaglia improvvisata.`,
+        `${rival.title} ti sfida di nuovo: la sua squadra è cresciuta dall'ultimo incontro!`,
+        `${rival.title} ti aspetta per lo scontro decisivo, prima dell'Alto Comando.`,
+      ][Math.min(rivalStageIndex, 2)];
       return e(BattleScene, {
-        key: "rival",
+        key: `rival-${rivalStageIndex}`,
         title: "Sfida a sorpresa",
-        text: `${rival.title} ti blocca la strada per una battaglia improvvisata.`,
+        text: rivalIntro,
         opponentTitle: rival.title,
         opponentTeamIds: rival.teamIds,
         opponentPower: scaledPower,
@@ -93,7 +102,7 @@ export function GymBattleSceneContainer({ game }) {
         onResolved: ({ won }) => {
           if (won) resolveBattleWin(null);
           else handleNuzlockeLoss();
-          update({ rivalDone: true, phase: "explore" });
+          update({ rivalDone: rivalStageIndex + 1, phase: "explore" });
         },
       });
     }

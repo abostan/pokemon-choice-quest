@@ -45,13 +45,20 @@ export function computeScaledPower(basePower, state) {
  * Decide la prossima fase dopo la vittoria su una palestra. Richiede solo
  * { gymIndex, rivalDone, villainBossDone } da state, oltre alla generation
  * corrente. Non sblocca achievement: il chiamante decide in base a `phase`.
+ *
+ * `generation.rival` è un array di stage (il Rivale ricompare più volte
+ * lungo la regione, con una squadra che cresce — vedi ROADMAP.md Fase 7):
+ * `state.rivalDone` è quindi un contatore di quanti stage sono già stati
+ * affrontati, non più un booleano. Lo stage successivo è
+ * `generation.rival[state.rivalDone]`.
  * @returns {{ phase: string, patch: object }}
  */
 export function resolveAfterGymBattle(state, generation) {
   const finishedGymIndex = state.gymIndex;
   const nextGymIndex = finishedGymIndex + 1;
 
-  if (generation.rival && !state.rivalDone && generation.rival.afterGymIndex === finishedGymIndex) {
+  const nextRivalStage = generation.rival?.[state.rivalDone || 0];
+  if (nextRivalStage && nextRivalStage.afterGymIndex === finishedGymIndex) {
     return { phase: "rivalBattle", patch: { gymIndex: nextGymIndex } };
   }
 
