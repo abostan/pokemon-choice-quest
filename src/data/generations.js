@@ -364,7 +364,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capopalestra di tipo Elementale", badge: "Medaglia Tris", teamIds: [506, 512], opponentPower: 18 },
+      { title: "Capopalestra di tipo Erba", badge: "Medaglia Tris", teamIds: [506, 512], opponentPower: 18 },
       { title: "Capopalestra di tipo Normale", badge: "Medaglia Base", teamIds: [504, 505], opponentPower: 26 },
       { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Maggiolino", teamIds: [544, 556, 542], opponentPower: 35 },
       { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Volt", teamIds: [587, 587, 523], opponentPower: 46 },
