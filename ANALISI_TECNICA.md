@@ -31,6 +31,13 @@ problemi più seri non sono di "codice che non funziona", ma di:
 
 ### 2.1 🔴 Randomizer Mode / Mono-Type Challenge: funzionalità morta ma pubblicizzata
 
+> ✅ **Risolto in v8.6** — toggle reintrodotto in `GenerationSelectScreen`,
+> filtro applicato in `useGameState.goTo()` (non nel render). Vedi
+> ROADMAP.md v8.6. Un secondo bug emerso nell'implementazione — il filtro
+> veniva applicato anche ai pool di incontro leggendario, sostituendo il
+> leggendario con un Pokémon comune dello stesso tipo — è stato corretto
+> escludendo esplicitamente `pendingEncounterIsLegendary: true` dal filtro.
+
 - `challengeEngine.js` è scritto, deterministico e corretto (usa
   `seededPick`, nessun `Math.random()` nel render — esattamente il fix
   descritto in `ROADMAP.md`).
@@ -115,6 +122,13 @@ contributor non lo confonda con dati reali dei giochi.
 
 ### 2.8 🟢 Copertura test sottile rispetto alla superficie del progetto
 
+> **Parzialmente ampliata in v8.6** — nuova `tests/explorePicker.test.js`
+> (9 test) copre `engine/explorePicker.js` con simulazioni di run intere
+> (fino a 200×120 bivi): copertura totale delle opzioni, non-dominazione,
+> rarità del leggendario, purezza/determinismo, e cattura leggendari via
+> Monte Carlo. `evolutions`, `hallOfFame`, `saveGame`, `megaLogic` restano
+> senza test — il gap sotto resta valido per quei moduli.
+
 `tests/engine.test.js` copre bene `battleLogic`, `scoreLogic`,
 `typeMatchup`, `saveSanitizer` (7 test, tutti mirati e con asserzioni
 numeriche precise — buona qualità). Ma moduli altrettanto centrali per la
@@ -150,6 +164,13 @@ simulando la stanchezza), oppure consumo di un oggetto/Pokédollari per
 riprovare, oppure limitare i retry a 1-2 per battaglia.
 
 ### 3.2 🔴 Megaevoluzione + Terastallizzazione: cumulabili, gratuite, sempre convenienti
+
+> ✅ **Risolto in v8.6** — Mega e Tera sono ora mutuamente esclusivi:
+> attivandone una, il pulsante dell'altra scompare per quella battaglia
+> (`BattleScene.js`). Restano invece invariati, per scelta esplicita
+> dell'utente in fase Alpha: nessun costo per "Riprova la battaglia" (3.1)
+> e nessun costo per l'uso di oggetti (3.5) — segnati per una revisione
+> futura.
 
 In `BattleScene.js` entrambi i bottoni Mega (`+30%`) e Tera (`+25%`) sono
 disponibili nella stessa battaglia (righe 178-265), indipendenti l'uno
@@ -297,15 +318,13 @@ comunicato all'inizio.
 
 Se dovessi scegliere un ordine, partirei da qui:
 
-1. 🔴 **Decidere il destino di Randomizer/Mono-Type** — o si riattivano
-   (il fix è già scritto in ROADMAP, punto 2.1), o si toglie la promessa dal
-   README per non disallineare aspettativa e realtà.
+1. ✅ **Randomizer/Mono-Type riattivati** — risolto in v8.6 (2.1).
 2. 🔴 **Dare un costo reale al "Riprova la battaglia"** (3.1) — è la
    modifica di design con il maggior impatto sulla coerenza dell'esperienza
    ("le scelte contano") a fronte di un cambiamento di codice piccolo.
-3. 🔴 **Decidere se Mega e Tera devono restare cumulabili gratis** (3.2) —
-   stessa famiglia di problema del punto precedente, stesso ordine di
-   sforzo per sistemarlo.
+   Deciso in v8.6 di rimandarla: si resta in fase Alpha, da rivedere più
+   avanti.
+3. ✅ **Mega e Tera resi mutuamente esclusivi** — risolto in v8.6 (3.2).
 4. 🟡 **Correggere il testo Nuzlocke fuorviante** (3.3) — 1 riga di testo,
    zero rischio.
 5. 🟡 **Aggiungere qualche breakpoint mobile in più** (4.1) — soprattutto

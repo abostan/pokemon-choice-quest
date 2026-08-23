@@ -76,11 +76,26 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 
 ---
 
-### Versione 8.5 — Refactoring Ultra-Modulare & Sanitizzatore (v8.5 - Attuale)
+### Versione 8.5 — Refactoring Ultra-Modulare & Sanitizzatore (v8.5)
 - [x] **🧹 Refactoring Architetturale**: scomposizione di `App.js` ed `useGameState.js` in sotto-hook compatti (`useSaveSlot.js`, `usePokedexState.js`) e sotto-container per le scene (`ExploreSceneContainer.js`, `GymBattleSceneContainer.js`, `LeagueSceneContainer.js`).
 - [x] **🛡️ Sanitizzatore Automatico dei Salvataggi (`saveSanitizer.js`)**: validatore automatico per ripristinare valori sicuri in caso di salvataggi parziali o corrotti in LocalStorage.
 - [x] **🧪 Suite di Test Automatici (`npm test`)**: test runner nativo di Node.js (`node --test`) con 7 test unitari su logica di battaglia, punteggio, tipo e salvataggi.
 - [x] **🔍 Logger Diagnostico (`logger.js`)**: tracciamento pulito delle transizioni di fase ed esiti battaglie in console DevTools.
+
+---
+
+### Versione 8.6 — Randomizer/Mono-Type, Bilanciamento & Strumenti di Analisi Run (v8.6 - Attuale)
+- [x] **🎲 Randomizer Mode & 🔥 Mono-Type Challenge riattivati**: toggle nella schermata `GenerationSelectScreen`; il filtro (`filterEncounterPoolByChallenge`) viene ora applicato centralmente in `useGameState.goTo()` al momento della transizione di stato, non nel render — fix definitivo del bug storico di re-render infinito (vedi sezione TODOLIST/Fix qui sotto, ora risolta).
+- [x] **🐛 Fix incontri leggendari**: il filtro Randomizer/Mono-Type non viene più applicato ai pool di incontro leggendario (che contengono un solo id) — prima poteva sostituire il leggendario con un Pokémon comune qualsiasi dello stesso tipo.
+- [x] **⚔️ Mega Evoluzione e Terastallizzazione mutuamente esclusive**: in battaglia non è più possibile attivare entrambe nella stessa battaglia (prima cumulabili e gratuite, +62.5% di potenza combinata senza alcun costo).
+- [x] **🐛 Fix bivio di esplorazione ripetuto identico**: il seed che sceglie le opzioni speciali del bivio principale dipendeva solo da `gymIndex`/`badges.length` (fissi per l'intera durata di una palestra) — un'opzione poteva dominare per intere run mentre altre non comparivano mai. Ora il seed incorpora `choicesCount` (che avanza ad ogni transizione di stato) e l'hash di mescolamento è stato sostituito con FNV-1a + un finalizzatore a 32 bit (prima l'ordinamento guardava solo la prima lettera dell'id).
+- [x] **📐 Bivi allargati da 3 a 6 opzioni speciali** mostrate per bivio principale (oltre a erba/allenamento/ruota del destino).
+- [x] **⚖️ Bilanciamento incontro & cattura leggendari**: probabilità di incontro ridotta (peso 0.10 → 0.06, il più basso della tabella), tasso di cattura base abbassato (Poké Ball 15%→10%, Cibo 18%→12%), bonus Leggiadria dimezzato sui leggendari, tetto massimo 30%→20%. Master Ball resta garanzia 100% (invariato).
+- [x] **🧪 Nuovo modulo puro `src/engine/explorePicker.js`**: logica di selezione dei bivi estratta da `ExploreSceneContainer.js` in un modulo senza React/`Math.random()`, testabile in isolamento. Tabella pesi condivisa in `src/data/exploreOptions.js` (unica fonte di verità tra componente e test).
+- [x] **🧪 Nuova suite `tests/explorePicker.test.js`**: simula run intere (fino a 200×120 bivi) per verificare copertura totale delle opzioni, assenza di dominazione, rarità del leggendario, purezza/determinismo dell'algoritmo (incluso un test che fa esplodere `Math.random()` se il picker lo chiama mai) e cattura leggendari via Monte Carlo su 20.000 tentativi.
+- [x] **📊 Registratore di sessione locale (`src/engine/runRecorder.js`)**: traccia bivi mostrati/scelti, incontri, catture e battaglie di una run reale. Autosave automatico ogni 10 eventi e alla chiusura/cambio scheda (`sendBeacon`), oltre a `pcqRunLog.save()`/`.download()` manuali da console DevTools.
+- [x] **🖥️ Nuovo `server.mjs`**: server locale a zero dipendenze npm che sostituisce `npx serve .` come `npm start` — serve i file statici e accetta `POST /api/log` per scrivere i log di sessione in `logs/` (cartella esclusa da git).
+- [x] **📈 Nuovo `scripts/analyze-run-log.mjs` (`npm run logs`)**: legge i log reali in `logs/` e stampa un report con verdetto ⚠️/✅ automatico (dominazione bivi, ripetizioni identiche, scarto osservato/teorico su catture e battaglie), con soglie coerenti con `tests/explorePicker.test.js`.
 
 ---
 
@@ -113,39 +128,25 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 ### ⚔️ Fase 4: Modalità di Gioco & Sfide (Challenge Modes)
 - [x] **💀 Nuzlocke Hardcore**: attivabile sulla schermata di selezione starter — morte permanente, badge visivo, moltiplicatore punteggio x1.5.
 - [x] **📐 Bivi post-game dinamici**: pool di 20+ bivi speciali con shuffle deterministico basato su `postgameRound`.
-- [ ] **🎲 Randomizer Mode** *(disabilitata — vedi TODOLIST/Fix)*
-- [ ] **🔥 Mono-Type Challenge** *(disabilitata — vedi TODOLIST/Fix)*
+- [x] **🎲 Randomizer Mode** *(riattivata in v8.6, vedi sopra)*
+- [x] **🔥 Mono-Type Challenge** *(riattivata in v8.6, vedi sopra)*
 - [ ] **⏱️ Speedrun / Choice Timer**: tracciamento del numero di decisioni effettuate e tempo trascorso.
 
 ---
 
-## 🐛 TODOLIST / Fix — Funzionalità in Backlog Tecnico
+## 🐛 TODOLIST / Fix — Storico (✅ Risolto in v8.6)
 
-Queste funzionalità sono **strutturalmente implementate** in `challengeEngine.js` ma causano un **loop di re-render infinito** in React e sono quindi temporaneamente disabilitate dall'interfaccia.
+Randomizer Mode e Mono-Type Challenge erano **strutturalmente implementate** in `challengeEngine.js` ma disabilitate perché causavano un **loop di re-render infinito** in React.
 
 ### Causa del Bug (comune a Randomizer e Mono-Type)
 
-Il filtro veniva applicato in **`SceneRouter.js` durante il render React** chiamando `filterEncounterPoolByChallenge(pool, state)`. Questa funzione usava `Math.random()` internamente per generare specie casuali, producendo output diverso ad ogni chiamata → React rileva props cambiate → re-render → loop → freeze del browser (1000+ errori `Uncaught` da `react-dom`).
+Il filtro veniva applicato durante il render React chiamando `filterEncounterPoolByChallenge(pool, state)` direttamente nel render path. Questa funzione usava `Math.random()` internamente, producendo output diverso ad ogni chiamata → React rileva props cambiate → re-render → loop → freeze del browser.
 
-### Fix Corretto (da implementare)
+### Fix applicato (v8.6)
 
-Spostare il filtraggio **a monte**, nell'handler `onSelect()` del bivio — cioè al momento del `goTo("encounter", { pendingEncounterPool: filterEncounterPoolByChallenge(pool, state) })` — invece che nel render path. In questo modo il pool filtrato viene calcolato **una volta sola** e salvato in `state.pendingEncounterPool`, che è stabile tra i render.
+Il filtraggio è stato spostato **a monte**, dentro `goTo()` in `src/hooks/useGameState.js`: ogni volta che un `patch` passato a `goTo()` contiene `pendingEncounterPool` (e non è un incontro leggendario, vedi sotto), viene filtrato lì una volta sola e il risultato salvato in `state.pendingEncounterPool`, stabile tra i render. Lo starter viene filtrato allo stesso modo in `SceneRouter.js` con `filterStartersByChallenge`. Il toggle UI è in `GenerationSelectScreen.js`.
 
-```js
-// ✅ Pattern corretto (da implementare)
-onSelect: () => goTo("encounter", {
-  pendingEncounterPool: filterEncounterPoolByChallenge(tier.grass, state),
-  pendingEncounterLevel: tier.level,
-})
-
-// ❌ Pattern sbagliato (causa freeze)
-// const encPool = filterEncounterPoolByChallenge(rawEncPool, state); // nel render
-```
-
-### Items in Backlog
-
-- [ ] **🎲 Randomizer Mode**: `challengeEngine.js` → `filterEncounterPoolByChallenge` con `isRandomizer`. UI toggle da reintrodurre in `GenerationSelectScreen.js` dopo il fix. Applicare il filtro in ogni `onSelect()` di bivio in `ExploreSceneContainer.js`, `GymBattleSceneContainer.js`, `LeagueSceneContainer.js`.
-- [ ] **🔥 Mono-Type Challenge**: `challengeEngine.js` → `filterEncounterPoolByChallenge` con `monoType` + lookup `TYPE_TO_IDS_MAP` (già implementato). UI select 18 tipi da reintrodurre. Stesso fix: filtraggio negli handler `onSelect()`.
+Un secondo bug emerso applicando il fix: il filtro veniva applicato anche ai pool di incontro leggendario (un solo id) — se il leggendario rollato non era del tipo scelto, il fallback del filtro lo sostituiva con un Pokémon comune qualsiasi dello stesso tipo. Risolto escludendo esplicitamente `pendingEncounterIsLegendary: true` dal filtro.
 
 ---
 

@@ -2,8 +2,8 @@
 
 Documento di lavoro e specifica tecnica delle funzionalità del progetto.
 
-**Stato:** ✅ Implementate e verificate: Gen 1-9 complete, 1025 Pokédex, Classifica Punteggio (S/A/B/C), Centro Pokémon & PokéMart, Abilità Passive, Torneo Campioni Post-Game, Effetti Sonori 8-Bit, Sala della Fama, Mega/Gigamax, Nuzlocke Hardcore (solo in StarterSelect), Efficacia Tipi, Villain Bosses, Master Ball, Rogue-Lite Bivi (20+ post-game), Item Tooltips, Multi-Save, Shiny, Oggetti, Visual Badges, Layout 2x3 Team Panel, Pool Bivi Deterministici (no Math.random in render).
-**In Backlog (TODOLIST/Fix):** 🎲 Randomizer Mode e 🔥 Mono-Type Challenge — architettura `challengeEngine.js` pronta, disabilitate per bug re-render React. Fix: spostare `filterEncounterPoolByChallenge()` dagli handler `onSelect()` dei bivi (non nel render path). Vedi sezione TODOLIST/Fix in ROADMAP.md.
+**Stato:** ✅ Implementate e verificate: Gen 1-9 complete, 1025 Pokédex, Classifica Punteggio (S/A/B/C), Centro Pokémon & PokéMart, Abilità Passive, Torneo Campioni Post-Game, Effetti Sonori 8-Bit, Sala della Fama, Mega/Gigamax (ora mutuamente esclusivi con Terastallizzazione in battaglia), Nuzlocke Hardcore (solo in StarterSelect), Efficacia Tipi, Villain Bosses, Master Ball, Rogue-Lite Bivi (6 opzioni speciali per bivio, seed arricchito con `choicesCount`), Item Tooltips, Multi-Save, Shiny, Oggetti, Visual Badges, Layout 2x3 Team Panel, Pool Bivi Deterministici (no Math.random in render), **🎲 Randomizer Mode** e **🔥 Mono-Type Challenge** (toggle in `GenerationSelectScreen`, filtro applicato in `useGameState.goTo()`), strumenti di analisi run reali (`src/engine/runRecorder.js`, `server.mjs`, `npm run logs`).
+**In Backlog:** vedi Fase 5/6 in ROADMAP.md (Impostazioni, Achievement, cache offline PokeAPI, ecc.). Il bug storico di re-render che teneva disabilitati Randomizer/Mono-Type è stato risolto — vedi ROADMAP.md v8.6.
 
 ---
 

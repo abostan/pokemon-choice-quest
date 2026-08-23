@@ -35,13 +35,18 @@ dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
 `npm start` lancia `server.mjs`, un server locale minimale (solo moduli
 built-in di Node, nessuna dipendenza da installare) che oltre a servire i
-file del progetto accetta `POST /api/log` — usato da `pcqRunLog.save()`
-nella console DevTools per salvare i log di sessione direttamente nella
-cartella `logs/` del progetto (vedi `src/engine/runRecorder.js` e
-`scripts/analyze-run-log.mjs`). Le opzioni B e C funzionano per giocare, ma
-senza quell'endpoint `pcqRunLog.save()` ripiega sul download dal browser.
+file del progetto accetta `POST /api/log`: `src/engine/runRecorder.js`
+registra da solo bivi, scelte, incontri, catture e battaglie di ogni
+sessione e li salva in automatico in `logs/` (ogni 10 eventi e alla
+chiusura della scheda — nessun comando richiesto). Da console DevTools puoi
+anche forzare un salvataggio immediato (`pcqRunLog.save()`) o scaricarlo nel
+browser (`pcqRunLog.download()`). Per leggere i log accumulati:
+`npm run logs` (analizza tutto `logs/` e stampa un report con verdetto
+⚠️/✅ automatico — vedi `scripts/analyze-run-log.mjs`). Le opzioni B e C
+funzionano per giocare, ma senza l'endpoint del server il salvataggio
+automatico ripiega sul download dal browser.
 
-## Cosa contiene questa versione (v8.5)
+## Cosa contiene questa versione (v8.6)
 
 - **🏆 Classifica Punteggio & Grado di Vittoria (Grado S / A / B / C)**: Calcolo automatico delle prestazioni di gioco con scheda d'onore (`ScoreCardModal`), trofei visivi (🏆 Maestro, 🥇 Élite, 🥈 Veterano, 🥉 Promettente) e salvataggio del Record Personale!
 - **🏥 Centro Pokémon & Mercatino PokéMart**: Nuova tappa di esplorazione tra le palestre per curare la squadra con trillo audio a 8-bit (`playHealJingle()`), accumulare Pokédollari e acquistare Pozioni, Caramelle Rare e Master Ball!
@@ -51,7 +56,7 @@ senza quell'endpoint `pcqRunLog.save()` ripiega sul download dal browser.
 - **🏆 Sala della Fama & Hall of Fame Storica**: Registro permanente consultabile dall'header (`🏆 Sala della Fama`) che conserva la storia di tutte le squadre incoronate Campioni della Lega nelle 9 generazioni!
 - **🔮 Sistema di Megaevoluzione / Gigamax**: Trasformazione speciale attiva nelle sfide decisive contro Capipalestra, Capo Team e Lega Pokémon per ottenere un **+30% di potenza squadra immediato**!
 - **💀 Modalità Sfida Hardcore / Nuzlocke**: Regole ad alta sfida attivabili all'inizio della partita con **Permadeath (morte permanente)** dei Pokémon svenuti nel PC Box (`isFainted: true`), blocco battaglie se la squadra è vuota e schermata di Game Over automatica!
-- **🎲 Randomizer Mode**: Modalità caos attivabile all'avvio dalla schermata di selezione regione. Mescola casualmente i Pokémon selvatici usando `challengeEngine.js` con lookup deterministico (no `Math.random()` nel render path — previene re-render infiniti in React).
+- **🎲 Randomizer Mode & 🔥 Mono-Type Challenge**: Modalità sfida attivabili dalla schermata di selezione regione (toggle Randomizer + select del tipo). Randomizer mescola casualmente i Pokémon selvatici e gli starter; Mono-Type limita l'intera run ad un solo tipo. Filtro applicato in `useGameState.goTo()` con `challengeEngine.js` (deterministico, no `Math.random()` nel render path).
 - **📐 Bivi Post-Game Dinamici (20+ pool)**: Esplorazione post-game con oltre 20 bivi speciali shuffled proceduralmente con seed deterministico basato su `postgameRound` per garantire scelte sempre diverse e stabili tra i render.
 - **⚡ Sistema di Efficacia dei Tipi**: Calcolo automatico dei vantaggi/svantaggi di tipo per tutti i 18 tipi ufficiali! Bonus di **+15% alla potenza della squadra** per gli attacchi Super Efficaci e svantaggio del **-10%** se vulnerabili, con badge visivo in `BattleScene`.
 - **🕵️ Battaglie Boss Narrative contro i Capo Team**: Scontri boss unici per ciascuna delle 9 generazioni (Giovanni, Archer, Max/Archie, Cyrus, Ghetsis, Lysandre, Guzma, Rose, Eri/Cassiopea) dopo la 4ª palestra.
@@ -59,7 +64,7 @@ senza quell'endpoint `pcqRunLog.save()` ripiega sul download dal browser.
 - **🍬 Caramella Rara**: Aumenta istantaneamente il livello di tutti i Pokémon della squadra di **+3 Livelli**.
 - **🗺️ 9 Generazioni Giocabili**: Kanto (Gen 1), Johto (Gen 2), Hoenn (Gen 3), Sinnoh (Gen 4), Unova (Gen 5), Kalos (Gen 6), **Alola (Gen 7)**, **Galar (Gen 8)** e **Paldea (Gen 9)**.
 - **📖 Pokédex Nazionale Completo (1025 specie)**: Modale Pokédex esteso con la **Vista Griglia Album (⬛)** a figurine con anteprime pixel e silhouette `? Ignoto` per tutti i 1025 slot dal #1 Bulbasaur al #1025 Pecharunt, con tab per regione (Kanto..Paldea) e ricerca per `#ID`.
-- **🎲 Bivi Casuali (Rogue-Lite)**: Ad ogni tappa tra le palestre vengono generate **3-4 scelte casuali** (2 base + 1-2 eventi speciali pesati come Leggendari ⭐, Uova 🐣, Centro Pokémon 🏥, Vulcano 🌋, Foresta 👻, Dojo 🥊, Team Nemico 🕵️‍♂️).
+- **🎲 Bivi Casuali (Rogue-Lite)**: Ad ogni tappa tra le palestre vengono generate **9 scelte** (Erba, Allenamento, Ruota del Destino + 6 eventi speciali pesati come Leggendari ⭐, Uova 🐣, Centro Pokémon 🏥, Vulcano 🌋, Foresta 👻, Dojo 🥊, Team Nemico 🕵️‍♂️), scelti con un seed che varia ad ogni bivio (mai lo stesso terzetto ripetuto per intere run).
 - **📦 Transizione Team nel PC Box tra Generazioni**: Quando si batte la Lega e si passa alla regione successiva, la squadra precedente viene salvata nel **PC Box** per ripartire solo col nuovo starter locale a Lv 5!
 - **🎒 Tooltip Descrizioni Oggetti**: Descrizioni dettagliate su hover al passaggio del mouse su ciascun elemento dello Zaino (`TeamPanel`) ed in `BattleScene`.
 - **✨ Sistema Pokémon Shiny**: Probabilità 1/500 di incontrare uno Shiny selvatico (1/20 per i leggendari), con badge dorato ✨ e sprite Shiny dedicato.

@@ -1,6 +1,8 @@
-# Manuale Tecnico — Pokémon: Scegli il Cammino (v8.5)
+# Manuale Tecnico — Pokémon: Scegli il Cammino (v8.6)
 
-> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v8.5 (Classifica Punteggio & Grado di Vittoria, Centro Pokémon & Mercatino PokéMart, Abilità Passive, Torneo Campioni Post-Game, Effetti Sonori 8-bit Web Audio API, Sala della Fama Storica, Mega/Gigamax, Nuzlocke Hardcore, Efficacia Tipi, Boss Narrative & Master Ball, **Randomizer Mode**, **Bivi Post-Game Dinamici 20+**, **challengeEngine.js** con lookup deterministico, **Layout 2x3 Team Panel**, **Mono-Type in backlog**).
+> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v8.6 (Classifica Punteggio & Grado di Vittoria, Centro Pokémon & Mercatino PokéMart, Abilità Passive, Torneo Campioni Post-Game, Effetti Sonori 8-bit Web Audio API, Sala della Fama Storica, Mega/Gigamax mutuamente esclusivi con Terastallizzazione, Nuzlocke Hardcore, Efficacia Tipi, Boss Narrative & Master Ball, **Randomizer Mode e Mono-Type Challenge attivi**, **Bivi Post-Game Dinamici 20+**, **challengeEngine.js** con lookup deterministico, **explorePicker.js** per i bivi principali, **Layout 2x3 Team Panel**, **strumenti di logging/analisi run reali**). Vedi ROADMAP.md v8.6 per il changelog dettagliato.
+>
+> ⚠️ Le sezioni 2 (struttura file) e 3 (diagramma stati) di questo manuale predatano il refactor che ha introdotto `useGameState.js`/`SceneRouter.js`/`scenes/` e diversi moduli oggi presenti in `src/`: descrivono l'architettura pre-refactor e non l'inventario file attuale. Un aggiornamento completo di quelle sezioni è un lavoro a parte, non ancora fatto.
 
 ---
 
@@ -301,45 +303,59 @@ Modulo centralizzato per la logica delle Modalità Sfida. Espone:
 
 **Sintomo:** centinaia/migliaia di errori `Uncaught` da `react-dom.production.min.js` con la app che si blocca.
 
-**Soluzione applicata (bivi normali):** tutti i shuffle dei bivi esplorativi in `ExploreSceneContainer.js` usano una **funzione di hashing deterministica** basata su `gymIndex` / `postgameRound`:
+**Soluzione applicata:** ogni logica di selezione deterministica (bivi esplorativi, filtro Randomizer/Mono-Type) vive fuori dal render, dentro l'handler di transizione di stato:
+
+- **Bivi esplorativi** — estratti in `src/engine/explorePicker.js` (modulo puro, zero React, zero `Math.random()`): `computeExploreSeed()`, `computePostgameSeed()`, `pickWeightedIds()`, `pickTopIds()`. `ExploreSceneContainer.js` li chiama nel corpo del componente (non è un problema di per sé: sono puri e deterministici, quindi anche se React rirenderizza producono sempre lo stesso output per lo stesso input — l'importante è che non usino `Math.random()`, non che non vengano chiamati durante il render). Il seed combina `gymIndex`, `badges.length` e `choicesCount` (quest'ultimo avanza ad ogni transizione di stato in `useGameState.goTo()`), e l'hash di mescolamento usa FNV-1a sull'intera stringa dell'id + un finalizzatore a 32 bit — non solo la prima lettera come nella prima versione, che faceva bloccare in gruppo gli id con la stessa iniziale.
+- **Filtro Randomizer/Mono-Type** — applicato in `useGameState.goTo()`: quando un `patch` contiene `pendingEncounterPool` (e non è un incontro leggendario), viene filtrato lì una volta sola e il risultato salvato nello stato, stabile tra i render. Gli starter sono filtrati allo stesso modo in `SceneRouter.js` con `filterStartersByChallenge`.
 
 ```js
-// ✅ CORRETTO — deterministico, stesso input = stesso output
-const seed = state.gymIndex * 1013 + 7;
-const shuffled = [...arr].sort((a, b) => {
-  const ha = ((a.id.charCodeAt(0) * 31 + seed) * 17) % 97;
-  const hb = ((b.id.charCodeAt(0) * 31 + seed) * 17) % 97;
-  return ha - hb;
-});
-
-// ❌ SBAGLIATO — causa re-render infinito
-const shuffled = [...arr].sort(() => Math.random() - 0.5);
+// ✅ CORRETTO — filtraggio al momento della transizione, non nel render
+function goTo(phase, patch = {}) {
+  if (patch.pendingEncounterPool && !patch.pendingEncounterIsLegendary) {
+    patch = { ...patch, pendingEncounterPool: filterEncounterPoolByChallenge(patch.pendingEncounterPool, state) };
+  }
+  update({ phase, ...patch });
+}
 ```
 
-### 🐛 TODOLIST/Fix — Randomizer Mode & Mono-Type Challenge
+**Bug correlato risolto in v8.6:** il filtro veniva inizialmente applicato anche ai pool di incontro leggendario (un solo id) — se il leggendario rollato non era del tipo scelto in Mono-Type, il fallback del filtro lo sostituiva con un Pokémon comune qualsiasi dello stesso tipo, tradendo la promessa dell'evento. Risolto escludendo `pendingEncounterIsLegendary: true` dal filtro in `goTo()`.
 
-Entrambe le funzionalità sono **strutturalmente complete** in `challengeEngine.js` ma sono **disabilitate dall'UI** perché il filtraggio veniva applicato nel render path di React.
+### Randomizer Mode & Mono-Type Challenge — ✅ Attive (v8.6)
 
-**Fix da implementare:** applicare `filterEncounterPoolByChallenge()` nell'handler `onSelect()` del bivio (lato evento, non lato render):
-
-```js
-// ✅ Pattern corretto (da implementare in ExploreSceneContainer, GymBattle, ecc.)
-onSelect: () => goTo("encounter", {
-  pendingEncounterPool: filterEncounterPoolByChallenge(tier.grass, state),
-  pendingEncounterLevel: tier.level,
-})
-
-// ❌ Pattern sbagliato rimosso
-// const encPool = filterEncounterPoolByChallenge(rawEncPool, state); // era nel render
-```
-
-**Checklist per riabilitare entrambe le modalità:**
-1. Applicare il filtro in ogni `onSelect()` di `ExploreSceneContainer.js` (erba, grotta, acqua, zone speciali)
-2. Applicare il filtro in `GymBattleSceneContainer.js` e `LeagueSceneContainer.js`
-3. Reintrodurre i toggle UI in `GenerationSelectScreen.js`
-4. Testare che zero errori React compaiano in console con la modalità attiva
+Entrambe le funzionalità, prima disabilitate per il bug di re-render sopra descritto, sono ora attive: toggle in `GenerationSelectScreen.js` (checkbox Randomizer + select 18 tipi, mutuamente esclusivi in UI), filtro applicato come descritto sopra. Copertura test in `tests/explorePicker.test.js`.
 
 ### Nuzlocke Hardcore
 
 La modalità Nuzlocke è **pienamente funzionante**. Il toggle è disponibile **solo** nella schermata di selezione starter (`StartScreen.js`) — rimosso da `GenerationSelectScreen.js` per evitare duplicazione. Il flag `state.isNuzlocke` viene passato con lo starter scelto.
+
+---
+
+## 10. Strumenti di Sviluppo: Log di Sessione & Analisi Run (v8.6)
+
+Aggiunti per verificare empiricamente, giocando run reali, che i bilanciamenti e le probabilità configurati (bivi, catture, battaglie) si comportino come atteso — a complemento delle simulazioni statiche in `tests/explorePicker.test.js`.
+
+### `server.mjs`
+
+Server locale a **zero dipendenze npm** (solo moduli built-in `node:http`/`node:fs`), lanciato da `npm start` al posto di `npx serve .`. Due responsabilità:
+1. Serve i file statici del progetto (stessa funzione di un server statico generico, con protezione path traversal).
+2. Accetta `POST /api/log?session=<id>`: scrive il body JSON ricevuto in `logs/pcq-run-log-<id>.json` (cartella esclusa da git). Lo stesso `session` id per tutta la durata di una tab fa sì che i salvataggi successivi sovrascrivano lo stesso file invece di accumularne uno nuovo ogni volta.
+
+Resta in ascolto solo su `127.0.0.1`: scrive file su disco in risposta a richieste HTTP, non va mai esposto in rete.
+
+### `src/engine/runRecorder.js`
+
+Registratore di sessione in memoria, attivo solo in locale (stesso criterio di `logger.js`: hostname `localhost`/`127.0.0.1` o `file:`). Espone `recordCrossroad`, `recordChoice`, `recordEncounter`, `recordCapture`, `recordBattle`, chiamati dai rispettivi componenti (`ExploreSceneContainer.js`, `EncounterScene.js`, `BattleScene.js`).
+
+- **Autosave automatico**: ogni 10 eventi registrati, POST a `server.mjs`; alla chiusura/cambio scheda, `navigator.sendBeacon` (più affidabile di `fetch` durante l'unload della pagina) invia quanto non ancora salvato.
+- **Comandi manuali** da console DevTools: `pcqRunLog.get()`, `.save()`, `.download()` (fallback via dialogo browser se il server non risponde), `.clear()`.
+- `recordCrossroad` dedup alla fonte sull'ultimo bivio registrato, perché viene chiamato nel corpo del render di `ExploreSceneContainer.js` (componente senza hook propri) e React può rirenderizzare lo stesso bivio senza che sia un evento nuovo.
+
+### `scripts/analyze-run-log.mjs` (`npm run logs`)
+
+Legge tutti i file in `logs/` (o file specifici passati come argomento) e stampa un report con **verdetto esplicito** invece di soli numeri da interpretare:
+- ⚠️ = fuori dai limiti attesi (stessi limiti validati in `tests/explorePicker.test.js`: dominazione bivi > 60%, leggendario > 35%, bivio identico ripetuto > 2 volte di fila, scarto osservato/teorico su catture o battaglie > 20 punti percentuali).
+- ℹ️ = campione troppo piccolo per un verdetto affidabile (es. < 6 tentativi per catture/battaglie, < 15 bivi per la copertura).
+- Riepilogo finale: `✅ Nessuna anomalia` o l'elenco di cosa controllare.
+
+`grass`/`train`/`chaosRoulette` sono esclusi dal controllo di dominazione perché sono bivi fissi mostrati sempre per design, non parte della rotazione pesata (`src/data/exploreOptions.js`, importato anche qui come unica fonte di verità dei pesi).
 
