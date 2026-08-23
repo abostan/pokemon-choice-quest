@@ -3,6 +3,7 @@ import { PokemonChip } from "./PokemonSprite.js";
 import { getItemDescription } from "../data/items.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 import { computeTeamPower } from "../engine/battleLogic.js";
+import { usePokemon } from "../hooks/usePokemon.js";
 
 const e = React.createElement;
 
@@ -37,27 +38,48 @@ function BadgeItem({ name }) {
   );
 }
 
+function TeamGridSlot({ pokemon }) {
+  if (!pokemon) {
+    return e(
+      "div",
+      { className: "team-grid-slot empty" },
+      e("span", { className: "empty-icon" }, "+"),
+      e("span", { className: "empty-text" }, "Vuoto")
+    );
+  }
+
+  const { data, loading } = usePokemon(pokemon.id);
+  const name = loading ? "..." : (data?.name ?? `#${pokemon.id}`);
+  const spriteUrl = pokemon.isShiny
+    ? (data?.spriteShiny || data?.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`)
+    : (data?.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`);
+
+  return e(
+    "div",
+    {
+      className: `team-grid-slot ${pokemon.isShiny ? "shiny-slot" : ""}`,
+      title: `${name} Lv.${pokemon.level}${pokemon.isShiny ? " ✨ (Shiny)" : ""}`,
+    },
+    e("img", { src: spriteUrl, alt: name, className: "team-slot-img" }),
+    e("span", { className: "team-slot-name" }, name),
+    e("span", { className: "team-slot-level" }, `Lv.${pokemon.level}`),
+    pokemon.isShiny && e("span", { className: "shiny-sparkle" }, "✨")
+  );
+}
+
 /**
- * Pannello laterale sempre visibile: squadra, box, medaglie, zaino.
- *
- * props:
- *  - team: Array<{id,level,isShiny}>
- *  - box: Array<{id,level,isShiny}>
- *  - badges: Array<string>
- *  - items: Array<string>
- *  - onOpenBox(): callback per aprire il BoxModal
+ * Pannello laterale sempre visibile: squadra (griglia 2x3), box, medaglie, zaino.
  */
 export function TeamPanel({
-  team,
-  box,
-  badges,
-  items,
+  team = [],
+  box = [],
+  badges = [],
+  items = [],
   coins = 0,
   isNuzlocke = false,
   activeMega = false,
   activeItemBoost = 0,
   onOpenBox,
-  onSwapTeamPosition,
 }) {
   const abilities = computeTeamAbilities(team);
   const baseTeamPower = computeTeamPower(team);
@@ -66,9 +88,14 @@ export function TeamPanel({
   const teamPower = Math.round((baseTeamPower + itemBoost) * megaMult);
   const bonusDiff = teamPower - baseTeamPower;
 
+  // Griglia 2x3 fissa con 6 slot
+  const gridSlots = [0, 1, 2, 3, 4, 5].map((i) => team[i] || null);
+
   return e(
     "div",
     { className: "panel side-panel" },
+
+    // Pokédollari Badge
     e(
       "div",
       {
@@ -89,6 +116,8 @@ export function TeamPanel({
       e("span", null, "💰 Pokédollari:"),
       e("span", null, `${coins} 💰`)
     ),
+
+    // Potenza Squadra Badge
     e(
       "div",
       {
@@ -115,6 +144,8 @@ export function TeamPanel({
         bonusDiff > 0 && e("span", { style: { fontSize: "0.72rem", marginLeft: "4px", color: "#f472b6" } }, `(+${bonusDiff})`)
       )
     ),
+
+    // Nuzlocke Badge
     isNuzlocke && e(
       "div",
       {
@@ -134,56 +165,22 @@ export function TeamPanel({
       },
       "💀 NUZLOCKE HARDCORE MODE"
     ),
+
+    // Titolo Squadra
     e("h2", null, `La tua squadra (${team.length}/6)`),
-    team.length === 0
-      ? e("p", { className: "empty-hint" }, "Non hai ancora nessun Pokémon.")
-      : e(
-          "div",
-          { className: "team-list" },
-          team.map((p, idx) =>
-            e(
-              "div",
-              {
-                key: `${p.id}-${idx}`,
-                style: { position: "relative", display: "inline-flex", flexDirection: "column", alignItems: "center" },
-              },
-              e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny }),
-              onSwapTeamPosition && team.length > 1 &&
-                e(
-                  "div",
-                  { style: { display: "flex", gap: "4px", marginTop: "2px" } },
-                  idx > 0 &&
-                    e(
-                      "button",
-                      {
-                        className: "mini-swap-btn",
-                        title: "Sposta a sinistra",
-                        style: { padding: "0 4px", fontSize: "0.65rem", cursor: "pointer", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "3px", color: "#fff" },
-                        onClick: () => onSwapTeamPosition(idx, idx - 1),
-                      },
-                      "◄"
-                    ),
-                  idx < team.length - 1 &&
-                    e(
-                      "button",
-                      {
-                        className: "mini-swap-btn",
-                        title: "Sposta a destra",
-                        style: { padding: "0 4px", fontSize: "0.65rem", cursor: "pointer", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "3px", color: "#fff" },
-                        onClick: () => onSwapTeamPosition(idx, idx + 1),
-                      },
-                      "►"
-                    )
-                )
-            )
-          )
-        ),
+
+    // Griglia 2x3 Perfetta
+    e(
+      "div",
+      { className: "team-matrix-grid" },
+      gridSlots.map((p, idx) => e(TeamGridSlot, { key: `grid-slot-${idx}`, pokemon: p }))
+    ),
 
     // Sezione Abilità Passive Attive
     abilities.length > 0 &&
       e(
         "div",
-        { style: { marginTop: "12px" } },
+        { style: { marginTop: "8px" } },
         e("span", { style: { fontSize: "0.75rem", fontWeight: "bold", color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.5px" } }, "🌟 Abilità Attive:"),
         e(
           "div",
@@ -215,7 +212,7 @@ export function TeamPanel({
     e(
       "div",
       { className: "team-panel-box-row" },
-      e("h2", { style: { marginTop: "20px" } }, `Box (${(box || []).length})`),
+      e("h2", { style: { marginTop: "16px" } }, `Box (${(box || []).length})`),
       box && box.length > 0 &&
         e(
           "button",
@@ -233,7 +230,8 @@ export function TeamPanel({
     box && box.length > 3 &&
       e("p", { className: "empty-hint", style: { fontSize: "0.75rem" } }, `...e altri ${box.length - 3} nel box`),
 
-    e("h2", { style: { marginTop: "20px" } }, "Medaglie"),
+    // Medaglie
+    e("h2", { style: { marginTop: "16px" } }, "Medaglie"),
     badges.length === 0
       ? e("p", { className: "empty-hint" }, "Nessuna medaglia ancora.")
       : e(
@@ -242,7 +240,8 @@ export function TeamPanel({
           badges.map((b, idx) => e(BadgeItem, { key: `${b}-${idx}`, name: b }))
         ),
 
-    e("h2", { style: { marginTop: "20px" } }, "Zaino (Passa sopra per info)"),
+    // Zaino
+    e("h2", { style: { marginTop: "16px" } }, "Zaino (Passa sopra per info)"),
     !items || items.length === 0
       ? e("p", { className: "empty-hint" }, "Zaino vuoto.")
       : e(
