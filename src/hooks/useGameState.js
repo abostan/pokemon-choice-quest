@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { logger } from "../engine/logger.js";
 import { getGeneration, getNextGeneration } from "../data/generations.js";
 import { checkEvolution } from "../data/evolutions.js";
 import { hasSave } from "../engine/saveGame.js";
@@ -141,6 +142,7 @@ export function useGameState() {
 
   function goTo(phase, patch = {}) {
     playButtonClickSound();
+    logger.stateTransition(state.phase, phase, patch);
     update({ phase, ...patch });
   }
 
