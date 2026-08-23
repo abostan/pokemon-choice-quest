@@ -56,6 +56,34 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* TapTooltip: fallback a tocco per le descrizioni altrimenti visibili solo
+   via hover (attributo title), invisibile su touch (ANALISI_TECNICA.md 4.2). */
+.tap-tooltip-anchor {
+  position: relative;
+  display: inline-block;
+}
+
+.tap-tooltip-bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel-darker);
+  color: var(--text);
+  border: 1px solid var(--accent-2);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: normal;
+  white-space: normal;
+  width: max-content;
+  max-width: 220px;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  animation: fadeIn 0.15s ease;
+}
+
 .info-chip {
   display: inline-flex;
   align-items: center;
@@ -111,6 +139,38 @@ body {
 @media (min-width: 800px) {
   .layout {
     grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Schermi stretti (telefoni): sotto gli 800px .layout impila già la
+   colonna del TeamPanel sotto il contenuto principale, ma restava tutto
+   dimensionato per desktop (vedi ANALISI_TECNICA.md 4.1) — qui si riduce
+   il padding generale e si stringe la griglia squadra 3x2 -> 2x3 così le
+   card dei Pokémon hanno più respiro invece di essere schiacciate. */
+@media (max-width: 480px) {
+  #root {
+    padding: 14px 10px 48px;
+  }
+
+  .app-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .app-header .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .team-matrix-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pokedex-header-btn {
+    font-size: 0.78rem;
+    padding: 5px 9px;
   }
 }
 
@@ -950,6 +1010,27 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.battle-item-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.battle-item-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--panel-alt);
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  cursor: help;
+  flex-shrink: 0;
+}
+.battle-item-info:hover { color: var(--text); }
 
 .battle-item-notice {
   background: #1a3224;

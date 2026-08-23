@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useModalA11y } from "../hooks/useModalA11y.js";
 import { usePokemon } from "../hooks/usePokemon.js";
 import { loadHistoricPokedex } from "../engine/saveGame.js";
 
@@ -132,6 +133,7 @@ function PokedexListRow({ pokemonId, status, hasShiny }) {
 // Componente principale Pokédex
 // -------------------------------------------------------------------
 export function PokedexModal({ pokedexRun, onClose }) {
+  const modalRef = useModalA11y(onClose);
   const [tab, setTab] = useState("run");             // "run" | "historic"
   const [viewMode, setViewMode] = useState("grid");  // "grid" | "list"
   const [regionFilter, setRegionFilter] = useState("all");
@@ -188,7 +190,7 @@ export function PokedexModal({ pokedexRun, onClose }) {
     { className: "modal-overlay", onClick: (ev) => { if (ev.target === ev.currentTarget) onClose(); } },
     e(
       "div",
-      { className: "modal-card pokedex-modal" },
+      { className: "modal-card pokedex-modal", ref: modalRef, role: "dialog", "aria-modal": "true", "aria-label": "Pokédex", tabIndex: -1 },
       // Header modale
       e(
         "div",

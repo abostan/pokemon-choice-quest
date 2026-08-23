@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
+import { useModalA11y } from "../hooks/useModalA11y.js";
 
 const e = React.createElement;
 
@@ -7,6 +8,7 @@ const e = React.createElement;
  * Modale di gestione Box: permette di scambiare, ritirare o depositare Pokémon.
  */
 export function BoxModal({ team, box, onSwap, onWithdraw, onDeposit, onClose }) {
+  const modalRef = useModalA11y(onClose);
   const [selectedBox, setSelectedBox] = useState(null);   // indice nel box selezionato
   const [selectedTeam, setSelectedTeam] = useState(null); // indice nel team selezionato
 
@@ -44,7 +46,7 @@ export function BoxModal({ team, box, onSwap, onWithdraw, onDeposit, onClose }) 
     { className: "modal-overlay", onClick: (ev) => { if (ev.target === ev.currentTarget) onClose(); } },
     e(
       "div",
-      { className: "modal-card box-modal" },
+      { className: "modal-card box-modal", ref: modalRef, role: "dialog", "aria-modal": "true", "aria-label": "Gestione Box", tabIndex: -1 },
       // Header
       e(
         "div",

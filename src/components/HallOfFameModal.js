@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
 import { getHallOfFame, clearHallOfFame } from "../engine/hallOfFame.js";
+import { useModalA11y } from "../hooks/useModalA11y.js";
 
 const e = React.createElement;
 
@@ -11,6 +12,7 @@ const e = React.createElement;
  *  - onClose(): callback per chiudere il modale
  */
 export function HallOfFameModal({ onClose }) {
+  const modalRef = useModalA11y(onClose);
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
@@ -31,6 +33,11 @@ export function HallOfFameModal({ onClose }) {
       "div",
       {
         className: "modal-card HOF-modal",
+        ref: modalRef,
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-label": "Sala della Fama",
+        tabIndex: -1,
         style: {
           maxWidth: "760px",
           width: "90%",

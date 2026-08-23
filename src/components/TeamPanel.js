@@ -6,6 +6,7 @@ import { computeTeamPower } from "../engine/battleLogic.js";
 import { usePokemon } from "../hooks/usePokemon.js";
 import { getTypeIcon } from "../data/types.js";
 import { getBadgeType } from "../data/generations.js";
+import { TapTooltip } from "./TapTooltip.js";
 
 const e = React.createElement;
 
@@ -188,10 +189,10 @@ export function TeamPanel({
           { style: { display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "4px" } },
           abilities.map((ab, idx) =>
             e(
-              "span",
+              TapTooltip,
               {
                 key: `${ab.name}-${idx}`,
-                title: ab.description,
+                text: ab.description,
                 className: "info-chip",
                 style: {
                   background: "rgba(251, 191, 36, 0.15)",
@@ -239,7 +240,7 @@ export function TeamPanel({
         ),
 
     // Zaino
-    e("h2", { style: { marginTop: "16px" } }, "Zaino (Passa sopra per info)"),
+    e("h2", { style: { marginTop: "16px" } }, "Zaino"),
     !items || items.length === 0
       ? e("p", { className: "empty-hint" }, "Zaino vuoto.")
       : e(

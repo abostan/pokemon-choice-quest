@@ -6,6 +6,7 @@ import { computeTypeEffectiveness } from "../engine/typeMatchup.js";
 import { computeMegaPower } from "../engine/megaLogic.js";
 import { playMegaSound, playVictoryJingle } from "../engine/soundEngine.js";
 import { recordBattle } from "../engine/runRecorder.js";
+import { TapTooltip } from "./TapTooltip.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 import { getTypeIcon, TYPE_LIST } from "../data/types.js";
 
@@ -253,22 +254,26 @@ export function BattleScene({
       e(
         "div",
         { className: "battle-item-section" },
-        e("span", { className: "battle-item-label" }, "🎒 Usa uno strumento prima dello scontro (passa sopra per info):"),
+        e("span", { className: "battle-item-label" }, "🎒 Usa uno strumento prima dello scontro:"),
         e(
           "div",
           { className: "battle-item-list" },
           items.map((itemName, idx) => {
             const desc = getItemDescription(itemName);
             return e(
-              "button",
-              {
-                key: `${itemName}-${idx}`,
-                className: `battle-item-btn ${usedItem?.name === itemName ? "used" : ""}`,
-                disabled: usedItem !== null,
-                title: `${itemName}: ${desc}`,
-                onClick: () => handleUseItem(idx),
-              },
-              `🧪 ${itemName}`
+              "span",
+              { key: `${itemName}-${idx}`, className: "battle-item-row" },
+              e(
+                "button",
+                {
+                  className: `battle-item-btn ${usedItem?.name === itemName ? "used" : ""}`,
+                  disabled: usedItem !== null,
+                  title: `${itemName}: ${desc}`,
+                  onClick: () => handleUseItem(idx),
+                },
+                `🧪 ${itemName}`
+              ),
+              e(TapTooltip, { text: `${itemName}: ${desc}`, as: "span", className: "battle-item-info" }, "ⓘ")
             );
           })
         )

@@ -208,6 +208,10 @@ invece di lasciarlo apparire come una svista.
 
 ### 3.3 🟡 Testo Nuzlocke fuorviante sul "tentativo di cattura unico"
 
+> ✅ **Risolto in v8.6** — rimossa la frase "1 solo tentativo di cattura per
+> tappa" dalla descrizione Nuzlocke in `StartScreen.js` (non era mai stata
+> una regola esclusiva di quella modalità).
+
 `StartScreen.js` (riga 58) descrive la modalità Nuzlocke con: *"Morte
 permanente dei Pokémon svenuti nel Box + **1 solo tentativo di cattura per
 tappa**!"* — presentandolo come una regola speciale della modalità Hardcore.
@@ -248,6 +252,13 @@ va tenuto a mente se l'obiettivo futuro è dare più peso alle scelte.
 
 ### 4.1 🔴 Copertura mobile minima
 
+> ✅ **Risolto in v8.6 (scope minimo)** — nuovo `@media (max-width: 480px)`:
+> padding ridotto, `TeamPanel` da griglia 3 a 2 colonne, pulsanti header
+> compattati e con `flexWrap` corretto (prima potevano uscire dallo
+> schermo). Non una sidebar collassabile o un redesign completo — verificato
+> però che a 375px di larghezza non c'è più overflow orizzontale e il
+> `TeamPanel` (il componente più denso) è leggibile.
+
 `styles.css` (1336 righe) ha solo **due** media query, entrambe
 `min-width` (800px e 760px) — cioè lo stile di base è pensato per schermi
 piccoli "per difetto" ma non ottimizzato per essi: nessun adattamento
@@ -261,6 +272,13 @@ diventa una colonna molto lunga da scorrere prima di poter agire.
 
 ### 4.2 🟡 Tooltip via attributo `title` — invisibili su touch
 
+> ✅ **Risolto in v8.6** — nuovo `TapTooltip.js`: tocca per aprire una bolla
+> con la descrizione, tocca altrove per chiuderla. Applicato alle chip
+> abilità e agli strumenti in battaglia (con una ⓘ separata dal pulsante,
+> per non consumare l'oggetto toccando per informarsi). Le medaglie e gli
+> oggetti dello zaino mostravano già l'informazione come testo visibile,
+> non serviva intervenire lì — solo il `title` era ridondante.
+
 Le descrizioni di oggetti (`TeamPanel.js`, `BattleScene.js`), abilità e
 medaglie sono tutte implementate con l'attributo HTML nativo `title`
 (tooltip al passaggio del mouse). Su dispositivo touch (tablet/telefono,
@@ -271,6 +289,11 @@ alternativa più robusta sarebbe un piccolo pannello/modal "ⓘ" apribile al
 tap, oltre all'hover.
 
 ### 4.3 🟡 Modali senza gestione da tastiera/accessibilità
+
+> ✅ **Risolto in v8.6** — nuovo hook `useModalA11y` applicato a tutti i
+> modali (inclusi `OnboardingModal` appena introdotto): chiusura con `Esc`,
+> `role="dialog"`/`aria-modal="true"`, focus intrappolato dentro il modale,
+> focus spostato lì automaticamente all'apertura.
 
 Tutti i modali (`PokedexModal`, `BoxModal`, `HallOfFameModal`,
 `ScoreCardModal`) si chiudono cliccando sul backdrop, ma nessuno:
@@ -362,16 +385,15 @@ Se dovessi scegliere un ordine, partirei da qui:
    Deciso in v8.6 di rimandarla: si resta in fase Alpha, da rivedere più
    avanti.
 3. ✅ **Mega e Tera resi mutuamente esclusivi** — risolto in v8.6 (3.2).
-4. 🟡 **Correggere il testo Nuzlocke fuorviante** (3.3) — 1 riga di testo,
-   zero rischio.
-5. 🟡 **Aggiungere qualche breakpoint mobile in più** (4.1) — soprattutto
-   per il `TeamPanel`, che è il componente più denso.
+4. ✅ **Testo Nuzlocke fuorviante corretto** — risolto in v8.6 (3.3).
+5. ✅ **Breakpoint mobile aggiuntivi** — risolto in v8.6, scope minimo
+   (4.1).
 6. ✅ **Icone incoerenti, Iper Pozione, fallback abilità, stile inline,
-   gerarchia visiva, onboarding** — tutti i 🟢 risolti in v8.6 (2.5, 2.6,
-   2.7, 4.4, 4.5, 4.6).
+   gerarchia visiva, onboarding, tooltip touch, accessibilità modali** —
+   tutti i 🟢/🟡 rimanenti risolti in v8.6 (2.5, 2.6, 2.7, 4.2, 4.3, 4.4,
+   4.5, 4.6).
 
-Restano da fare: 🟡 testo Nuzlocke fuorviante (3.3), 🟡 breakpoint mobile
-(4.1), 🟡 tooltip invisibili su touch (4.2), 🟡 modali senza accessibilità
-da tastiera (4.3), 🔴 costo del "Riprova la battaglia" (3.1, deliberatamente
-rimandato in fase Alpha), refresh completo di `MANUAL_TECNICO.md` §2/§3
-(fuori scope di questo documento).
+Resta solo: 🔴 costo del "Riprova la battaglia" (3.1, deliberatamente
+rimandato in fase Alpha — l'unico punto ancora aperto della lista
+originale), e un refresh completo di `MANUAL_TECNICO.md` §2/§3 (fuori
+scope di questo documento).

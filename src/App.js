@@ -214,7 +214,7 @@ export default function App() {
         state.phase !== "generationSelect" && state.phase !== "resume" &&
           e(
             "div",
-            { style: { display: "flex", gap: "8px" } },
+            { style: { display: "flex", gap: "8px", flexWrap: "wrap" } },
             e(
               "button",
               {

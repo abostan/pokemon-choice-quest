@@ -55,7 +55,7 @@ export function StartScreen({ starterIds, generationName, continueTeam, onChoose
         "div",
         null,
         e("span", { style: { fontWeight: "bold", color: nuzlockeMode ? "#fda4af" : "#e2e8f0" } }, "💀 Modalità Sfida Hardcore / Nuzlocke"),
-        e("div", { style: { fontSize: "0.78rem", color: "#94a3b8" } }, "Morte permanente dei Pokémon svenuti nel Box + 1 solo tentativo di cattura per tappa!")
+        e("div", { style: { fontSize: "0.78rem", color: "#94a3b8" } }, "Morte permanente: i Pokémon svenuti restano nel Box e non possono più combattere!")
       )
     ),
     isContinue &&

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { computeVictoryScore, getHighScore, saveHighScore } from "../engine/scoreLogic.js";
+import { useModalA11y } from "../hooks/useModalA11y.js";
 
 const e = React.createElement;
 
@@ -7,6 +8,7 @@ const e = React.createElement;
  * Modale Scheda Punteggio & Grado di Vittoria (Grado S/A/B/C).
  */
 export function ScoreCardModal({ gameState, onClose }) {
+  const modalRef = useModalA11y(onClose);
   const scoreData = computeVictoryScore(gameState);
   const [highScore, setHighScore] = useState(() => getHighScore());
   const [isNewRecord, setIsNewRecord] = useState(false);
@@ -29,6 +31,11 @@ export function ScoreCardModal({ gameState, onClose }) {
       {
         className: "modal-content score-modal",
         onClick: (evt) => evt.stopPropagation(),
+        ref: modalRef,
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-label": "Punteggio & Grado di Vittoria",
+        tabIndex: -1,
         style: {
           background: "linear-gradient(135deg, #1e293b, var(--panel-darker))",
           border: `2px solid ${rank.color}`,

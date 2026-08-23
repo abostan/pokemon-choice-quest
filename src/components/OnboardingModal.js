@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useModalA11y } from "../hooks/useModalA11y.js";
 
 const e = React.createElement;
 
@@ -33,6 +34,7 @@ const STEPS = [
  *  - onClose(): callback per chiudere il modale
  */
 export function OnboardingModal({ onClose }) {
+  const modalRef = useModalA11y(onClose);
   const [step, setStep] = useState(0);
   const isLast = step === STEPS.length - 1;
   const current = STEPS[step];
@@ -42,7 +44,15 @@ export function OnboardingModal({ onClose }) {
     { className: "modal-overlay", onClick: (ev) => { if (ev.target === ev.currentTarget) onClose(); } },
     e(
       "div",
-      { className: "modal-card onboarding-modal", style: { maxWidth: "480px", textAlign: "center" } },
+      {
+        className: "modal-card onboarding-modal",
+        ref: modalRef,
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-label": "Come si gioca",
+        tabIndex: -1,
+        style: { maxWidth: "480px", textAlign: "center" },
+      },
       e(
         "div",
         { className: "modal-header", style: { justifyContent: "flex-end" } },
