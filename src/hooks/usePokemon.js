@@ -24,6 +24,7 @@ async function fetchPokemon(id) {
         data.sprites?.other?.["official-artwork"]?.front_shiny ||
         data.sprites?.front_shiny ||
         "",
+      cry: data.cries?.latest || data.cries?.legacy || null,
     }));
 
   cache.set(id, promise);

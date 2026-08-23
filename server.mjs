@@ -46,7 +46,15 @@ async function serveStatic(req, res) {
   try {
     const data = await readFile(filePath);
     const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, { "Content-Type": MIME_TYPES[ext] || "application/octet-stream" });
+    res.writeHead(200, {
+      "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
+      // Server di sviluppo: mai far mettere in cache i file dal browser, o
+      // una modifica al codice può restare invisibile finché non si fa un
+      // hard refresh manuale (successo con soundEngine.js: EvolutionNotice.js
+      // aggiornato importava un export non ancora presente nella versione
+      // di soundEngine.js servita dalla cache del browser).
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+    });
     res.end(data);
   } catch {
     res.writeHead(404).end("Not found");

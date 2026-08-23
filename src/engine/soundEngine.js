@@ -156,6 +156,25 @@ export function playItemUseSound() {
   setTimeout(() => playNote(880, 120, "sine", 0.18), 70);
 }
 
+// 🔊 Verso ufficiale del Pokémon (file audio reale da PokeAPI/cries, non un
+// jingle sintetizzato) — riprodotto a incontro/evoluzione (vedi ROADMAP.md
+// Fase 6). Usa l'elemento <audio> nativo, non l'oscillatore Web Audio delle
+// altre funzioni di questo file: è un file .ogg vero, non una nota sintetica.
+export function playPokemonCry(url) {
+  if (isMuted || !url) return;
+  try {
+    const audio = new Audio(url);
+    audio.volume = 0.35;
+    audio.play().catch(() => {
+      // Riproduzione bloccata (es. autoplay non ancora sbloccato dal
+      // browser prima di un'interazione utente) — non è un errore da
+      // segnalare, semplicemente quel verso non si sente questa volta.
+    });
+  } catch {
+    // URL non valido o Audio non disponibile: ignora silenziosamente.
+  }
+}
+
 // 📈 Suono di Level Up della squadra
 export function playLevelUpSound() {
   if (isMuted) return;

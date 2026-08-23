@@ -2,10 +2,11 @@ import React, { useMemo, useState, useEffect } from "react";
 import { PokemonPreview } from "./PokemonSprite.js";
 import { computeCaptureChance, rollCapture } from "../engine/battleLogic.js";
 import { computeTeamAbilities } from "../data/abilities.js";
-import { playShinySound, playCaptureSound, playMasterBallSound } from "../engine/soundEngine.js";
+import { playShinySound, playCaptureSound, playMasterBallSound, playPokemonCry } from "../engine/soundEngine.js";
 import { recordEncounter, recordCapture } from "../engine/runRecorder.js";
 import { getShinyChance } from "../engine/settings.js";
 import { ParticleBurst } from "./ParticleBurst.js";
+import { usePokemon } from "../hooks/usePokemon.js";
 
 const e = React.createElement;
 
@@ -48,6 +49,14 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
   useEffect(() => {
     recordEncounter({ pokemonId: wildId, isLegendary, isShiny });
   }, [wildId, isLegendary, isShiny]);
+
+  // Verso ufficiale del Pokémon incontrato (PokeAPI/cries). usePokemon usa
+  // la stessa cache in memoria di PokemonPreview qui sotto, quindi non
+  // duplica la chiamata di rete già fatta per lo sprite.
+  const { data: wildData } = usePokemon(wildId);
+  useEffect(() => {
+    if (wildData?.cry) playPokemonCry(wildData.cry);
+  }, [wildData?.cry]);
 
   const [result, setResult] = useState(null); // { method, success } | null
 

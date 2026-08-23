@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { usePokemon } from "../hooks/usePokemon.js";
 import { ParticleBurst } from "./ParticleBurst.js";
+import { playPokemonCry } from "../engine/soundEngine.js";
 
 const e = React.createElement;
 
@@ -13,6 +14,12 @@ function EvoCard({ fromId, toId, accepted, onToggle }) {
 
   const fromName = fromData?.name ?? `#${fromId}`;
   const toName = toData?.name ?? `#${toId}`;
+
+  // Verso della nuova forma, solo se l'evoluzione è (ancora) accettata —
+  // se il giocatore la blocca col Tasto B non ha senso farglielo sentire.
+  useEffect(() => {
+    if (accepted && toData?.cry) playPokemonCry(toData.cry);
+  }, [accepted, toData?.cry]);
 
   return e(
     "div",
