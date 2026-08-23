@@ -265,6 +265,8 @@ export default function App() {
           items: state.items,
           coins: state.coins || 0,
           isNuzlocke: state.isNuzlocke,
+          isRandomizer: state.isRandomizer,
+          monoType: state.monoType,
           activeMega: state.activeMega,
           activeTerastal: state.activeTerastal,
           activeItemBoost: state.activeItemBoost,

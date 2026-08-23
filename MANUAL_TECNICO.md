@@ -1,6 +1,6 @@
-# Manuale Tecnico — Pokémon: Scegli il Cammino (v8.0)
+# Manuale Tecnico — Pokémon: Scegli il Cammino (v8.5)
 
-> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v8.0 (Classifica Punteggio & Grado di Vittoria, Centro Pokémon & Mercatino PokéMart, Abilità Passive dei Pokémon, Torneo dei Campioni della Lega Post-Game, Effetti Sonori & Audio 8-bit Web Audio API, Sala della Fama & Hall of Fame Storica, Megaevoluzione / Gigamax, Modalità Nuzlocke Hardcore, Efficacia Tipi, Boss Narrative & Master Ball).
+> Documento di riferimento per sviluppatori. Descrive l'architettura, il flusso di gioco, i moduli e le decisioni tecniche della codebase aggiornata alla v8.5 (Classifica Punteggio & Grado di Vittoria, Centro Pokémon & Mercatino PokéMart, Abilità Passive, Torneo Campioni Post-Game, Effetti Sonori 8-bit Web Audio API, Sala della Fama Storica, Mega/Gigamax, Nuzlocke Hardcore, Efficacia Tipi, Boss Narrative & Master Ball, **Randomizer Mode**, **Bivi Post-Game Dinamici 20+**, **challengeEngine.js** con lookup deterministico, **Layout 2x3 Team Panel**, **Mono-Type in backlog**).
 
 ---
 
@@ -44,8 +44,12 @@ pokemon-choice-quest/
     │   ├── evolutions.js   # Mappa completa delle evoluzioni (300+ specie)
     │   └── items.js        # Modulo descrizioni e helper per gli strumenti dello zaino
     ├── engine/
-    │   ├── battleLogic.js  # Logica pura per cattura, cap Lv100 (clampLevel) e battaglie
-    │   └── saveGame.js     # Modulo di salvataggio multi-slot (1..3), export/import JSON e Pokédex
+    │   ├── battleLogic.js     # Logica pura per cattura, cap Lv100 (clampLevel) e battaglie
+    │   ├── saveGame.js        # Modulo di salvataggio multi-slot (1..3), export/import JSON e Pokédex
+    │   ├── saveSanitizer.js   # Validatore/sanitizzatore automatico dei salvataggi LocalStorage
+    │   ├── hallOfFame.js      # Registro Sala della Fama storico persistente
+    │   ├── scoreLogic.js      # Calcolo punteggio e grado di vittoria (S/A/B/C)
+    │   └── challengeEngine.js # Logica sfide (Randomizer, MonoType-backlog) con lookUp deterministico
     ├── hooks/
     │   └── usePokemon.js   # Hook React con cache in memoria per PokeAPI (sprite standard + Shiny)
     └── components/
@@ -276,4 +280,66 @@ node scripts/simulate-flow.mjs
 ```
 
 Esegue una simulazione a secco di tutte e 6 le generazioni verificate in sequenza (22 passi ciascuna), assicurandosi che nessun indice di palestra, rivale, Alto Comando o campione risulti `undefined` o generi eccezioni di runtime.
+
+---
+
+## 9. Challenge Engine & Regola del Render Deterministico
+
+### `src/engine/challengeEngine.js`
+
+Modulo centralizzato per la logica delle Modalità Sfida. Espone:
+
+| Export | Scopo |
+|---|---|
+| `filterEncounterPoolByChallenge(pool, state)` | Filtra il pool di incontri per Randomizer/MonoType |
+| `filterStartersByChallenge(starterIds, state)` | Filtra gli starter disponibili per MonoType |
+| `getMatchingTypePokemon(type)` | Restituisce tutti gli ID del tipo specificato (lookup O(1)) |
+
+### ⚠️ Regola Critica: Nessun `Math.random()` nel Render Path di React
+
+**Problema:** chiamare `Math.random()` durante il render di un componente React causa re-render infiniti perché ogni esecuzione produce output diverso → React vede props cambiate → re-render → loop.
+
+**Sintomo:** centinaia/migliaia di errori `Uncaught` da `react-dom.production.min.js` con la app che si blocca.
+
+**Soluzione applicata (bivi normali):** tutti i shuffle dei bivi esplorativi in `ExploreSceneContainer.js` usano una **funzione di hashing deterministica** basata su `gymIndex` / `postgameRound`:
+
+```js
+// ✅ CORRETTO — deterministico, stesso input = stesso output
+const seed = state.gymIndex * 1013 + 7;
+const shuffled = [...arr].sort((a, b) => {
+  const ha = ((a.id.charCodeAt(0) * 31 + seed) * 17) % 97;
+  const hb = ((b.id.charCodeAt(0) * 31 + seed) * 17) % 97;
+  return ha - hb;
+});
+
+// ❌ SBAGLIATO — causa re-render infinito
+const shuffled = [...arr].sort(() => Math.random() - 0.5);
+```
+
+### 🐛 TODOLIST/Fix — Randomizer Mode & Mono-Type Challenge
+
+Entrambe le funzionalità sono **strutturalmente complete** in `challengeEngine.js` ma sono **disabilitate dall'UI** perché il filtraggio veniva applicato nel render path di React.
+
+**Fix da implementare:** applicare `filterEncounterPoolByChallenge()` nell'handler `onSelect()` del bivio (lato evento, non lato render):
+
+```js
+// ✅ Pattern corretto (da implementare in ExploreSceneContainer, GymBattle, ecc.)
+onSelect: () => goTo("encounter", {
+  pendingEncounterPool: filterEncounterPoolByChallenge(tier.grass, state),
+  pendingEncounterLevel: tier.level,
+})
+
+// ❌ Pattern sbagliato rimosso
+// const encPool = filterEncounterPoolByChallenge(rawEncPool, state); // era nel render
+```
+
+**Checklist per riabilitare entrambe le modalità:**
+1. Applicare il filtro in ogni `onSelect()` di `ExploreSceneContainer.js` (erba, grotta, acqua, zone speciali)
+2. Applicare il filtro in `GymBattleSceneContainer.js` e `LeagueSceneContainer.js`
+3. Reintrodurre i toggle UI in `GenerationSelectScreen.js`
+4. Testare che zero errori React compaiano in console con la modalità attiva
+
+### Nuzlocke Hardcore
+
+La modalità Nuzlocke è **pienamente funzionante**. Il toggle è disponibile **solo** nella schermata di selezione starter (`StartScreen.js`) — rimosso da `GenerationSelectScreen.js` per evitare duplicazione. Il flag `state.isNuzlocke` viene passato con lo starter scelto.
 

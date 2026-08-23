@@ -77,6 +77,8 @@ export function TeamPanel({
   items = [],
   coins = 0,
   isNuzlocke = false,
+  isRandomizer = false,
+  monoType = null,
   activeMega = false,
   activeTerastal = false,
   activeItemBoost = 0,
@@ -147,25 +149,45 @@ export function TeamPanel({
       )
     ),
 
-    // Nuzlocke Badge
-    isNuzlocke && e(
+    // Challenge Badges
+    e(
       "div",
-      {
-        className: "nuzlocke-badge-panel",
-        style: {
-          padding: "4px 8px",
-          marginBottom: "10px",
-          borderRadius: "6px",
-          background: "linear-gradient(135deg, #be123c, #881337)",
-          color: "#fff",
-          fontSize: "0.75rem",
-          fontWeight: "bold",
-          textAlign: "center",
-          letterSpacing: "0.5px",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+      { style: { display: "flex", flexDirection: "column", gap: "4px", marginBottom: "10px" } },
+      isNuzlocke && e(
+        "div",
+        {
+          className: "nuzlocke-badge-panel",
+          style: {
+            padding: "4px 8px",
+            borderRadius: "6px",
+            background: "linear-gradient(135deg, #be123c, #881337)",
+            color: "#fff",
+            fontSize: "0.75rem",
+            fontWeight: "bold",
+            textAlign: "center",
+            letterSpacing: "0.5px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+          },
         },
-      },
-      "💀 NUZLOCKE HARDCORE MODE"
+        "💀 NUZLOCKE HARDCORE"
+      ),
+      isRandomizer && e(
+        "div",
+        {
+          style: {
+            padding: "4px 8px",
+            borderRadius: "6px",
+            background: "linear-gradient(135deg, #7e22ce, #581c87)",
+            color: "#e9d5ff",
+            fontSize: "0.75rem",
+            fontWeight: "bold",
+            textAlign: "center",
+            letterSpacing: "0.5px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+          },
+        },
+        "🎲 RANDOMIZER CAOS MODE"
+      )
     ),
 
     // Titolo Squadra

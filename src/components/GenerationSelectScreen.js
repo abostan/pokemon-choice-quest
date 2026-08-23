@@ -5,6 +5,14 @@ import { PokemonPreview } from "./PokemonSprite.js";
 const e = React.createElement;
 
 export function GenerationSelectScreen({ onChooseGeneration, boxCount }) {
+  function handleStart(genId) {
+    onChooseGeneration(genId, {
+      isNuzlocke: false,  // impostato nella schermata starter
+      isRandomizer: false,
+      monoType: null,
+    });
+  }
+
   return e(
     "div",
     { className: "panel" },
@@ -14,8 +22,9 @@ export function GenerationSelectScreen({ onChooseGeneration, boxCount }) {
       { className: "scene-text" },
       boxCount > 0
         ? `Hai già ${boxCount} Pokémon nel box da avventure precedenti: resteranno con te qualunque regione tu scelga ora.`
-        : "Ogni regione ha il proprio starter, le proprie palestre e la propria Lega. Da quale vuoi iniziare?"
+        : "Ogni regione ha il proprio starter, le proprie palestre e la propria Lega. Scegli da dove iniziare la tua avventura!"
     ),
+
     e(
       "div",
       { className: "pokemon-card-row" },
@@ -34,7 +43,7 @@ export function GenerationSelectScreen({ onChooseGeneration, boxCount }) {
           ),
           e(
             "button",
-            { className: "continue-btn", onClick: () => onChooseGeneration(gen.id) },
+            { className: "continue-btn", onClick: () => handleStart(gen.id) },
             `Parti da ${gen.name}`
           )
         )

@@ -14,6 +14,7 @@ import { GymBattleSceneContainer } from "./scenes/GymBattleSceneContainer.js";
 import { LeagueSceneContainer } from "./scenes/LeagueSceneContainer.js";
 import { getExplorationTier } from "../data/generations.js";
 import { CHAMPIONS_TOURNAMENT } from "../data/championsTournament.js";
+import { filterEncounterPoolByChallenge, filterStartersByChallenge } from "../engine/challengeEngine.js";
 import { addHallOfFameEntry } from "../engine/hallOfFame.js";
 import { deleteSave } from "../engine/saveGame.js";
 import { initialState } from "../hooks/useGameState.js";
@@ -63,7 +64,8 @@ export function SceneRouter({ game }) {
   if (state.phase === "generationSelect") {
     return e(GenerationSelectScreen, {
       boxCount: state.box.length,
-      onChooseGeneration: (generationId) => goTo("starterSelect", { generationId }),
+      onChooseGeneration: (generationId, challengeOptions = {}) =>
+        goTo("starterSelect", { generationId, ...challengeOptions }),
     });
   }
 
@@ -222,9 +224,12 @@ export function SceneRouter({ game }) {
     const hasMb = state.items.includes("Master Ball");
     const tier = getExplorationTier(generation, state.gymIndex);
     const fallbackPool = isLegendary ? (generation?.legendaries || [150]) : (tier?.grass || [25]);
-    const encPool = (state.pendingEncounterPool && state.pendingEncounterPool.length > 0)
+    const rawEncPool = (state.pendingEncounterPool && state.pendingEncounterPool.length > 0)
       ? state.pendingEncounterPool
       : fallbackPool;
+    // Nota: filterEncounterPoolByChallenge rimosso dal render path (causa re-render infiniti).
+    // Il filtraggio Randomizer/MonoType avverrà in futuro al momento del goTo() (non nel render).
+    const encPool = rawEncPool;
 
     return e(EncounterScene, {
       key: `${state.phase}-${encPool[0] || state.gymIndex}`,

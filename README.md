@@ -29,7 +29,7 @@ Poi apri l'indirizzo che ti viene indicato (es. `http://localhost:5173`) nel
 browser. Serve una connessione internet normale: la app scarica sprite e dati
 dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 
-## Cosa contiene questa versione (v8.0)
+## Cosa contiene questa versione (v8.5)
 
 - **🏆 Classifica Punteggio & Grado di Vittoria (Grado S / A / B / C)**: Calcolo automatico delle prestazioni di gioco con scheda d'onore (`ScoreCardModal`), trofei visivi (🏆 Maestro, 🥇 Élite, 🥈 Veterano, 🥉 Promettente) e salvataggio del Record Personale!
 - **🏥 Centro Pokémon & Mercatino PokéMart**: Nuova tappa di esplorazione tra le palestre per curare la squadra con trillo audio a 8-bit (`playHealJingle()`), accumulare Pokédollari e acquistare Pozioni, Caramelle Rare e Master Ball!
@@ -39,6 +39,8 @@ dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 - **🏆 Sala della Fama & Hall of Fame Storica**: Registro permanente consultabile dall'header (`🏆 Sala della Fama`) che conserva la storia di tutte le squadre incoronate Campioni della Lega nelle 9 generazioni!
 - **🔮 Sistema di Megaevoluzione / Gigamax**: Trasformazione speciale attiva nelle sfide decisive contro Capipalestra, Capo Team e Lega Pokémon per ottenere un **+30% di potenza squadra immediato**!
 - **💀 Modalità Sfida Hardcore / Nuzlocke**: Regole ad alta sfida attivabili all'inizio della partita con **Permadeath (morte permanente)** dei Pokémon svenuti nel PC Box (`isFainted: true`), blocco battaglie se la squadra è vuota e schermata di Game Over automatica!
+- **🎲 Randomizer Mode**: Modalità caos attivabile all'avvio dalla schermata di selezione regione. Mescola casualmente i Pokémon selvatici usando `challengeEngine.js` con lookup deterministico (no `Math.random()` nel render path — previene re-render infiniti in React).
+- **📐 Bivi Post-Game Dinamici (20+ pool)**: Esplorazione post-game con oltre 20 bivi speciali shuffled proceduralmente con seed deterministico basato su `postgameRound` per garantire scelte sempre diverse e stabili tra i render.
 - **⚡ Sistema di Efficacia dei Tipi**: Calcolo automatico dei vantaggi/svantaggi di tipo per tutti i 18 tipi ufficiali! Bonus di **+15% alla potenza della squadra** per gli attacchi Super Efficaci e svantaggio del **-10%** se vulnerabili, con badge visivo in `BattleScene`.
 - **🕵️ Battaglie Boss Narrative contro i Capo Team**: Scontri boss unici per ciascuna delle 9 generazioni (Giovanni, Archer, Max/Archie, Cyrus, Ghetsis, Lysandre, Guzma, Rose, Eri/Cassiopea) dopo la 4ª palestra.
 - **🟣 Strumento Master Ball**: Ricompensa epica per aver sconfitto i Capo Team. Consente una **cattura al 100% garantita** per qualsiasi incontro selvatico o leggendario!
@@ -54,6 +56,7 @@ dei Pokémon in diretta da [PokeAPI](https://pokeapi.co).
 - **💾 Salvataggio Multi-Slot & Backup JSON**: 3 slot di salvataggio indipendenti con data/ora e supporto completo ad esportazione/importazione di file JSON.
 - **Evoluzioni & Blocco Tasto B**: evoluzioni automatiche al livello soglia con opzione visiva per annullare/bloccare l'evoluzione di ogni specie (mappate per tutte le 9 Gen).
 - **Modalità Infinita Post-Game & Leggendari**: esplorazione infinita a difficoltà crescente dopo Paldea, con probabilità di incontrare Pokémon leggendari unici.
+- **📐 Layout Griglia 2x3 Team Panel**: struttura CSS Grid a 3 colonne per un pannello della squadra ordinato e leggibile su ogni dimensione di schermo.
 
 ## Struttura del progetto
 

@@ -1,8 +1,9 @@
-# Pokémon: Scegli il Cammino — Spec v8.0
+# Pokémon: Scegli il Cammino — Spec v8.5
 
 Documento di lavoro e specifica tecnica delle funzionalità del progetto.
 
-**Stato:** ✅ Tutte le specifiche (Gen 1-9, 1025 Pokedex, Classifica Punteggio & Grado S/A/B/C, Centro Pokémon & PokéMart, Abilità Passive, Torneo dei Campioni Post-Game, Effetti Sonori 8-Bit Web Audio API, Sala della Fama Storica, Megaevoluzione / Gigamax, Modalità Nuzlocke, Sistema Efficacia Tipi, Villain Bosses, Master Ball, Rogue-Lite Bivi, Item Tooltips, Multi-Save, Shiny, Oggetti, Visual Badges) sono state interamente implementate e verificate.
+**Stato:** ✅ Implementate e verificate: Gen 1-9 complete, 1025 Pokédex, Classifica Punteggio (S/A/B/C), Centro Pokémon & PokéMart, Abilità Passive, Torneo Campioni Post-Game, Effetti Sonori 8-Bit, Sala della Fama, Mega/Gigamax, Nuzlocke Hardcore (solo in StarterSelect), Efficacia Tipi, Villain Bosses, Master Ball, Rogue-Lite Bivi (20+ post-game), Item Tooltips, Multi-Save, Shiny, Oggetti, Visual Badges, Layout 2x3 Team Panel, Pool Bivi Deterministici (no Math.random in render).
+**In Backlog (TODOLIST/Fix):** 🎲 Randomizer Mode e 🔥 Mono-Type Challenge — architettura `challengeEngine.js` pronta, disabilitate per bug re-render React. Fix: spostare `filterEncounterPoolByChallenge()` dagli handler `onSelect()` dei bivi (non nel render path). Vedi sezione TODOLIST/Fix in ROADMAP.md.
 
 ---
 

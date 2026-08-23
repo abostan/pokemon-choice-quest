@@ -2,8 +2,12 @@ import React from "react";
 import { ChoiceScene } from "../ChoiceScene.js";
 import { getExplorationTier } from "../../data/generations.js";
 import { MAX_LEVEL } from "../../hooks/useGameState.js";
+import { filterEncounterPoolByChallenge } from "../../engine/challengeEngine.js";
 
 const e = React.createElement;
+
+// Alias locale per compatibilità con le chiamate interne
+const applyChallengeFilters = filterEncounterPoolByChallenge;
 
 export function ExploreSceneContainer({ game }) {
   const {
@@ -273,8 +277,13 @@ export function ExploreSceneContainer({ game }) {
       },
     ];
 
-    // Shuffler con vera casualità ad ogni caricamento del post-game
-    const shuffled = [...postgameSpecialPool].sort(() => Math.random() - 0.5);
+    // Shuffle deterministico basato su postgameRound (nessun Math.random() in render → no loop infinito)
+    const seed = (state.postgameRound || 0) * 1013 + 7;
+    const shuffled = [...postgameSpecialPool].sort((a, b) => {
+      const ha = ((a.id.charCodeAt(0) * 31 + seed) * 17) % 97;
+      const hb = ((b.id.charCodeAt(0) * 31 + seed) * 17) % 97;
+      return ha - hb;
+    });
     const rolledSpecials = shuffled.slice(0, 4);
 
     const baseGrassChoice = {
@@ -302,7 +311,7 @@ export function ExploreSceneContainer({ game }) {
     };
 
     return e(ChoiceScene, {
-      key: `postgame-${state.postgameRound}-${Date.now()}`,
+      key: `postgame-${state.postgameRound}`,
       title: "Esplorazione libera post-game",
       text: `Continui ad esplorare il mondo Pokémon. I Pokémon selvatici ed avversari sono al massimo della potenza. (Round ${state.postgameRound + 1})`,
       choices: [...choicesPool, chaosRouletteChoice],
@@ -636,10 +645,21 @@ export function ExploreSceneContainer({ game }) {
     },
   ];
 
+  // Shuffle e selezione deterministica basata su gymIndex (nessun Math.random() in render)
+  const explSeed = (state.gymIndex || 0) * 1013 + (state.badges ? state.badges.length * 37 : 0) + 7;
+  function seededRandom(extra) {
+    return ((explSeed + extra) * 1664525 + 1013904223) % 2147483647 / 2147483647;
+  }
+
   const rolledSpecials = [];
-  const shuffled = [...allSpecialOptions].sort(() => Math.random() - 0.5);
+  const shuffled = [...allSpecialOptions].sort((a, b) => {
+    const ha = ((a.id.charCodeAt(0) * 31 + explSeed) * 17) % 97;
+    const hb = ((b.id.charCodeAt(0) * 31 + explSeed) * 17) % 97;
+    return ha - hb;
+  });
+  let extraSeed = 0;
   for (const opt of shuffled) {
-    if (Math.random() < opt.weight) {
+    if (seededRandom(++extraSeed) < opt.weight) {
       rolledSpecials.push(opt);
       if (rolledSpecials.length >= 3) break;
     }

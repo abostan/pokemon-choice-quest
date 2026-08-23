@@ -30,6 +30,9 @@ export function sanitizeGameState(raw) {
     tournamentRound: typeof raw.tournamentRound === "number" ? Math.max(0, raw.tournamentRound) : 0,
 
     isNuzlocke: !!raw.isNuzlocke,
+    isRandomizer: !!raw.isRandomizer,
+    monoType: typeof raw.monoType === "string" ? raw.monoType : null,
+    choicesCount: typeof raw.choicesCount === "number" ? Math.max(0, raw.choicesCount) : 0,
     pokedexRun: raw.pokedexRun && typeof raw.pokedexRun === "object" ? raw.pokedexRun : {},
     pokedexOpen: false,
     activeMega: false,

@@ -111,9 +111,41 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
 ---
 
 ### ⚔️ Fase 4: Modalità di Gioco & Sfide (Challenge Modes)
-- [ ] **🔥 Mono-Type Challenge**: modalità sfida dove il giocatore sceglie un solo tipo (es. Solo Fuoco, Solo Spettro) e può catturare ed usare solo Pokémon di quel tipo.
-- [ ] **🎲 Randomizer Mode**: modalità caos che mescola casualmente i Pokémon selvatici di tutti i percorsi e le squadre di palestre e Lega.
-- [ ] **⏱️ Speedrun / Choice Timer**: registro del tempo e del numero di decisioni impiegate per completare ogni regione.
+- [x] **💀 Nuzlocke Hardcore**: attivabile sulla schermata di selezione starter — morte permanente, badge visivo, moltiplicatore punteggio x1.5.
+- [x] **📐 Bivi post-game dinamici**: pool di 20+ bivi speciali con shuffle deterministico basato su `postgameRound`.
+- [ ] **🎲 Randomizer Mode** *(disabilitata — vedi TODOLIST/Fix)*
+- [ ] **🔥 Mono-Type Challenge** *(disabilitata — vedi TODOLIST/Fix)*
+- [ ] **⏱️ Speedrun / Choice Timer**: tracciamento del numero di decisioni effettuate e tempo trascorso.
+
+---
+
+## 🐛 TODOLIST / Fix — Funzionalità in Backlog Tecnico
+
+Queste funzionalità sono **strutturalmente implementate** in `challengeEngine.js` ma causano un **loop di re-render infinito** in React e sono quindi temporaneamente disabilitate dall'interfaccia.
+
+### Causa del Bug (comune a Randomizer e Mono-Type)
+
+Il filtro veniva applicato in **`SceneRouter.js` durante il render React** chiamando `filterEncounterPoolByChallenge(pool, state)`. Questa funzione usava `Math.random()` internamente per generare specie casuali, producendo output diverso ad ogni chiamata → React rileva props cambiate → re-render → loop → freeze del browser (1000+ errori `Uncaught` da `react-dom`).
+
+### Fix Corretto (da implementare)
+
+Spostare il filtraggio **a monte**, nell'handler `onSelect()` del bivio — cioè al momento del `goTo("encounter", { pendingEncounterPool: filterEncounterPoolByChallenge(pool, state) })` — invece che nel render path. In questo modo il pool filtrato viene calcolato **una volta sola** e salvato in `state.pendingEncounterPool`, che è stabile tra i render.
+
+```js
+// ✅ Pattern corretto (da implementare)
+onSelect: () => goTo("encounter", {
+  pendingEncounterPool: filterEncounterPoolByChallenge(tier.grass, state),
+  pendingEncounterLevel: tier.level,
+})
+
+// ❌ Pattern sbagliato (causa freeze)
+// const encPool = filterEncounterPoolByChallenge(rawEncPool, state); // nel render
+```
+
+### Items in Backlog
+
+- [ ] **🎲 Randomizer Mode**: `challengeEngine.js` → `filterEncounterPoolByChallenge` con `isRandomizer`. UI toggle da reintrodurre in `GenerationSelectScreen.js` dopo il fix. Applicare il filtro in ogni `onSelect()` di bivio in `ExploreSceneContainer.js`, `GymBattleSceneContainer.js`, `LeagueSceneContainer.js`.
+- [ ] **🔥 Mono-Type Challenge**: `challengeEngine.js` → `filterEncounterPoolByChallenge` con `monoType` + lookup `TYPE_TO_IDS_MAP` (già implementato). UI select 18 tipi da reintrodurre. Stesso fix: filtraggio negli handler `onSelect()`.
 
 ---
 
