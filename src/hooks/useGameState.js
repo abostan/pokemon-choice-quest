@@ -203,7 +203,7 @@ export function useGameState() {
 
   const generation = state.generationId ? getGeneration(state.generationId) : null;
   const isPostgame =
-    (state.completedGensCount || 0) >= 8 ||
+    (state.completedGensCount || 0) >= GENERATIONS.length ||
     (generation && state.gymIndex >= generation.gymLeaders.length) ||
     (state.phase && state.phase.startsWith("postgame")) ||
     (state.phase && state.phase.startsWith("champions")) ||

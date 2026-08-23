@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
 import { computeTeamPower, computeWinChance, rollBattle, TACTICS } from "../engine/battleLogic.js";
 import { useTeamStats } from "../hooks/useTeamStats.js";
-import { getItemDescription } from "../data/items.js";
+import { getItemDescription, groupItemsByName } from "../data/items.js";
 import { computeTypeEffectiveness } from "../engine/typeMatchup.js";
 import { computeMegaPower } from "../engine/megaLogic.js";
 import { playMegaSound, playVictoryJingle } from "../engine/soundEngine.js";
@@ -264,21 +264,22 @@ export function BattleScene({
         e(
           "div",
           { className: "battle-item-list" },
-          items.map((itemName, idx) => {
+          groupItemsByName(items).map(({ name: itemName, count, firstIndex }) => {
             const desc = getItemDescription(itemName);
+            const label = count > 1 ? `${itemName} x${count}` : itemName;
             return e(
               "span",
-              { key: `${itemName}-${idx}`, className: "battle-item-row" },
+              { key: itemName, className: "battle-item-row" },
               e(
                 "button",
                 {
                   className: `battle-item-btn ${usedItem?.name === itemName ? "used" : ""}`,
                   disabled: usedItem !== null,
                   title: `${itemName}: ${desc}`,
-                  onClick: () => handleUseItem(idx),
+                  onClick: () => handleUseItem(firstIndex),
                 },
                 e(ItemIcon, { name: itemName, size: 16 }),
-                ` ${itemName}`
+                ` ${label}`
               ),
               e(TapTooltip, { text: `${itemName}: ${desc}`, as: "span", className: "battle-item-info" }, "ⓘ")
             );

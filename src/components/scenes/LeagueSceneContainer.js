@@ -18,6 +18,7 @@ export function LeagueSceneContainer({ game }) {
     handleNuzlockeLoss,
     checkNextGeneration,
     useItem,
+    addItem,
   } = game;
 
   if (state.phase === "nextGenSelect") {
@@ -108,6 +109,7 @@ export function LeagueSceneContainer({ game }) {
           if (won) {
             if (state.isNuzlocke) unlockAchievement("nuzlockeMaster");
             resolveBattleWin(champion.badge);
+            addItem("Master Ball");
             addHallOfFameEntry({
               genName: generation.name,
               team: state.team,

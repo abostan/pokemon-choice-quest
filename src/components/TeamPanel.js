@@ -1,6 +1,6 @@
 import React from "react";
 import { PokemonChip } from "./PokemonSprite.js";
-import { getItemDescription } from "../data/items.js";
+import { getItemDescription, groupItemsByName } from "../data/items.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 import { computeTeamPower } from "../engine/battleLogic.js";
 import { usePokemon } from "../hooks/usePokemon.js";
@@ -259,16 +259,17 @@ export function TeamPanel({
       : e(
           "ul",
           { className: "inventory-list" },
-          items.map((it, idx) => {
-            const desc = getItemDescription(it);
+          groupItemsByName(items).map(({ name, count }) => {
+            const desc = getItemDescription(name);
+            const label = count > 1 ? `${name} x${count}` : name;
             return e(
               "li",
               {
-                key: `${it}-${idx}`,
+                key: name,
                 className: "inventory-item-row",
-                title: `${it}: ${desc}`,
+                title: `${name}: ${desc}`,
               },
-              e("span", { className: "inventory-item-name" }, e(ItemIcon, { name: it }), ` ${it}`),
+              e("span", { className: "inventory-item-name" }, e(ItemIcon, { name }), ` ${label}`),
               e("span", { className: "inventory-item-tooltip" }, desc)
             );
           })

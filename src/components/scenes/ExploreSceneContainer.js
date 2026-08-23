@@ -118,13 +118,7 @@ export function ExploreSceneContainer({ game }) {
         id: "wanderingMerchant",
         label: "🛒 Mercante Ambulante di Strumenti Rari",
         hint: "Acquista pietre evolutive, Caramelle Rare o Master Ball",
-        onSelect: () => {
-          const merchantItems = ["Caramella Rara", "Resti", "Assorbosfera", "Master Ball"];
-          const bought = merchantItems[Math.floor(Math.random() * merchantItems.length)];
-          addItem(bought);
-          update({ postgameRound: state.postgameRound + 1 });
-          setTimeout(() => startPostgameExplore(), 0);
-        },
+        onSelect: () => goTo("merchant"),
       },
       {
         id: "casinoGameCorner",
@@ -587,17 +581,7 @@ export function ExploreSceneContainer({ game }) {
       weight: EXPLORE_SPECIAL_WEIGHTS.wanderingMerchant,
       label: "🛒 Mercante Ambulante di Strumenti",
       hint: "Acquista pietre evolutive rare o Caramelle Rare con i tuoi Pokédollari",
-      onSelect: () => {
-        const merchantItems = ["Pietra Focaia", "Idropietra", "Pietra Foglia", "Pietra Tuono", "Pietraluna", "Caramella Rara"];
-        const boughtItem = merchantItems[Math.floor(Math.random() * merchantItems.length)];
-        addItem(boughtItem);
-        if (boughtItem === "Caramella Rara") {
-          boostTeam(2);
-        } else {
-          boostTeam(1);
-        }
-        goTo("gymBattle");
-      },
+      onSelect: () => goTo("merchant"),
     },
     {
       id: "casinoGameCorner",

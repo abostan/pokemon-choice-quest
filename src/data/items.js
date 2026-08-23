@@ -12,6 +12,11 @@ export const ITEM_DESCRIPTIONS = {
   "Pietra Idrica": "Pietra evolutiva elementale dell'acqua. Aumenta la potenza di battaglia di +14.",
   "Pietra Folletto": "Pietra incantata ricca di energia magica. Aumenta la potenza di battaglia di +14.",
   "Pietra Brillante": "Pietra che brilla di una luce intensa. Aumenta la potenza di battaglia di +14.",
+  "Pietra Focaia": "Pietra evolutiva rossa e ardente. Aumenta la potenza di battaglia di +14.",
+  "Idropietra": "Pietra evolutiva blu intriso d'acqua. Aumenta la potenza di battaglia di +14.",
+  "Pietra Foglia": "Pietra evolutiva verde a forma di foglia. Aumenta la potenza di battaglia di +14.",
+  "Pietra Tuono": "Pietra evolutiva gialla carica di elettricità. Aumenta la potenza di battaglia di +14.",
+  "Pietraluna": "Pietra evolutiva scura che emette un tenue bagliore lunare. Aumenta la potenza di battaglia di +14.",
   "Foglia Strana": "Foglia aromatica speciale. Rinfresca la squadra e dona +10 Potenza.",
   "Biscotto Lavarone": "Famoso biscotto curativo di Lavarone. Rigenera la squadra (+10 Potenza).",
   "Miele": "Miele profumato e dolcissimo. Attira la fortuna in battaglia (+10 Potenza).",
@@ -43,6 +48,11 @@ export const ITEM_POKEAPI_SLUGS = {
   "Pietra Solare": "sun-stone",
   "Pietra Idrica": "water-stone",
   "Pietra Brillante": "shiny-stone",
+  "Pietra Focaia": "fire-stone",
+  "Idropietra": "water-stone",
+  "Pietra Foglia": "leaf-stone",
+  "Pietra Tuono": "thunder-stone",
+  "Pietraluna": "moon-stone",
   "Pallina Esca": "poke-toy",
   "Resti": "leftovers",
   "Revitalizzante": "revive",
@@ -51,6 +61,28 @@ export const ITEM_POKEAPI_SLUGS = {
   "Assorbosfera": "absorb-bulb",
   "Miele": "honey",
 };
+
+/**
+ * Raggruppa un array di oggetti (con eventuali duplicati) per nome, contando
+ * le occorrenze e ricordando l'indice della prima copia nell'array originale
+ * (utile per consumare un oggetto per indice, es. `useItem`, senza dover
+ * cambiare la struttura dati sottostante ad array-con-duplicati).
+ * @param {string[]} items
+ * @returns {Array<{ name: string, count: number, firstIndex: number }>}
+ */
+export function groupItemsByName(items) {
+  const groups = [];
+  const indexByName = new Map();
+  (items || []).forEach((name, idx) => {
+    if (indexByName.has(name)) {
+      groups[indexByName.get(name)].count += 1;
+    } else {
+      indexByName.set(name, groups.length);
+      groups.push({ name, count: 1, firstIndex: idx });
+    }
+  });
+  return groups;
+}
 
 /**
  * Restituisce la descrizione di uno strumento dato il suo nome.

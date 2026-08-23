@@ -9,6 +9,7 @@ import { ResumeScreen } from "./ResumeScreen.js";
 import { NuzlockeGameOverScreen } from "./NuzlockeGameOverScreen.js";
 import { TournamentScene } from "./TournamentScene.js";
 import { PokeCenterScene } from "./PokeCenterScene.js";
+import { MerchantScene } from "./MerchantScene.js";
 import { ExploreSceneContainer } from "./scenes/ExploreSceneContainer.js";
 import { GymBattleSceneContainer } from "./scenes/GymBattleSceneContainer.js";
 import { LeagueSceneContainer } from "./scenes/LeagueSceneContainer.js";
@@ -112,6 +113,36 @@ export function SceneRouter({ game }) {
         }));
         update({ team: updatedTeam });
       },
+      onBuyItem: (itemName, price) => {
+        addItem(itemName);
+        update({ coins: Math.max(0, (state.coins || 0) - price) });
+      },
+      onLeave: () => {
+        if (isPostgame) goTo("postgameExplore");
+        else goTo("gymBattle");
+      },
+    });
+  }
+
+  if (state.phase === "merchant") {
+    const pool = isPostgame
+      ? [
+          { name: "Caramella Rara", price: 5 },
+          { name: "Resti", price: 6 },
+          { name: "Assorbosfera", price: 6 },
+          { name: "Master Ball", price: 10 },
+        ]
+      : [
+          { name: "Pietra Focaia", price: 4 },
+          { name: "Idropietra", price: 4 },
+          { name: "Pietra Foglia", price: 4 },
+          { name: "Pietra Tuono", price: 4 },
+          { name: "Pietraluna", price: 4 },
+          { name: "Caramella Rara", price: 5 },
+        ];
+    return e(MerchantScene, {
+      coins: state.coins || 0,
+      pool,
       onBuyItem: (itemName, price) => {
         addItem(itemName);
         update({ coins: Math.max(0, (state.coins || 0) - price) });

@@ -1,7 +1,16 @@
 import React, { useState, useRef } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
+import { getTypeIcon } from "../data/types.js";
 
 const e = React.createElement;
+
+function getModeBadges(savedState) {
+  const badges = [];
+  if (savedState.isNuzlocke) badges.push("💀 Nuzlocke");
+  if (savedState.isRandomizer) badges.push("🎲 Randomizer");
+  if (savedState.monoType) badges.push(`${getTypeIcon(savedState.monoType)} Mono-${savedState.monoType}`);
+  return badges.length > 0 ? badges.join(" · ") : "Standard";
+}
 
 /**
  * Single Slot Card component
@@ -70,7 +79,8 @@ function SlotCard({ slotId, data, isSelected, onSelect, onResume, onNewGame, onD
             e("div", { className: "resume-stat" }, e("span", { className: "resume-label" }, "Regione"), e("span", null, genName)),
             e("div", { className: "resume-stat" }, e("span", { className: "resume-label" }, "Progresso"), e("span", null, gymText)),
             e("div", { className: "resume-stat" }, e("span", { className: "resume-label" }, "Pokémon"), e("span", null, `${teamSize} in squadra`)),
-            e("div", { className: "resume-stat" }, e("span", { className: "resume-label" }, "Livello max"), e("span", null, maxLevel > 0 ? `Lv${maxLevel}` : "—"))
+            e("div", { className: "resume-stat" }, e("span", { className: "resume-label" }, "Livello max"), e("span", null, maxLevel > 0 ? `Lv${maxLevel}` : "—")),
+            e("div", { className: "resume-stat", style: { gridColumn: "1 / -1" } }, e("span", { className: "resume-label" }, "Modalità"), e("span", null, getModeBadges(savedState)))
           ),
           teamSize > 0 &&
             e(
@@ -133,7 +143,7 @@ export function ResumeScreen({ slots, selectedSlotId, onSelectSlot, onResume, on
     { className: "panel resume-screen-multi" },
     e("div", { className: "resume-icon" }, "💾"),
     e("h2", { className: "scene-title" }, "Gestione Salvataggi"),
-    e("p", { className: "scene-text" }, "Seleziona uno dei 3 slot per continuare o iniziare una nuova avventura."),
+    e("p", { className: "scene-text" }, "Seleziona uno degli slot per continuare o iniziare una nuova avventura."),
 
     e(
       "div",

@@ -4,7 +4,7 @@
 import { sanitizeGameState } from "./saveSanitizer.js";
 
 const SAVE_VERSION = 1;
-const DEFAULT_SLOTS = [1, 2, 3];
+const DEFAULT_SLOTS = [1, 2, 3, 4, 5];
 
 // Campi dello state che NON vanno salvati (stato transiente della scena corrente)
 const SKIP_FIELDS = ["pendingEncounterPool", "pendingEncounterLevel", "pokedexOpen", "pendingEvolutions", "boxModalOpen"];
@@ -16,7 +16,7 @@ function getSlotKey(slotId = 1) {
 /**
  * Serializza e salva lo stato di gioco su uno specifico slot in localStorage.
  * @param {object} state - Lo stato React dell'app
- * @param {number} slotId - Indice dello slot (1, 2, 3)
+ * @param {number} slotId - Indice dello slot (1-5)
  */
 export function saveGame(state, slotId = 1) {
   try {
@@ -41,7 +41,7 @@ export function saveGame(state, slotId = 1) {
 /**
  * Carica e valida il salvataggio da uno specifico slot in localStorage.
  * Supporta la retro-compatibilità con il vecchio pcq_save_v1.
- * @param {number} slotId - Indice dello slot (1, 2, 3)
+ * @param {number} slotId - Indice dello slot (1-5)
  * @returns {{ state: object, savedAt: string, slotId: number } | null}
  */
 export function loadGame(slotId = 1) {
@@ -69,7 +69,7 @@ export function loadGame(slotId = 1) {
 }
 
 /**
- * Carica le informazioni riassuntive di tutti i 3 slot per la ResumeScreen.
+ * Carica le informazioni riassuntive di tutti gli slot per la ResumeScreen.
  * @returns {Array<{ slotId: number, data: object|null }>}
  */
 export function loadAllSlots() {
