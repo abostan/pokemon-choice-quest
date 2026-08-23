@@ -6,6 +6,13 @@ Il progetto attuale è arrivato a 9 generazioni, decine di meccaniche e ~50 file
 
 Ogni milestone elenca **cosa costruire** e **perché in quell'ordine**, con riferimento diretto a un episodio reale di questo progetto quando ce n'è uno pertinente.
 
+> **Aggiornamento**: le idee nate discutendo di come gestiamo oggi i pool di
+> Pokémon (pool combinatori Generazione × Tipo invece di array curati a
+> mano, registri unici per bivi/oggetti/achievement, type-checking dev-only)
+> sono state integrate direttamente nelle milestone pertinenti (0, 0bis, 3,
+> 4, 5, 7, 8, 10) invece di vivere in un documento separato — vedi
+> `IDEE_REFACTORING_DATI.md` per la discussione originale, ora confluita qui.
+
 ---
 
 ## 🏛️ Milestone 0 — Decisioni fondazionali (prima di scrivere una sola feature)
@@ -13,9 +20,11 @@ Ogni milestone elenca **cosa costruire** e **perché in quell'ordine**, con rife
 Decisioni che costano pochissimo a monte e moltissimo a valle se rimandate — tutte cose che in questo progetto sono finite in backlog "da valutare" (`ROADMAP.md` Fase 9) invece che essere state decise all'inizio.
 
 - **Build tooling, una volta sola**: zero-build (React da CDN, `React.createElement`) oppure TypeScript + build step. Non è una scelta sbagliata in sé (per questo progetto zero-build ha funzionato bene finché è rimasto piccolo), ma va presa *prima* di scrivere il primo componente — cambiarla a metà strada su 50+ file costa ordini di grandezza di più che deciderla al commit zero.
+- **Type-checking leggero, dev-only, deciso insieme a "zero-build"**: le due cose non sono in conflitto — si può restare zero-build in produzione (il gioco continua a essere servito via CDN senza bundler) e avere comunque `JSDoc` (`@typedef`/`@param`) più uno script `npm run typecheck` (`tsc --checkJs --noEmit`, mai eseguito a runtime) o anche solo ESLint con le regole base (`no-undef`, `no-unused-vars`). **Episodio reale**: nella sessione che ha portato a questo documento, un refactor ha introdotto `export { MAX_LEVEL } from "..."` invece di un'importazione normale — sintatticamente valido, ma `MAX_LEVEL` non era un binding utilizzabile nello stesso file, causando un `ReferenceError` scoperto solo dall'utente in produzione (screenshot della console). `no-undef` l'avrebbe segnalato al salvataggio del file, `node --check` (usato di fatto come unica rete di sicurezza) valida solo la sintassi, non i binding.
 - **Contratto/schema dei dati di contenuto**: definire fin da subito la forma esatta di "una generazione" (starter, tier di esplorazione, 8 capipalestra, alto comando, campione, rivale, boss, leggendari) come un contratto scritto — anche solo un commento o un tipo — invece di lasciare che emerga implicitamente scrivendo Kanto e poi copiando il pattern a mano per le altre 8 regioni.
 - **i18n sì/no, deciso una volta**: se si vuole mai supportare più lingue, le stringhe vanno estratte in un dizionario dal primo componente, non dopo che decine di componenti hanno testo italiano inline nel JSX (situazione attuale, `ROADMAP.md` Fase 9).
 - **CI attiva dal primo commit**: anche solo `npm test` su push, da subito — non aggiunta dopo 8 versioni quando i test esistono già ma nessuno li fa girare automaticamente.
+- **Un solo documento "se ripartissimo da zero", non N**: anche la documentazione va decisa a Milestone 0 — un indice in cima al README che spiega a cosa serve ciascun file `.md` evita che si accumulino documenti che si sovrappongono senza che sia chiaro quale sia la fonte di verità (situazione che il progetto reale ha rischiato più volte, incluso durante la stesura di questo stesso documento).
 
 ---
 
@@ -50,6 +59,11 @@ src/
     explore/
       explorePicker.js
       explorePicker.test.js
+      poolBuilder.js           # Generazione × Tipo → pool di incontro (Milestone 3)
+      poolBuilder.test.js
+    achievements/
+      achievementRules.js      # evento di gioco → quali achievement sblocca (pura, no UI)
+      achievementRules.test.js
     economy/
       casinoLogic.js
       weatherLogic.js
@@ -66,7 +80,15 @@ src/
       hoenn.js
       ...                    # una regione per file, non un unico generations.js monolitico
       index.js                # aggrega ed esporta GENERATIONS = [...]
-    items.js
+    pokemonTypes.js            # id → tipi per tutte le specie, generato una tantum (Milestone 3)
+    exploreOptions.js          # UN registro per ogni bivio (id, pesi, tipi della zona, hint) —
+                                # sia il componente sia gli script di simulazione leggono da qui
+    items.js                   # UN registro per oggetto (nome, icona, descrizione, effetto,
+                                # dove si ottiene) invece di sparso fra 3-4 file (Milestone 4)
+    achievements.js             # solo il catalogo (id, titolo, icona, descrizione) — le regole
+                                # di sblocco vivono in core/achievements/ (Milestone 8)
+    balanceConstants.js         # tutti i numeri di bilanciamento (soglie, minimi, quante opzioni
+                                # per bivio) in un solo posto, non uno per file che li usa
     abilities.js
     natures.js
     types.js
@@ -89,8 +111,7 @@ src/
     casino/
       CasinoScene.js
     achievements/
-      AchievementsModal.js
-      achievements.js
+      AchievementsModal.js       # legge il catalogo da content/achievements.js
       AchievementToast.js       # notifica a schermo nativa fin da subito (Milestone 8)
     hallOfFame/
       HallOfFameModal.js
@@ -120,6 +141,9 @@ tests/
 
 scripts/
   analyze-run-log.mjs
+  simulate-pool-balance.mjs   # frequenza bivi, dimensione pool, raggiungibilità Pokédex —
+                               # riusa sempre core/content pure, mai una copia (Milestone 3/5)
+  generate-pokemon-types.mjs  # rigenera content/pokemonTypes.js da PokeAPI, una tantum
 ```
 
 **Le tre regole che guidano questa struttura:**
@@ -136,7 +160,7 @@ Prima riga di codice "di gioco" scritta: **non un componente**, ma i moduli di l
 
 - `battleLogic.js`: potenza squadra, probabilità di vittoria, probabilità di cattura — pure funzioni, input/output, niente `Math.random()` non iniettato, niente stato React.
 - Macchina a stati del gioco come **funzioni pure indipendenti da React** fin dall'origine (`computeIsPostgame`, `resolveAfterGymBattle`, `checkNextGeneration`...) — mai logica di transizione scritta *dentro* un hook `useState`/`setState`.
-- Sanitizzatore/whitelist dello state salvato, presente fin dal primo campo di stato — non aggiunto quando un campo dimenticato causa già un crash in produzione.
+- Sanitizzatore/whitelist dello state salvato, presente fin dal primo campo di stato — non aggiunto quando un campo dimenticato causa già un crash in produzione. Progettato fin da subito come **catena di migrazioni versionate** (`v1→v2`, `v2→v3`, applicate in ordine) invece di un'unica funzione che deve conoscere tutte le forme storiche contemporaneamente: nel progetto reale un solo campo che cambia tipo (`rivalDone` booleano→numero, per modellare un Rivale che ricompare più volte) ha già richiesto un ramo di retro-compatibilità dedicato — con più campi che cambiano forma nel tempo, una funzione piatta cresce linearmente con la storia del progetto invece che con le sue esigenze attuali.
 
 **Perché per primo**: nel progetto reale, i tre bug più seri mai trovati (il loop di re-render infinito di Randomizer/Mono-Type, il crash `starterIds` al cambio regione per un campo mancante nel sanitizzatore, e `isPostgame` che saltava le palestre di Paldea) sono *tutti* nati da logica di stato scritta dentro componenti/hook invece che in moduli puri testabili in isolamento. Costruire questo layer per primo, con test da subito, previene l'intera classe invece di scoprirla bug per bug nelle versioni successive.
 
@@ -156,10 +180,11 @@ Prima riga di codice "di gioco" scritta: **non un componente**, ma i moduli di l
 ## 🧪 Milestone 3 — Validatore di contenuti, poi la seconda regione
 
 - Un test generico di integrità dati (schema-check) che scorre *qualunque* generazione e verifica: numero di capipalestra atteso, potenza crescente, `teamIds` validi, presenza di alto comando/campione, tipo risolvibile per ogni id usato nei pool.
-- **Solo dopo** aver scritto questo validatore, si scrive Johto — usandolo come guardrail immediato: se manca qualcosa, fallisce un test a scrittura, non un giocatore mesi dopo in produzione.
+- **`content/pokemonTypes.js` (id → tipi) e `core/explore/poolBuilder.js` scritti qui, non dopo**: i pool di incontro per zona (Fuoco, Spettro, Ghiaccio...) **si generano** da Generazione × insieme di tipi (`buildTypePool(generationId, ["fire", "ground", "rock"])`), invece di essere array scritti a mano per ogni regione. Le zone che non sono tassonomiche per natura (Safari, Fossili, Uovo Misterioso, Scambio NPC) restano curate a mano — non tutto deve diventare combinatorio, solo ciò che ha davvero un asse naturale (tipo, generazione) dietro.
+- **Solo dopo** aver scritto questo validatore (e il generatore di pool), si scrive Johto — usandolo come guardrail immediato: se manca qualcosa, fallisce un test a scrittura, non un giocatore mesi dopo in produzione.
 - Multi-slot di salvataggio, PC Box e transizione della squadra fra regioni.
 
-**Perché in questo ordine e non prima/dopo**: nel progetto reale il validatore di integrità dati non esiste tuttora (è ancora in backlog, `ROADMAP.md` Fase 10) e due bug diversi sono nati esattamente dalla sua assenza — il filtro Mono-Type che restituiva risultati sbagliati per Johto e oltre perché la tabella tipi copriva solo Kanto, e `isPostgame` che non si accorgeva della nona regione. Scrivere il validatore *prima* della seconda regione, invece che scoprirne la mancanza alla nona, rende ogni nuova regione un'aggiunta meccanica e sicura invece che un rischio.
+**Perché in questo ordine e non prima/dopo**: nel progetto reale il validatore di integrità dati non esiste tuttora (è ancora in backlog, `ROADMAP.md` Fase 10) e più bug sono nati esattamente dalla sua assenza — il filtro Mono-Type che restituiva risultati sbagliati per Johto e oltre perché la tabella tipi copriva solo Kanto, `isPostgame` che non si accorgeva della nona regione, e — episodio più recente, nato proprio scrivendo questo documento — un simulatore statistico costruito apposta (`scripts/simulate-pool-balance.mjs` nell'idea di questo documento) che ha scoperto **3 regioni su 9 senza alcun pool dedicato per 7 zone a tema** (ricadevano tutte sullo stesso fallback generico) e una zona (`iceZone`) mai sopra le 4 specie in *nessuna* delle 9 regioni — scoperto solo dopo aver costruito lo strumento apposta per cercarlo, non prima. Con i pool generati invece che scritti a mano, questa intera classe di bug (regione dimenticata, pool troppo piccolo) diventa strutturalmente impossibile invece di doverla scoprire a campione. Scrivere il validatore *e* il generatore *prima* della seconda regione, invece che scoprirne la mancanza alla nona, rende ogni nuova regione un'aggiunta meccanica e sicura invece che un rischio.
 
 ---
 
@@ -167,6 +192,7 @@ Prima riga di codice "di gioco" scritta: **non un componente**, ma i moduli di l
 
 - Pokédollari, PokéMart, cura della squadra — **con un vero effetto meccanico da subito** (nel progetto reale "Cura la Squadra" è rimasto un no-op puramente cosmetico per diverse versioni prima di ricevere un senso reale in Fase 8).
 - Oggetti con effetti differenziati fin dall'inizio (cura %, cattura, XP...), non solo "+N Potenza" con il numero che cambia — lezione diretta da Fase 11 del progetto reale, dove quasi tutti gli strumenti fanno la stessa cosa.
+- **Un registro per oggetto, non un oggetto sparso fra file**: `content/items.js` come unica fonte (nome, icona, descrizione, effetto, dove si ottiene) letta sia dallo shop sia dalla battaglia sia dai pool tematici — nel progetto reale la stessa informazione su un oggetto vive in 3-4 file diversi (`items.js` per la descrizione, `itemEffects.js` per l'effetto, gruppi tematici duplicati nei pool di esplorazione), e aggiungerne uno nuovo richiede ricordarsi di toccarli tutti.
 - Evoluzioni, gestione Box.
 
 **Perché qui**: è la prima meccanica trasversale (tocca esplorazione, battaglia, e progressione), quindi conviene stabilizzarla prima di scalare a più regioni e prima di aggiungere meccaniche di battaglia avanzate che si appoggeranno sugli stessi oggetti.
@@ -175,9 +201,9 @@ Prima riga di codice "di gioco" scritta: **non un componente**, ma i moduli di l
 
 ## 🗺️ Milestone 5 — Contenuto a scala: le altre 7 regioni
 
-- Con schema + validatore + economia già solidi (Milestone 0/3/4), aggiungere le regioni 3-9 diventa un lavoro meccanico e ripetibile invece che un rischio crescente.
-- Pool di incontro **larghi fin dall'inizio** (8-10 id per zona/tier, non 3-4) — lezione diretta da Fase 11, dove i pool scritti a mano nella prima stesura non sono mai stati riallargati e oggi sembrano ripetitivi.
-- Tabella tipi **completa per ogni id usato nei pool di ogni regione scritta**, non solo per Kanto — lezione diretta dal bug Mono-Type Johto.
+- Con schema + validatore + generatore di pool + economia già solidi (Milestone 0/3/4), aggiungere le regioni 3-9 diventa un lavoro meccanico e ripetibile invece che un rischio crescente: una nuova regione eredita automaticamente pool di incontro dimensionati correttamente su ogni zona, perché generati da `poolBuilder.js` invece di scritti a mano una per una.
+- Tabella tipi **completa per ogni id usato nei pool di ogni regione scritta**, non solo per Kanto — lezione diretta dal bug Mono-Type Johto (risolta strutturalmente qui, dato che `content/pokemonTypes.js` copre tutte le specie fin dalla Milestone 3, non aggiunta regione per regione).
+- **Un controllo di raggiungibilità del Pokédex nazionale come parte del validatore**, non uno strumento scoperto a posteriori: verificare che ogni specie non-leggendaria sia raggiungibile da almeno un pool (direttamente, o tramite la catena di evoluzioni) evita di scoprire — come nel progetto reale, con un simulatore costruito ad hoc molti mesi dopo — che una regione intera raggiunge solo il 71% delle proprie specie, o che la tabella evoluzioni stessa contiene coppie id sbagliate (nel progetto reale, verificando questo controllo, sono emersi **3 bug reali pre-esistenti in `evolutions.js`**: due specie mappate su id completamente sbagliati per una svista di battitura, risalenti probabilmente alla stesura iniziale della tabella e mai scoperti perché nessun controllo incrociava gli id con una fonte esterna).
 
 **Perché solo ora**: scalare a 9 regioni prima di avere un validatore automatico è esattamente come è andata nel progetto reale — funziona, ma nasconde silenziosamente buchi (dati mancanti, soglie non aggiornate) che emergono uno alla volta, a distanza di versioni, invece che tutti insieme e subito.
 
@@ -197,6 +223,7 @@ Prima riga di codice "di gioco" scritta: **non un componente**, ma i moduli di l
 
 - Nuzlocke, Randomizer, Mono-Type — **solo dopo** che pool di incontro e tabella tipi sono completi e validati (Milestone 3/5): sono filtri sopra dati che devono già essere corretti, non features indipendenti.
 - Torneo dei Campioni, modalità post-game infinita — con il pool di bivi speciali dimensionato fin dall'inizio in proporzione al numero di voci reali disponibili (nel progetto reale il post-game mostra 4 bivi estratti da un catalogo di 20, un'incoerenza mai corretta finché non è stata segnalata, Fase 11).
+- **I bivi come registro dati (`content/exploreOptions.js`), non come oggetti letterali dentro il componente**: nel progetto reale, l'elenco delle opzioni post-game esiste *solo* dentro `ExploreSceneContainer.js` — al punto che lo script di analisi statistica ha dovuto mantenere una propria copia manuale dello stesso elenco di id, commentata esplicitamente come "va tenuta in sync a mano" (un rischio di disallineamento introdotto consapevolmente per mancanza di un'alternativa). Con un registro unico, sia il componente sia qualunque script di analisi leggono la stessa lista.
 
 **Perché qui e non prima**: nel progetto reale, Randomizer e Mono-Type sono state scritte, poi disabilitate per un bug di re-render (Milestone 1 assente all'epoca), poi riattivate, poi scoperte comunque parzialmente rotte per dati di tipo incompleti (Milestone 3/5 assenti all'epoca). Costruirle per ultime, sopra fondamenta già solide, evita tutti e tre questi giri.
 
@@ -205,6 +232,7 @@ Prima riga di codice "di gioco" scritta: **non un componente**, ma i moduli di l
 ## 🏆 Milestone 8 — Meta-progressione & retention
 
 - Achievement, **con notifica a schermo fin dal primo achievement scritto** — non aggiunta dopo, quando già esistono 4 trofei silenziosi che si scoprono solo aprendo un modale a mano (situazione reale attuale, Fase 11).
+- **Achievement sbloccati da eventi, non da chiamate sparse nella logica di gioco**: nel progetto reale `unlockAchievement(id)` viene chiamato da punti diversi e lontani tra loro (`GymBattleSceneContainer.js`, `LeagueSceneContainer.js`, `SceneRouter.js`, `useGameState.js`) — la logica di battaglia/esplorazione deve "sapere" esplicitamente quali achievement esistono. Con `core/achievements/achievementRules.js` puro (evento tipizzato → quali id sblocca) e la logica di gioco che si limita a emettere eventi generici (`gymBattleWon`, `legendaryCaught`, `championDefeated`), aggiungere un achievement non richiede più toccare il codice di gioco che lo determina.
 - Sala della Fama, punteggio/grado di vittoria.
 - Pokédex nazionale + numerazione regionale.
 
@@ -224,6 +252,9 @@ Prima riga di codice "di gioco" scritta: **non un componente**, ma i moduli di l
 ## 🎨 Milestone 10 — Polish, accessibilità, tooling di lungo periodo
 
 - Temi visivi, responsive mobile, effetti particellari, onboarding.
+- Un componente `<Badge variant="...">` condiviso invece di una classe CSS quasi identica per ogni badge (`.new-species-badge`, `.ball-lure-badge`, `.legendary-badge`, `.caught-badge` nel progetto reale — nate una alla volta, mai consolidate).
+- `content/balanceConstants.js`: tutti i numeri di tuning del gioco (soglie di dominazione, dimensione minima di un pool, quante opzioni mostrare per bivio) in un solo file, non uno per ciascun modulo che li usa — utile soprattutto negli stessi cicli di ribilanciamento già capitati più volte nel progetto reale.
+- Un util di test condiviso per il PRNG seedato usato nelle simulazioni (`mulberry32`) invece che duplicato identico in più file di test/script, come accaduto nel progetto reale.
 - Solo qui rivalutare TypeScript/coverage/riorganizzazione cartelle per-feature (le voci di Fase 9 del progetto reale) — decisioni di tooling a lungo termine che vanno prese quando si sa davvero quanto il progetto è cresciuto, non a scatola chiusa a inizio Milestone 0 (quella era la decisione binaria "zero-build sì/no"; questa è "vale la pena investire di più ora che il progetto è grande davvero").
 
 **Perché per ultimo**: è tutto lavoro a basso rischio e alto valore percepito ma zero impatto sulla correttezza del gioco — l'esatto opposto delle Milestone 1/3, dove un errore di fondazione si paga per tutte le versioni successive.

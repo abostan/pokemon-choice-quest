@@ -178,6 +178,20 @@ test("sanitizeGameState - pendingTrainer/pokedexRun: oggetto passa, altrimenti f
   assert.deepStrictEqual(sanitizeGameState({}).pokedexRun, {});
 });
 
+test("sanitizeGameState - badgesByGeneration: oggetto di array di stringhe passa, ripulito per-chiave, altrimenti {}", () => {
+  const clean = sanitizeGameState({ badgesByGeneration: { kanto: ["Medaglia Roccia", "Medaglia Cascata"], johto: [] } });
+  assert.deepStrictEqual(clean.badgesByGeneration, { kanto: ["Medaglia Roccia", "Medaglia Cascata"], johto: [] });
+
+  // Ogni valore viene comunque filtrato come array di stringhe, coerente con badges
+  const mixed = sanitizeGameState({ badgesByGeneration: { kanto: ["Medaglia Roccia", 42, null], hoenn: "non un array" } });
+  assert.deepStrictEqual(mixed.badgesByGeneration, { kanto: ["Medaglia Roccia"] });
+
+  assert.deepStrictEqual(sanitizeGameState({ badgesByGeneration: null }).badgesByGeneration, {});
+  assert.deepStrictEqual(sanitizeGameState({ badgesByGeneration: [] }).badgesByGeneration, {});
+  assert.deepStrictEqual(sanitizeGameState({ badgesByGeneration: "not an object" }).badgesByGeneration, {});
+  assert.deepStrictEqual(sanitizeGameState({}).badgesByGeneration, {});
+});
+
 test("sanitizeGameState - monoType: stringa passa, altrimenti null", () => {
   assert.strictEqual(sanitizeGameState({ monoType: "Fuoco" }).monoType, "Fuoco");
   assert.strictEqual(sanitizeGameState({ monoType: 1 }).monoType, null);

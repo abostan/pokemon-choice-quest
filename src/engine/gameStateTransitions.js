@@ -92,23 +92,33 @@ export function resolveAfterEliteBattle(state, generation) {
  * Decide la prossima fase dopo aver completato una regione (Alto Comando +
  * Campione battuti). `isGrandMaster` è true solo quando il conteggio
  * raggiunge GENERATIONS.length — il chiamante decide se sbloccare l'achievement.
+ *
+ * Archivia anche le medaglie della regione appena completata in
+ * `badgesByGeneration` (storico multi-regione, mostrato raggruppato per
+ * regione in BadgesModal.js) — questo è l'unico punto raggiunto sia se
+ * esiste una regione successiva sia se questa era l'ultima (Paldea ->
+ * postgame), quindi un solo punto di scrittura invece di uno per ramo.
+ * `state.badges` viene azzerato più tardi (quando il giocatore preme
+ * "Continua" nella schermata della nuova regione), dopo che questo
+ * snapshot è già stato preso.
  * @returns {{ phase: string, patch: object, isGrandMaster: boolean }}
  */
 export function resolveNextGeneration(state) {
   const nextGen = getNextGeneration(state.generationId);
   const newCompletedCount = (state.completedGensCount || 0) + 1;
+  const badgesByGeneration = { ...state.badgesByGeneration, [state.generationId]: state.badges };
 
   if (nextGen) {
     return {
       phase: "nextGenSelect",
-      patch: { nextGenId: nextGen.id, completedGensCount: newCompletedCount },
+      patch: { nextGenId: nextGen.id, completedGensCount: newCompletedCount, badgesByGeneration },
       isGrandMaster: false,
     };
   }
 
   return {
     phase: "postgame",
-    patch: { completedGensCount: newCompletedCount },
+    patch: { completedGensCount: newCompletedCount, badgesByGeneration },
     isGrandMaster: newCompletedCount >= GENERATIONS.length,
   };
 }

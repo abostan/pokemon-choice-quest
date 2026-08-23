@@ -41,6 +41,7 @@ export function initialState() {
     team: [],
     box: [],
     badges: [],
+    badgesByGeneration: {}, // storico { [generationId]: string[] } delle regioni già completate
     items: [],
     coins: 5,
     pendingEncounterPool: null,

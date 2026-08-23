@@ -17,14 +17,14 @@ import { ItemIcon } from "./ItemIcon.js";
 
 const e = React.createElement;
 
-function getBadgeIcon(badgeName) {
+export function getBadgeIcon(badgeName) {
   if (badgeName.includes("Campione")) return "👑";
   if (badgeName.includes("Tris")) return "🍀"; // medaglia speciale non legata ad un tipo singolo
   const type = getBadgeType(badgeName);
   return type ? getTypeIcon(type) : "🏅";
 }
 
-function BadgeItem({ name }) {
+export function BadgeItem({ name }) {
   const icon = getBadgeIcon(name);
   return e(
     "div",
@@ -101,6 +101,7 @@ export function TeamPanel({
   activeWeather = null,
   teamFatigued = false,
   onOpenBox,
+  onOpenBadges,
 }) {
   const abilities = computeTeamAbilities(team);
   const statsById = useTeamStats(team);
@@ -277,14 +278,20 @@ export function TeamPanel({
       ? e("p", { className: "empty-hint" }, "Box vuoto.")
       : e(
           "div",
-          { className: "team-list" },
-          box.slice(0, 3).map((p, idx) => e(PokemonChip, { key: `box-${p.id}-${idx}`, id: p.id, level: p.level, isShiny: p.isShiny }))
+          { className: "box-preview-grid" },
+          box.slice(0, 4).map((p, idx) => e(PokemonChip, { key: `box-${p.id}-${idx}`, id: p.id, level: p.level, isShiny: p.isShiny }))
         ),
-    box && box.length > 3 &&
-      e("p", { className: "empty-hint", style: { fontSize: "0.75rem" } }, `...e altri ${box.length - 3} nel box`),
+    box && box.length > 4 &&
+      e("p", { className: "empty-hint", style: { fontSize: "0.75rem" } }, `...e altri ${box.length - 4} nel box`),
 
     // Medaglie
-    e("h2", { style: { marginTop: "16px" } }, "Medaglie"),
+    e(
+      "div",
+      { className: "team-panel-box-row" },
+      e("h2", { style: { marginTop: "16px" } }, "Medaglie"),
+      onOpenBadges &&
+        e("button", { className: "box-open-btn", onClick: onOpenBadges }, "Vedi tutte →")
+    ),
     badges.length === 0
       ? e("p", { className: "empty-hint" }, "Nessuna medaglia ancora.")
       : e(

@@ -149,6 +149,33 @@ test("resolveNextGeneration - ultima regione, conteggio raggiunge GENERATIONS.le
   assert.strictEqual(result.isGrandMaster, true);
 });
 
+test("resolveNextGeneration - archivia le medaglie della regione appena completata in badgesByGeneration, preservando quelle già archiviate", () => {
+  const result = resolveNextGeneration({
+    generationId: "johto",
+    completedGensCount: 1,
+    badges: ["Medaglia Zanfiro", "Medaglia Nebbia"],
+    badgesByGeneration: { kanto: ["Medaglia Roccia"] },
+  });
+  assert.deepStrictEqual(result.patch.badgesByGeneration, {
+    kanto: ["Medaglia Roccia"],
+    johto: ["Medaglia Zanfiro", "Medaglia Nebbia"],
+  });
+});
+
+test("resolveNextGeneration - archivia anche nel ramo ultima regione (Paldea -> postgame), non solo quando esiste una regione successiva", () => {
+  const result = resolveNextGeneration({
+    generationId: "paldea",
+    completedGensCount: GENERATIONS.length - 1,
+    badges: ["Titolo di Campione di Paldea"],
+    badgesByGeneration: { kanto: ["Medaglia Roccia"] },
+  });
+  assert.strictEqual(result.phase, "postgame");
+  assert.deepStrictEqual(result.patch.badgesByGeneration, {
+    kanto: ["Medaglia Roccia"],
+    paldea: ["Titolo di Campione di Paldea"],
+  });
+});
+
 // --- resolvePostgameExplore ------------------------------------------------
 
 const ALL_LEGENDARIES = GENERATIONS.flatMap((gen) => gen.legendaries || []);

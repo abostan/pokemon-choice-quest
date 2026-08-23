@@ -26,6 +26,18 @@ export function sanitizeGameState(raw) {
     team: Array.isArray(raw.team) ? raw.team.filter((p) => p && typeof p.id === "number") : [],
     box: Array.isArray(raw.box) ? raw.box.filter((p) => p && typeof p.id === "number") : [],
     badges: Array.isArray(raw.badges) ? raw.badges.filter((b) => typeof b === "string") : [],
+    // Storico multi-regione: oggetto { [generationId]: string[] }, stesso
+    // criterio di pokedexRun per i salvataggi vecchi che non hanno ancora
+    // questo campo. Ogni valore viene inoltre filtrato come array di
+    // stringhe, coerente con la sanificazione già applicata a badges.
+    badgesByGeneration:
+      raw.badgesByGeneration && typeof raw.badgesByGeneration === "object" && !Array.isArray(raw.badgesByGeneration)
+        ? Object.fromEntries(
+            Object.entries(raw.badgesByGeneration)
+              .filter(([, list]) => Array.isArray(list))
+              .map(([genId, list]) => [genId, list.filter((b) => typeof b === "string")])
+          )
+        : {},
     items: Array.isArray(raw.items) ? raw.items.filter((i) => typeof i === "string") : [],
     coins: typeof raw.coins === "number" && !isNaN(raw.coins) ? Math.max(0, raw.coins) : 5,
 

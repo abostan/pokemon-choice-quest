@@ -8,6 +8,7 @@ import { ScoreCardModal } from "./components/ScoreCardModal.js";
 import { OnboardingModal } from "./components/OnboardingModal.js";
 import { SettingsModal } from "./components/SettingsModal.js";
 import { AchievementsModal } from "./components/AchievementsModal.js";
+import { BadgesModal } from "./components/BadgesModal.js";
 import { SceneRouter } from "./components/SceneRouter.js";
 import { useGameState, initialState } from "./hooks/useGameState.js";
 import { updateHistoricPokedex } from "./engine/saveGame.js";
@@ -94,6 +95,7 @@ export default function App() {
   // l'onboarding), non legato ad uno slot di salvataggio.
   const [showSettings, setShowSettings] = React.useState(false);
   const [showAchievements, setShowAchievements] = React.useState(false);
+  const [showBadges, setShowBadges] = React.useState(false);
 
   // Menu header mobile a tendina: sotto un certo numero di pulsanti (ora 8)
   // la fila orizzontale diventa ingombrante su schermi stretti anche con il
@@ -191,6 +193,15 @@ export default function App() {
 
     // Medagliere Trofei modale
     showAchievements && e(AchievementsModal, { onClose: () => setShowAchievements(false) }),
+
+    // Tutte le Medaglie modale (storico multi-regione)
+    showBadges &&
+      e(BadgesModal, {
+        badges: state.badges,
+        badgesByGeneration: state.badgesByGeneration,
+        currentGenerationId: state.generationId,
+        onClose: () => setShowBadges(false),
+      }),
 
     // Overlay Evoluzioni
     state.pendingEvolutions && state.pendingEvolutions.length > 0 &&
@@ -399,6 +410,7 @@ export default function App() {
           activeWeather: state.activeWeather,
           teamFatigued: state.teamFatigued,
           onOpenBox: () => update({ boxModalOpen: true }),
+          onOpenBadges: () => setShowBadges(true),
           onSwapTeamPosition: game.swapTeamPosition,
         })
     ),

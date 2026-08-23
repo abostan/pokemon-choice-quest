@@ -7,7 +7,7 @@ export function EndScreen({ team, badges, onRestart }) {
   return e(
     "div",
     { className: "panel end-screen" },
-    e("h2", null, "Fine dell'avventura (per ora)"),
+    e("h2", { className: "scene-title" }, "Fine dell'avventura (per ora)"),
     e(
       "p",
       { className: "scene-text" },
