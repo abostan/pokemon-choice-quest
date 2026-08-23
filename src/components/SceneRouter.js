@@ -279,9 +279,11 @@ export function SceneRouter({ game }) {
       isLegendary: isLegendary || state.pendingEncounterIsLegendary,
       hasMasterBall: hasMb,
       pokedexRun: state.pokedexRun,
+      lastEncounterId: state.lastEncounterId,
       onSeen: markSeen,
       onCaught: markCaught,
-      onResolved: ({ caught, pokemon, usedMasterBall }) => {
+      onResolved: ({ caught, pokemon, usedMasterBall, wildId }) => {
+        update({ lastEncounterId: wildId });
         if (usedMasterBall) {
           const mbIdx = state.items.indexOf("Master Ball");
           if (mbIdx !== -1) useItem(mbIdx);

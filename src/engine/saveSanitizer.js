@@ -44,6 +44,7 @@ export function sanitizeGameState(raw) {
 
     pendingEvolutions: Array.isArray(raw.pendingEvolutions) ? raw.pendingEvolutions : [],
     caughtLegendaries: Array.isArray(raw.caughtLegendaries) ? raw.caughtLegendaries : [],
+    lastEncounterId: typeof raw.lastEncounterId === "number" ? raw.lastEncounterId : null,
 
     boxModalOpen: false,
     hallOfFameOpen: false,

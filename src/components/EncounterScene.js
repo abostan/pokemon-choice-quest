@@ -23,8 +23,10 @@ const e = React.createElement;
  *  - onCaught(id, isShiny): chiamata quando il Pokémon è catturato (per il Pokédex)
  *  - onResolved({ caught, pokemon }): chiamata quando la scena finisce
  *  - pokedexRun: { [id]: { seen, caught, shiny } } — usato per mostrare il badge "già catturato"
+ *  - lastEncounterId: id dell'ultimo Pokémon selvatico incontrato (qualunque zona) —
+ *    escluso dall'estrazione se il pool ha altre opzioni, per non rivedere subito lo stesso
  */
-export function EncounterScene({ title, text, pool = [], level = 4, isLegendary = false, hasMasterBall = false, team = [], pokedexRun = {}, onSeen, onCaught, onResolved }) {
+export function EncounterScene({ title, text, pool = [], level = 4, isLegendary = false, hasMasterBall = false, team = [], pokedexRun = {}, lastEncounterId = null, onSeen, onCaught, onResolved }) {
   const isShiny = useMemo(() => {
     return Math.random() < getShinyChance(isLegendary);
   }, [isLegendary]);
@@ -40,12 +42,22 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
     return [25];
   }, [pool]);
 
+  // Esclude l'ultimo Pokémon incontrato (qualunque zona) se il pool offre
+  // altre opzioni, per non rivedere subito lo stesso due volte di fila —
+  // ininfluente sui pool a un solo id (leggendari, fossili...), che ripiegano
+  // subito sul pool intero.
+  const pickableIds = useMemo(() => {
+    if (lastEncounterId == null) return safePool;
+    const filtered = safePool.filter((id) => id !== lastEncounterId);
+    return filtered.length > 0 ? filtered : safePool;
+  }, [safePool, lastEncounterId]);
+
   const wildId = useMemo(() => {
-    const id = safePool[Math.floor(Math.random() * safePool.length)];
+    const id = pickableIds[Math.floor(Math.random() * pickableIds.length)];
     // Notifica Pokédex: visto
     if (onSeen) onSeen(id, isShiny);
     return id;
-  }, [safePool]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pickableIds]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     recordEncounter({ pokemonId: wildId, isLegendary, isShiny });
@@ -82,9 +94,9 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
 
   function handleContinue() {
     if (result?.success) {
-      onResolved({ caught: true, pokemon: { id: wildId, level, isShiny }, usedMasterBall: result.method === "masterball" });
+      onResolved({ caught: true, pokemon: { id: wildId, level, isShiny }, usedMasterBall: result.method === "masterball", wildId });
     } else {
-      onResolved({ caught: false, pokemon: null, usedMasterBall: false });
+      onResolved({ caught: false, pokemon: null, usedMasterBall: false, wildId });
     }
   }
 
@@ -128,7 +140,7 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
         ),
         e(
           "button",
-          { className: "choice-btn", onClick: () => onResolved({ caught: false, pokemon: null }) },
+          { className: "choice-btn", onClick: () => onResolved({ caught: false, pokemon: null, wildId }) },
           e("span", null, "Ignora e prosegui"),
           e("span", { className: "choice-hint" }, "Nessun rischio, ma nessuna cattura")
         )

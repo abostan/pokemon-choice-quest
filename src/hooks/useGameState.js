@@ -55,6 +55,7 @@ export function initialState() {
     activeWeather: null,
     pendingEvolutions: [],
     caughtLegendaries: [],
+    lastEncounterId: null,
     boxModalOpen: false,
     hallOfFameOpen: false,
     scoreModalOpen: false,
