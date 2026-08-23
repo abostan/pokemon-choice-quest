@@ -1,4 +1,5 @@
 import { updateHistoricPokedex } from "../engine/saveGame.js";
+import { unlockAchievement } from "../engine/achievements.js";
 
 export function usePokedexState(setState) {
   function markSeen(id, isShiny = false) {
@@ -16,6 +17,7 @@ export function usePokedexState(setState) {
   }
 
   function markCaught(id, isShiny = false) {
+    if (isShiny) unlockAchievement("firstShiny");
     setState((prev) => {
       const existing = prev.pokedexRun[id] || {};
       updateHistoricPokedex(id, true, isShiny);

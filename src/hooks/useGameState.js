@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { logger } from "../engine/logger.js";
-import { getGeneration, getNextGeneration } from "../data/generations.js";
+import { getGeneration, getNextGeneration, GENERATIONS } from "../data/generations.js";
+import { unlockAchievement } from "../engine/achievements.js";
 import { checkEvolution } from "../data/evolutions.js";
 import { filterEncounterPoolByChallenge } from "../engine/challengeEngine.js";
 import { hasSave } from "../engine/saveGame.js";
@@ -274,10 +275,12 @@ export function useGameState() {
 
   function checkNextGeneration() {
     const nextGen = getNextGeneration(state.generationId);
+    const newCompletedCount = (state.completedGensCount || 0) + 1;
     if (nextGen) {
-      goTo("nextGenSelect", { nextGenId: nextGen.id, completedGensCount: (state.completedGensCount || 0) + 1 });
+      goTo("nextGenSelect", { nextGenId: nextGen.id, completedGensCount: newCompletedCount });
     } else {
-      goTo("postgame", { completedGensCount: (state.completedGensCount || 0) + 1 });
+      if (newCompletedCount >= GENERATIONS.length) unlockAchievement("grandMaster");
+      goTo("postgame", { completedGensCount: newCompletedCount });
     }
   }
 

@@ -162,16 +162,15 @@ Un secondo bug emerso applicando il fix: il filtro veniva applicato anche ai poo
 ---
 
 ### 🏆 Fase 5: Sistema di Achievement, Impostazioni & QoL
-- [ ] **⚙️ Pannello Impostazioni (Settings Modal)**:
-  - Tasso di Shiny (*Default 1/500*, *Aumentato 1/100*, *Disattivato*).
-  - Velocità del testo e animazioni delle battaglie.
-  - Selettore Lingua (Italiano, Inglese, Spagnolo).
+- [x] **⚙️ Pannello Impostazioni (Settings Modal) — Tasso di Shiny**: nuovo `SettingsModal.js` + `engine/settings.js` (persistenza globale in `localStorage`, stesso criterio del mute audio). 3 modalità — *Default* (1/500 normali, 1/20 leggendari), *Aumentato* (1/100 normali, 1/4 leggendari), *Disattivato* (mai Shiny) — applicate in `EncounterScene.js`.
+  - [ ] Velocità del testo e animazioni delle battaglie — rimandato: oggi non esiste alcun sistema di animazione/rivelazione testo da rendere configurabile, andrebbe costruito da zero.
+  - [ ] Selettore Lingua (Italiano, Inglese, Spagnolo) — rimandato: richiederebbe tradurre l'intero gioco, sforzo molto più grande di una singola voce di backlog.
 - [ ] **🎨 Temi Visivi Personalizzabili**: selettore di temi per l'interfaccia (Dark Synthwave, Retro GameBoy Green, Classic Emerald, Cyberpunk).
-- [ ] **🏆 Medagliere Trofei & Achievement**: schermata consultabile dall'Header con trofei sbloccabili tra cui:
-  - 🌟 *"Luccichio Epico"*: Cattura il tuo primo Pokémon Shiny.
-  - 👑 *"Master Nuzlocke"*: Completa una regione in modalità Nuzlocke senza perdere l'intera squadra.
-  - 🌋 *"Monte Argento"*: Sconfiggi Rosso Leggendario nel post-game.
-  - 🌍 *"Gran Maestro dei Continenti"*: Conquista tutte e 9 le regioni in una sola run.
+- [x] **🏆 Medagliere Trofei & Achievement**: nuovo `AchievementsModal.js` + `engine/achievements.js` (persistenza globale in `localStorage`, come la Sala della Fama storica — traguardi sull'insieme delle run, non per singolo salvataggio), consultabile dal pulsante "🏆 Trofei" nell'header. 4 trofei implementati:
+  - 🌟 *"Luccichio Epico"*: Cattura il tuo primo Pokémon Shiny — sbloccato in `usePokedexState.markCaught`.
+  - 👑 *"Master Nuzlocke"*: Completa una regione in modalità Nuzlocke senza perdere l'intera squadra — sbloccato alla vittoria sul Campione con `state.isNuzlocke` attivo (se il team fosse stato spazzato del tutto, il run si sarebbe fermato prima a `nuzlockeGameOver`, quindi arrivarci implica non averlo mai perso).
+  - 🌋 *"Monte Argento"*: Sconfiggi Rosso Leggendario nel post-game — sbloccato alla vittoria contro l'"Allenatore Leggendario Rosso" in `SceneRouter.js`.
+  - 🌍 *"Gran Maestro dei Continenti"*: Conquista tutte e 9 le regioni in una sola run — sbloccato quando `completedGensCount` raggiunge `GENERATIONS.length` al termine dell'ultima regione della catena.
 - [x] **🎨 Carte Bivio in Griglia 2x2 con Border Glow**: layout a griglia con sfondi sfumati a tema per le scelte di esplorazione e bordi illuminati al passaggio del mouse.
 - [ ] **📊 Indicatore Visivo Dinamico Probabilità di Vittoria**: barra a colori cangianti (Rosso/Giallo/Verde) con riempimento animato durante la scelta della tattica di battaglia.
 - [ ] **📱 Header Responsive Compatto Mobile**: raggruppamento dei pulsanti dell'header sotto un menu a tendina "⚙️ Menu / Extra" su schermi piccoli.

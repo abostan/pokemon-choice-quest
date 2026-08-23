@@ -16,6 +16,7 @@ import { getExplorationTier } from "../data/generations.js";
 import { CHAMPIONS_TOURNAMENT } from "../data/championsTournament.js";
 import { filterStartersByChallenge } from "../engine/challengeEngine.js";
 import { addHallOfFameEntry } from "../engine/hallOfFame.js";
+import { unlockAchievement } from "../engine/achievements.js";
 import { deleteSave } from "../engine/saveGame.js";
 import { initialState } from "../hooks/useGameState.js";
 
@@ -207,6 +208,7 @@ export function SceneRouter({ game }) {
       onPowerBoost: update,
       onResolved: ({ won }) => {
         if (won) {
+          if (tr.title === "Allenatore Leggendario Rosso") unlockAchievement("silverMountain");
           boostTeam(2);
           addItem("Super Pozione");
         }

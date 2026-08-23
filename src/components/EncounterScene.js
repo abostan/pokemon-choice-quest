@@ -4,6 +4,7 @@ import { computeCaptureChance, rollCapture } from "../engine/battleLogic.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 import { playShinySound, playCaptureSound, playMasterBallSound } from "../engine/soundEngine.js";
 import { recordEncounter, recordCapture } from "../engine/runRecorder.js";
+import { getShinyChance } from "../engine/settings.js";
 
 const e = React.createElement;
 
@@ -22,9 +23,7 @@ const e = React.createElement;
  */
 export function EncounterScene({ title, text, pool = [], level = 4, isLegendary = false, hasMasterBall = false, team = [], onSeen, onCaught, onResolved }) {
   const isShiny = useMemo(() => {
-    // 1/500 chance per i selvatici normali (0.002), 1/20 (0.05) per i leggendari
-    const chance = isLegendary ? 0.05 : 0.002;
-    return Math.random() < chance;
+    return Math.random() < getShinyChance(isLegendary);
   }, [isLegendary]);
 
   useEffect(() => {

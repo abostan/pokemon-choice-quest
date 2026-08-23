@@ -6,6 +6,8 @@ import { BoxModal } from "./components/BoxModal.js";
 import { HallOfFameModal } from "./components/HallOfFameModal.js";
 import { ScoreCardModal } from "./components/ScoreCardModal.js";
 import { OnboardingModal } from "./components/OnboardingModal.js";
+import { SettingsModal } from "./components/SettingsModal.js";
+import { AchievementsModal } from "./components/AchievementsModal.js";
 import { SceneRouter } from "./components/SceneRouter.js";
 import { useGameState, initialState } from "./hooks/useGameState.js";
 import { updateHistoricPokedex } from "./engine/saveGame.js";
@@ -86,6 +88,11 @@ export default function App() {
     setShowOnboarding(false);
   }
 
+  // Impostazioni: anche questo è un pannello globale al browser (come
+  // l'onboarding), non legato ad uno slot di salvataggio.
+  const [showSettings, setShowSettings] = React.useState(false);
+  const [showAchievements, setShowAchievements] = React.useState(false);
+
   // -------------------------------------------------------
   // Barra di avanzamento
   // -------------------------------------------------------
@@ -156,6 +163,12 @@ export default function App() {
 
     // Onboarding modale (primo avvio, o riaperto manualmente)
     showOnboarding && e(OnboardingModal, { onClose: dismissOnboarding }),
+
+    // Impostazioni modale
+    showSettings && e(SettingsModal, { onClose: () => setShowSettings(false) }),
+
+    // Medagliere Trofei modale
+    showAchievements && e(AchievementsModal, { onClose: () => setShowAchievements(false) }),
 
     // Overlay Evoluzioni
     state.pendingEvolutions && state.pendingEvolutions.length > 0 &&
@@ -246,6 +259,26 @@ export default function App() {
                 title: "Apri il Pokédex",
               },
               "📖 Pokédex"
+            ),
+            e(
+              "button",
+              {
+                className: "pokedex-header-btn",
+                style: { background: "linear-gradient(135deg, #4b5563, #374151)", border: "1px solid #6b7280" },
+                onClick: () => setShowSettings(true),
+                title: "Impostazioni",
+              },
+              "⚙️ Impostazioni"
+            ),
+            e(
+              "button",
+              {
+                className: "pokedex-header-btn",
+                style: { background: "linear-gradient(135deg, #b45309, #78350f)", border: "1px solid var(--gold)" },
+                onClick: () => setShowAchievements(true),
+                title: "Medagliere Trofei",
+              },
+              "🏆 Trofei"
             ),
             e(
               "button",
