@@ -109,14 +109,21 @@ export function resolveNextGeneration(state) {
 /**
  * Decide se il prossimo passo del post-game infinito è un incontro
  * leggendario (a probabilità LEGENDARY_CHANCE, solo se ne resta almeno uno
- * non ancora catturato per questa generazione) oppure la normale esplorazione.
+ * non ancora catturato) oppure la normale esplorazione.
+ *
+ * Pesca dal pool di **tutte** le regioni in GENERATIONS, non solo quella
+ * corrente — prima era limitato a `generation.legendaries` (la singola
+ * regione in cui ci si trova, che in post-game non cambia mai): una volta
+ * catturati tutti i leggendari di quella sola regione, il roll non scattava
+ * mai più, lasciando le Ultra Bestie (Fenditura Ultra-Varco) come unica
+ * fonte rimasta di incontri rari. Segnalato da un giocatore reale.
  * @param {object} state
- * @param {object} generation
  * @param {() => number} rng iniettabile per i test, default Math.random
  * @returns {{ phase: string, patch: object }}
  */
-export function resolvePostgameExplore(state, generation, rng = Math.random) {
-  const availableLegendaries = (generation?.legendaries || []).filter(
+export function resolvePostgameExplore(state, rng = Math.random) {
+  const allLegendaries = GENERATIONS.flatMap((gen) => gen.legendaries || []);
+  const availableLegendaries = allLegendaries.filter(
     (id) => !(state.caughtLegendaries || []).includes(id)
   );
 

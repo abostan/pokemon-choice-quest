@@ -137,25 +137,43 @@ test("resolveNextGeneration - ultima regione, conteggio raggiunge GENERATIONS.le
 
 // --- resolvePostgameExplore ------------------------------------------------
 
-const fakeGenWithLegendaries = { legendaries: [901, 902, 903] };
+const ALL_LEGENDARIES = GENERATIONS.flatMap((gen) => gen.legendaries || []);
 
-test("resolvePostgameExplore - rng basso => incontro leggendario", () => {
+test("resolvePostgameExplore - rng basso => incontro leggendario, pescato dal pool di TUTTE le regioni", () => {
   const state = { caughtLegendaries: [], postgameRound: 0 };
-  const result = resolvePostgameExplore(state, fakeGenWithLegendaries, () => 0.01);
+  const result = resolvePostgameExplore(state, () => 0.01);
   assert.strictEqual(result.phase, "legendaryEncounter");
   assert.strictEqual(result.patch.pendingEncounterIsLegendary, true);
-  assert.ok(fakeGenWithLegendaries.legendaries.includes(result.patch.pendingEncounterPool[0]));
+  assert.ok(ALL_LEGENDARIES.includes(result.patch.pendingEncounterPool[0]));
+});
+
+test("resolvePostgameExplore - regressione: un leggendario di una regione diversa da quella corrente può comparire", () => {
+  // Prima del fix il pool era ristretto a `generation.legendaries` (la
+  // singola regione fissa in cui ci si trova in post-game) — un giocatore
+  // che ha già catturato tutti i leggendari della propria regione non
+  // vedeva mai comparire quelli delle altre 8. Qui simuliamo "ho già
+  // catturato tutti i leggendari di Kanto": deve restare disponibile
+  // almeno un leggendario di un'altra regione (es. Johto).
+  const kanto = GENERATIONS.find((g) => g.id === "kanto");
+  const johto = GENERATIONS.find((g) => g.id === "johto");
+  const state = { caughtLegendaries: [...kanto.legendaries], postgameRound: 0 };
+  const result = resolvePostgameExplore(state, () => 0.01);
+  assert.strictEqual(result.phase, "legendaryEncounter");
+  assert.ok(!kanto.legendaries.includes(result.patch.pendingEncounterPool[0]), "non deve ripescare un leggendario di Kanto già catturato");
+  assert.ok(
+    ALL_LEGENDARIES.filter((id) => !kanto.legendaries.includes(id)).includes(result.patch.pendingEncounterPool[0])
+  );
 });
 
 test("resolvePostgameExplore - rng alto => normale esplorazione post-game", () => {
   const state = { caughtLegendaries: [], postgameRound: 0 };
-  const result = resolvePostgameExplore(state, fakeGenWithLegendaries, () => 0.5);
+  const result = resolvePostgameExplore(state, () => 0.5);
   assert.deepStrictEqual(result, { phase: "postgameExplore", patch: {} });
 });
 
-test("resolvePostgameExplore - tutti i leggendari già catturati => mai un incontro, anche con rng basso", () => {
-  const state = { caughtLegendaries: [901, 902, 903], postgameRound: 0 };
-  const result = resolvePostgameExplore(state, fakeGenWithLegendaries, () => 0.01);
+test("resolvePostgameExplore - tutti i leggendari di tutte le regioni già catturati => mai un incontro, anche con rng basso", () => {
+  const state = { caughtLegendaries: [...ALL_LEGENDARIES], postgameRound: 0 };
+  const result = resolvePostgameExplore(state, () => 0.01);
   assert.strictEqual(result.phase, "postgameExplore");
 });
 

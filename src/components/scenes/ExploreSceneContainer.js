@@ -60,6 +60,15 @@ export function ExploreSceneContainer({ game }) {
       ? generation.explorationTiers[generation.explorationTiers.length - 1]
       : { grass: [25, 39, 52], fishing: [129, 60], cave: [41, 74], grass2: [63, 92], level: 30 };
     const pgLevel = Math.min(MAX_LEVEL, lastTier.level + state.postgameRound * 5);
+    // La potenza degli allenatori post-game cresceva con state.postgameRound
+    // senza alcun tetto (a differenza di pgLevel sopra, correttamente
+    // limitato a MAX_LEVEL) — dopo un centinaio di round superava facilmente
+    // i 1000 punti, ben oltre quanto una squadra al livello massimo può mai
+    // raggiungere, rendendo il post-game infinito impossibile da battere
+    // oltre un certo punto. Segnalato da un giocatore reale. Fix: la crescita
+    // si ferma allo stesso round in cui pgLevel raggiunge già MAX_LEVEL,
+    // cosa che avviene comunque una volta sola (round non-negativo).
+    const powerGrowthRound = Math.min(state.postgameRound, Math.max(0, Math.ceil((MAX_LEVEL - lastTier.level) / 5)));
 
     const postgameSpecialPool = [
       {
@@ -101,7 +110,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🌾 Parco Safari Esotico Post-Game",
         hint: "Riserva naturale di specie rare di tutte le generazioni",
         onSelect: () => {
-          const safariPool = [123, 128, 147, 246, 371, 443, 610, 696, 782, 885, 996];
+          const safariPool = [123, 128, 147, 246, 371, 443, 610, 696, 782, 885, 996, 142, 193, 359, 472, 571, 707, 866, 952];
           const chosenId = safariPool[Math.floor(Math.random() * safariPool.length)];
           goTo("encounter", {
             pendingEncounterPool: [chosenId],
@@ -115,7 +124,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🧪 Laboratorio Fossili Antichi",
         hint: "Rianima e cattura un Pokémon preistorico a Lv 50",
         onSelect: () => {
-          const fossilPool = [138, 140, 142, 345, 347, 408, 410, 564, 566, 696, 698];
+          const fossilPool = [138, 140, 142, 345, 347, 408, 410, 564, 566, 696, 698, 880, 881, 882, 883];
           const fossilId = fossilPool[Math.floor(Math.random() * fossilPool.length)];
           markCaught(fossilId, false);
           addToTeam({ id: fossilId, level: 50 });
@@ -128,7 +137,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🤝 Allenatore in cerca di Scambi",
         hint: "Scambia un Pokémon per ottenere una specie rara a livello elevato",
         onSelect: () => {
-          const tradePool = [137, 212, 468, 474, 635, 706, 959];
+          const tradePool = [137, 212, 468, 474, 635, 706, 959, 448, 475, 700, 776, 887, 983];
           const tradeId = tradePool[Math.floor(Math.random() * tradePool.length)];
           markCaught(tradeId, false);
           addToTeam({ id: tradeId, level: Math.min(MAX_LEVEL, pgLevel + 5) });
@@ -166,7 +175,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Pokémon selvatici di tipo Fuoco, Terra e Roccia",
         onSelect: () =>
           goTo("encounter", {
-            pendingEncounterPool: [58, 77, 218, 322, 554, 667, 935],
+            pendingEncounterPool: [58, 77, 218, 322, 554, 667, 935, 4, 111, 246, 328, 408, 636, 758, 839, 936],
             pendingEncounterLevel: pgLevel,
             pendingEncounterIsLegendary: false,
           }),
@@ -177,7 +186,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Pokémon selvatici di tipo Spettro, Psico, Buio e Fata",
         onSelect: () =>
           goTo("encounter", {
-            pendingEncounterPool: [92, 200, 353, 425, 607, 708, 971],
+            pendingEncounterPool: [92, 200, 353, 425, 607, 708, 971, 63, 122, 302, 355, 359, 570, 677, 885],
             pendingEncounterLevel: pgLevel,
             pendingEncounterIsLegendary: false,
           }),
@@ -188,7 +197,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Pokémon selvatici di tipo Ghiaccio, Acciaio e Volante",
         onSelect: () =>
           goTo("encounter", {
-            pendingEncounterPool: [131, 225, 363, 459, 613, 712, 974],
+            pendingEncounterPool: [131, 225, 363, 459, 613, 712, 974, 87, 124, 215, 220, 361, 471, 582, 873, 996],
             pendingEncounterLevel: pgLevel,
             pendingEncounterIsLegendary: false,
           }),
@@ -199,7 +208,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Pokémon selvatici di tipo Lotta e Normale",
         onSelect: () =>
           goTo("encounter", {
-            pendingEncounterPool: [66, 106, 296, 447, 532, 759, 921],
+            pendingEncounterPool: [66, 106, 296, 447, 532, 759, 921, 56, 107, 236, 448, 619, 701, 979],
             pendingEncounterLevel: pgLevel,
             pendingEncounterIsLegendary: false,
           }),
@@ -227,7 +236,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🐣 Cova un Uovo Misterioso",
         hint: "Ricevi un uovo raro che si schiuderà in un nuovo Pokémon a Lv 5",
         onSelect: () => {
-          const eggPool = [133, 175, 447, 633, 704, 885, 996];
+          const eggPool = [133, 175, 447, 633, 704, 885, 996, 172, 173, 174, 298, 360, 438, 439];
           const eggId = eggPool[Math.floor(Math.random() * eggPool.length)];
           markCaught(eggId, false);
           addToTeam({ id: eggId, level: 5 });
@@ -241,7 +250,7 @@ export function ExploreSceneContainer({ game }) {
         label: "🕵️‍♂️ Incursione del Team Nemico",
         hint: "Sconfiggi le reclute del Team malvagio per liberare la strada e vincere un premio",
         onSelect: () => {
-          const oppPower = getScaledPower(100 + state.postgameRound * 5);
+          const oppPower = getScaledPower(100 + powerGrowthRound * 5);
           goTo("trainerBattle", {
             pendingTrainer: {
               title: "Recluta del Team Nemico Post-Game",
@@ -282,7 +291,7 @@ export function ExploreSceneContainer({ game }) {
         hint: "Battaglia rapida per XP extra e strumenti",
         onSelect: () => {
           const teamIds = [lastTier.grass[0], lastTier.cave[0]];
-          const power = getScaledPower(35 + state.postgameRound * 5);
+          const power = getScaledPower(35 + powerGrowthRound * 5);
           goTo("trainerBattle", {
             pendingTrainer: { title: "Allenatore di passaggio", teamIds, power },
           });

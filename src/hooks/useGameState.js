@@ -8,6 +8,7 @@ import { hasSave } from "../engine/saveGame.js";
 import { useSaveSlot } from "./useSaveSlot.js";
 import { usePokedexState } from "./usePokedexState.js";
 import {
+  MAX_LEVEL,
   computeIsPostgame,
   computeDifficultyMultiplier,
   computeScaledPower,
@@ -24,7 +25,7 @@ import {
   playItemUseSound,
 } from "../engine/soundEngine.js";
 
-export { MAX_LEVEL } from "../engine/gameStateTransitions.js";
+export { MAX_LEVEL };
 export const WIN_LEVEL_BOOST = 3;
 export const MAX_TEAM_SIZE = 6;
 
@@ -249,8 +250,7 @@ export function useGameState() {
   }
 
   function startPostgameExplore() {
-    const lastGen = generation || getGeneration(state.generationId);
-    const { phase, patch } = resolvePostgameExplore(state, lastGen);
+    const { phase, patch } = resolvePostgameExplore(state);
     goTo(phase, patch);
   }
 
