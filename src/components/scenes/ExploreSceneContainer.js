@@ -25,98 +25,287 @@ export function ExploreSceneContainer({ game }) {
       : { grass: [25, 39, 52], fishing: [129, 60], cave: [41, 74], grass2: [63, 92], level: 30 };
     const pgLevel = Math.min(MAX_LEVEL, lastTier.level + state.postgameRound * 5);
 
+    const postgameSpecialPool = [
+      {
+        id: "ultraWormhole",
+        label: "🌌 Fenditura Ultra-Varco (Ultra Bestie)",
+        hint: "Incontra creature leggendarie provenienti da altre dimensioni",
+        onSelect: () => {
+          const ultraPool = [793, 794, 795, 796, 797, 798, 799, 803, 804, 805, 806];
+          const ubId = ultraPool[Math.floor(Math.random() * ultraPool.length)];
+          goTo("legendaryEncounter", {
+            pendingEncounterPool: [ubId],
+            pendingEncounterLevel: Math.min(MAX_LEVEL, 75 + state.postgameRound * 2),
+            pendingEncounterIsLegendary: true,
+          });
+        },
+      },
+      {
+        id: "redBoss",
+        label: "👑 Sfida Rosso sul Monte Argento",
+        hint: "Lo scontro leggendario definitivo (Potenza 200) per ricompense epiche",
+        onSelect: () => {
+          goTo("trainerBattle", {
+            pendingTrainer: {
+              title: "Allenatore Leggendario Rosso",
+              teamIds: [25, 131, 143, 6, 9, 3],
+              power: getScaledPower(200),
+            },
+          });
+        },
+      },
+      {
+        id: "championsTournament",
+        label: "🏆 Torneo dei Campioni Post-Game",
+        hint: "Sfida i Campioni di tutte le regioni in un torneo ad eliminazione",
+        onSelect: () => goTo("championsTournament", { tournamentRound: 0 }),
+      },
+      {
+        id: "safariZone",
+        label: "🌾 Parco Safari Esotico Post-Game",
+        hint: "Riserva naturale di specie rare di tutte le generazioni",
+        onSelect: () => {
+          const safariPool = [123, 128, 147, 246, 371, 443, 610, 696, 782, 885, 996];
+          const chosenId = safariPool[Math.floor(Math.random() * safariPool.length)];
+          goTo("encounter", {
+            pendingEncounterPool: [chosenId],
+            pendingEncounterLevel: pgLevel,
+            pendingEncounterIsLegendary: false,
+          });
+        },
+      },
+      {
+        id: "fossilRevival",
+        label: "🧪 Laboratorio Fossili Antichi",
+        hint: "Rianima e cattura un Pokémon preistorico a Lv 50",
+        onSelect: () => {
+          const fossilPool = [138, 140, 142, 345, 347, 408, 410, 564, 566, 696, 698];
+          const fossilId = fossilPool[Math.floor(Math.random() * fossilPool.length)];
+          markCaught(fossilId, false);
+          addToTeam({ id: fossilId, level: 50 });
+          update({ postgameRound: state.postgameRound + 1 });
+          setTimeout(() => startPostgameExplore(), 0);
+        },
+      },
+      {
+        id: "npcTrade",
+        label: "🤝 Allenatore in cerca di Scambi",
+        hint: "Scambia un Pokémon per ottenere una specie rara a livello elevato",
+        onSelect: () => {
+          const tradePool = [137, 212, 468, 474, 635, 706, 959];
+          const tradeId = tradePool[Math.floor(Math.random() * tradePool.length)];
+          markCaught(tradeId, false);
+          addToTeam({ id: tradeId, level: Math.min(MAX_LEVEL, pgLevel + 5) });
+          addItem("Super Pozione");
+          update({ postgameRound: state.postgameRound + 1 });
+          setTimeout(() => startPostgameExplore(), 0);
+        },
+      },
+      {
+        id: "wanderingMerchant",
+        label: "🛒 Mercante Ambulante di Strumenti Rari",
+        hint: "Acquista pietre evolutive, Caramelle Rare o Master Ball",
+        onSelect: () => {
+          const merchantItems = ["Caramella Rara", "Resti", "Assorbosfera", "Master Ball"];
+          const bought = merchantItems[Math.floor(Math.random() * merchantItems.length)];
+          addItem(bought);
+          update({ postgameRound: state.postgameRound + 1 });
+          setTimeout(() => startPostgameExplore(), 0);
+        },
+      },
+      {
+        id: "casinoGameCorner",
+        label: "🎰 Casinò Razzo & Sala Giochi",
+        hint: "Fai girare le slot machine per vincere Porygon, monete e premi epici",
+        onSelect: () => {
+          const roll = Math.random();
+          if (roll < 0.25) {
+            markCaught(474, false);
+            addToTeam({ id: 474, level: Math.min(MAX_LEVEL, pgLevel) });
+            addItem("Master Ball");
+            update({ coins: (state.coins || 0) + 25 });
+          } else {
+            boostTeam(3);
+            update({ coins: (state.coins || 0) + 10 });
+          }
+          update({ postgameRound: state.postgameRound + 1 });
+          setTimeout(() => startPostgameExplore(), 0);
+        },
+      },
+      {
+        id: "weatherCondition",
+        label: "☀️ micro-Clima & Evento Atmosferico",
+        hint: "Tempesta o sole intenso potenziante per la tua squadra",
+        onSelect: () => {
+          boostTeam(2);
+          addItem("Super Pozione");
+          update({ postgameRound: state.postgameRound + 1 });
+          setTimeout(() => startPostgameExplore(), 0);
+        },
+      },
+      {
+        id: "fireZone",
+        label: "🌋 Zona del Vulcano & Deserto",
+        hint: "Pokémon selvatici di tipo Fuoco, Terra e Roccia",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: [58, 77, 218, 322, 554, 667, 935],
+            pendingEncounterLevel: pgLevel,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "ghostZone",
+        label: "👻 Foresta Stregata & Rovine Antiche",
+        hint: "Pokémon selvatici di tipo Spettro, Psico, Buio e Fata",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: [92, 200, 353, 425, 607, 708, 971],
+            pendingEncounterLevel: pgLevel,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "iceZone",
+        label: "❄️ Vetta Innevata & Ghiacciaio",
+        hint: "Pokémon selvatici di tipo Ghiaccio, Acciaio e Volante",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: [131, 225, 363, 459, 613, 712, 974],
+            pendingEncounterLevel: pgLevel,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "fightingZone",
+        label: "🥊 Dojo dei Combattenti & Arena",
+        hint: "Pokémon selvatici di tipo Lotta e Normale",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: [66, 106, 296, 447, 532, 759, 921],
+            pendingEncounterLevel: pgLevel,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "pokecenterMarket",
+        label: "🏥 Centro Pokémon & Mercatino di Città",
+        hint: "Cura i Pokémon feriti e acquista strumenti utili con i Pokédollari!",
+        onSelect: () => goTo("pokecenter"),
+      },
+      {
+        id: "searchItems",
+        label: "🔍 Cercatore di Strumenti & Bacche",
+        hint: "Esplora per trovare bacche, pozioni o pietre evolutive",
+        onSelect: () => {
+          const pool = ["Super Pozione", "Caramella Rara", "Pietra Lunare", "Resti"];
+          addItem(pool[Math.floor(Math.random() * pool.length)]);
+          boostTeam(1);
+          update({ postgameRound: state.postgameRound + 1 });
+          setTimeout(() => startPostgameExplore(), 0);
+        },
+      },
+      {
+        id: "mysteryEgg",
+        label: "🐣 Cova un Uovo Misterioso",
+        hint: "Ricevi un uovo raro che si schiuderà in un nuovo Pokémon a Lv 5",
+        onSelect: () => {
+          const eggPool = [133, 175, 447, 633, 704, 885, 996];
+          const eggId = eggPool[Math.floor(Math.random() * eggPool.length)];
+          markCaught(eggId, false);
+          addToTeam({ id: eggId, level: 5 });
+          addItem("Super Pozione");
+          update({ postgameRound: state.postgameRound + 1 });
+          setTimeout(() => startPostgameExplore(), 0);
+        },
+      },
+      {
+        id: "enemyTeam",
+        label: "🕵️‍♂️ Incursione del Team Nemico",
+        hint: "Sconfiggi le reclute del Team malvagio per liberare la strada e vincere un premio",
+        onSelect: () => {
+          const oppPower = getScaledPower(100 + state.postgameRound * 5);
+          goTo("trainerBattle", {
+            pendingTrainer: {
+              title: "Recluta del Team Nemico Post-Game",
+              teamIds: [24, 110, 130, 248],
+              power: oppPower,
+            },
+          });
+        },
+      },
+      {
+        id: "fish",
+        label: "🎣 Vai a pescare",
+        hint: "Pokémon acquatici rari",
+        onSelect: () =>
+          goTo("encounter", {
+            pendingEncounterPool: lastTier.fishing,
+            pendingEncounterLevel: pgLevel,
+            pendingEncounterIsLegendary: false,
+          }),
+      },
+      {
+        id: "cave",
+        label: "🦇 Esplora una grotta misteriosa",
+        hint: "Pokémon insoliti e strumenti",
+        onSelect: () => {
+          const pool = generation?.items?.cave ?? ["Pozione"];
+          addItem(pool[Math.floor(Math.random() * pool.length)]);
+          goTo("encounter", {
+            pendingEncounterPool: lastTier.cave,
+            pendingEncounterLevel: pgLevel,
+            pendingEncounterIsLegendary: false,
+          });
+        },
+      },
+      {
+        id: "trainer",
+        label: "⚔️ Sfida un Allenatore di passaggio",
+        hint: "Battaglia rapida per XP extra e strumenti",
+        onSelect: () => {
+          const teamIds = [lastTier.grass[0], lastTier.cave[0]];
+          const power = getScaledPower(35 + state.postgameRound * 5);
+          goTo("trainerBattle", {
+            pendingTrainer: { title: "Allenatore di passaggio", teamIds, power },
+          });
+        },
+      },
+    ];
+
+    // Shuffler con vera casualità ad ogni caricamento del post-game
+    const shuffled = [...postgameSpecialPool].sort(() => Math.random() - 0.5);
+    const rolledSpecials = shuffled.slice(0, 4);
+
+    const baseGrassChoice = {
+      id: "grass",
+      label: "🌿 Addentrati nell'erba alta",
+      hint: "Pokémon selvatici sempre più forti",
+      onSelect: () =>
+        goTo("encounter", {
+          pendingEncounterPool: lastTier.grass,
+          pendingEncounterLevel: pgLevel,
+          pendingEncounterIsLegendary: false,
+        }),
+    };
+
+    const choicesPool = [...rolledSpecials, baseGrassChoice];
+
+    const chaosRouletteChoice = {
+      id: "chaosRoulette",
+      label: "🎲 Ruota del Destino (Chaos Roulette)",
+      hint: "Lascia che sia la sorte a scegliere casualmente uno dei bivi per te!",
+      onSelect: () => {
+        const randomIndex = Math.floor(Math.random() * choicesPool.length);
+        choicesPool[randomIndex].onSelect();
+      },
+    };
+
     return e(ChoiceScene, {
-      key: `postgame-${state.postgameRound}`,
+      key: `postgame-${state.postgameRound}-${Date.now()}`,
       title: "Esplorazione libera post-game",
       text: `Continui ad esplorare il mondo Pokémon. I Pokémon selvatici ed avversari sono al massimo della potenza. (Round ${state.postgameRound + 1})`,
-      choices: [
-        {
-          id: "grass",
-          label: "🌿 Addentrati nell'erba alta",
-          hint: "Pokémon selvatici sempre più forti",
-          onSelect: () =>
-            goTo("encounter", {
-              pendingEncounterPool: lastTier.grass,
-              pendingEncounterLevel: pgLevel,
-              pendingEncounterIsLegendary: false,
-            }),
-        },
-        {
-          id: "fish",
-          label: "🎣 Vai a pescare",
-          hint: "Pokémon acquatici rari",
-          onSelect: () =>
-            goTo("encounter", {
-              pendingEncounterPool: lastTier.fishing,
-              pendingEncounterLevel: pgLevel,
-              pendingEncounterIsLegendary: false,
-            }),
-        },
-        {
-          id: "cave",
-          label: "🦇 Esplora una grotta",
-          hint: "Pokémon insoliti e strumenti",
-          onSelect: () => {
-            const pool = generation?.items?.cave ?? ["Pozione"];
-            addItem(pool[Math.floor(Math.random() * pool.length)]);
-            goTo("encounter", {
-              pendingEncounterPool: lastTier.cave,
-              pendingEncounterLevel: pgLevel,
-              pendingEncounterIsLegendary: false,
-            });
-          },
-        },
-        {
-          id: "ultraWormhole",
-          label: "🌌 Fenditura Ultra-Varco (Ultra Bestie)",
-          hint: "Incontra creature leggendarie provenienti da altre dimensioni",
-          onSelect: () => {
-            const ultraPool = [793, 794, 795, 796, 797, 798, 799, 803, 804, 805, 806];
-            const ubId = ultraPool[Math.floor(Math.random() * ultraPool.length)];
-            goTo("legendaryEncounter", {
-              pendingEncounterPool: [ubId],
-              pendingEncounterLevel: Math.min(MAX_LEVEL, 75 + state.postgameRound * 2),
-              pendingEncounterIsLegendary: true,
-            });
-          },
-        },
-        {
-          id: "redBoss",
-          label: "👑 Sfida Rosso sul Monte Argento",
-          hint: "Lo scontro leggendario definitivo (Potenza 200) per ricompense epiche",
-          onSelect: () => {
-            goTo("trainerBattle", {
-              pendingTrainer: {
-                title: "Allenatore Leggendario Rosso",
-                teamIds: [25, 131, 143, 6, 9, 3],
-                power: getScaledPower(200),
-              },
-            });
-          },
-        },
-        {
-          id: "trainer",
-          label: "⚔️ Sfida un Allenatore di passaggio",
-          hint: "Battaglia rapida per XP extra e strumenti",
-          onSelect: () => {
-            const teamIds = [lastTier.grass[0], lastTier.cave[0]];
-            const power = getScaledPower(35 + state.postgameRound * 5);
-            goTo("trainerBattle", {
-              pendingTrainer: { title: "Allenatore di passaggio", teamIds, power },
-            });
-          },
-        },
-        {
-          id: "train",
-          label: "🏋️‍♂️ Allenamento guidato",
-          hint: "La squadra sale di livello (cap Lv100)",
-          onSelect: () => {
-            boostTeam(2);
-            update({ postgameRound: state.postgameRound + 1 });
-            setTimeout(() => startPostgameExplore(), 0);
-          },
-        },
-      ],
+      choices: [...choicesPool, chaosRouletteChoice],
     });
   }
 
