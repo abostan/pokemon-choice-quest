@@ -197,6 +197,8 @@ export default function App() {
     state.pokedexOpen &&
       e(PokedexModal, {
         pokedexRun: state.pokedexRun,
+        regionalDexName: generation?.regionalDex ?? null,
+        regionName: generation?.name ?? null,
         onClose: () => update({ pokedexOpen: false }),
       }),
 

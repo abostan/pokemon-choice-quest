@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useModalA11y } from "../hooks/useModalA11y.js";
 import { usePokemon } from "../hooks/usePokemon.js";
 import { usePokemonSpecies } from "../hooks/usePokemonSpecies.js";
+import { useRegionalDexNumber } from "../hooks/useRegionalDex.js";
 import { loadHistoricPokedex } from "../engine/saveGame.js";
 
 const e = React.createElement;
@@ -186,10 +187,12 @@ function StatBars({ stats, bst }) {
   );
 }
 
-function PokedexDetailPanel({ pokemonId, hasShiny, onClose }) {
+function PokedexDetailPanel({ pokemonId, hasShiny, regionalDexName, regionName, onClose }) {
   const { data: pokeData, loading: pokeLoading } = usePokemon(pokemonId);
   const { data: speciesData, loading: speciesLoading } = usePokemonSpecies(pokemonId);
+  const regionalNumber = useRegionalDexNumber(pokemonId, regionalDexName);
   const formattedId = `#${String(pokemonId).padStart(3, "0")}`;
+  const formattedRegionalId = regionalNumber != null ? `#${String(regionalNumber).padStart(3, "0")}` : null;
   const sprite = hasShiny ? (pokeData?.spriteShiny || pokeData?.sprite) : pokeData?.sprite;
 
   return e(
@@ -210,6 +213,12 @@ function PokedexDetailPanel({ pokemonId, hasShiny, onClose }) {
         `${formattedId} ${pokeLoading ? "..." : (pokeData?.name ?? "")}`,
         hasShiny && " ✨"
       ),
+      formattedRegionalId &&
+        e(
+          "p",
+          { className: "pokedex-detail-genus", style: { margin: "0 0 4px" } },
+          `${regionName ?? "Regione"} ${formattedRegionalId}`
+        ),
       speciesData?.genus && e("p", { className: "pokedex-detail-genus" }, speciesData.genus),
       pokeData?.types &&
         e(
@@ -232,7 +241,7 @@ function PokedexDetailPanel({ pokemonId, hasShiny, onClose }) {
 // -------------------------------------------------------------------
 // Componente principale Pokédex
 // -------------------------------------------------------------------
-export function PokedexModal({ pokedexRun, onClose }) {
+export function PokedexModal({ pokedexRun, regionalDexName, regionName, onClose }) {
   const modalRef = useModalA11y(onClose);
   const [tab, setTab] = useState("run");             // "run" | "historic"
   const [viewMode, setViewMode] = useState("grid");  // "grid" | "list"
@@ -412,6 +421,8 @@ export function PokedexModal({ pokedexRun, onClose }) {
         e(PokedexDetailPanel, {
           pokemonId: selectedEntry.id,
           hasShiny: selectedEntry.hasShiny,
+          regionalDexName,
+          regionName,
           onClose: () => setSelectedEntry(null),
         }),
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 // Cache in memoria condivisa, stesso criterio di usePokemon.js — endpoint
 // PokeAPI diverso (/pokemon-species invece di /pokemon), dati diversi
-// (descrizione Pokédex e "genus" invece di sprite/tipi).
+// (descrizione Pokédex, "genus" e tasso di genere invece di sprite/tipi).
 const cache = new Map();
 
 function cleanFlavorText(text) {
@@ -29,6 +29,9 @@ async function fetchPokemonSpecies(id) {
       return {
         description,
         genus: genusEntry?.genus ?? null,
+        // -1 = senza genere, 0 = sempre maschio, 8 = sempre femmina,
+        // 1-7 = popolazione mista (frazione/8 di probabilità femmina).
+        genderRate: typeof data.gender_rate === "number" ? data.gender_rate : null,
       };
     });
 

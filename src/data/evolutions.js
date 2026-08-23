@@ -84,7 +84,12 @@ export const EVOLUTIONS = {
   128:{ evolvesAt: 36, evolvesTo: 128 }, // Tauros     (forma finale)
   129:{ evolvesAt: 20, evolvesTo: 130 }, // Magikarp   → Gyarados
   131:{ evolvesAt: 36, evolvesTo: 131 }, // Lapras     (forma finale)
-  133:{ evolvesAt: 36, evolvesTo: 136 }, // Eevee      → Flareon (semplificato: fuoco)
+  // Eevee → Espeon (giorno) / Umbreon (notte): unica evoluzione con una vera
+  // condizione avanzata reale (ciclo giorno/notte) invece della soglia di
+  // livello equivalente usata per tutte le altre — vedi il caso speciale in
+  // checkEvolution() più sotto, che ignora evolvesTo per questo id specifico
+  // e decide dinamicamente in base all'ora reale del sistema.
+  133:{ evolvesAt: 36, evolvesTo: 196 },
   134:{ evolvesAt: 36, evolvesTo: 134 }, // Vaporeon   (forma finale)
   135:{ evolvesAt: 36, evolvesTo: 135 }, // Jolteon    (forma finale)
   136:{ evolvesAt: 36, evolvesTo: 136 }, // Flareon    (forma finale)
@@ -475,6 +480,23 @@ export const EVOLUTIONS = {
 
 };
 
+const EEVEE_ID = 133;
+const ESPEON_ID = 196;
+const UMBREON_ID = 197;
+
+/**
+ * Risolve la destinazione di evoluzione di Eevee in base all'ora reale del
+ * sistema: Espeon di giorno (6:00-17:59), Umbreon di notte — l'unica
+ * condizione di evoluzione "avanzata" reale implementata in questo gioco
+ * (tutte le altre, pietre/scambio/amicizia, restano semplificate a soglie
+ * di livello equivalenti per design, vedi commento in cima al file).
+ * @param {Date} now iniettabile per i test
+ */
+export function resolveEeveeEvolution(now = new Date()) {
+  const hour = now.getHours();
+  return hour >= 6 && hour < 18 ? ESPEON_ID : UMBREON_ID;
+}
+
 /**
  * Controlla se un Pokémon deve evolvere al livello attuale.
  * Restituisce il Pokémon aggiornato (con il nuovo id) se c'è un'evoluzione,
@@ -485,7 +507,13 @@ export const EVOLUTIONS = {
  */
 export function checkEvolution(pokemon) {
   const evo = EVOLUTIONS[pokemon.id];
-  if (evo && evo.evolvesTo !== pokemon.id && pokemon.level >= evo.evolvesAt) {
+  if (!evo || pokemon.level < evo.evolvesAt) return pokemon;
+
+  if (pokemon.id === EEVEE_ID) {
+    return { ...pokemon, id: resolveEeveeEvolution(), evolvedFrom: pokemon.id };
+  }
+
+  if (evo.evolvesTo !== pokemon.id) {
     return { ...pokemon, id: evo.evolvesTo, evolvedFrom: pokemon.id };
   }
   return pokemon;

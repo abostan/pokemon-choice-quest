@@ -9,6 +9,8 @@ import { useTeamStats } from "../hooks/useTeamStats.js";
 import { getTypeIcon } from "../data/types.js";
 import { computeWeatherEffect } from "../engine/weatherLogic.js";
 import { getPokemonNature, computeNatureMultiplier } from "../data/natures.js";
+import { getGenderSymbol } from "../data/gender.js";
+import { usePokemonSpecies } from "../hooks/usePokemonSpecies.js";
 import { getBadgeType } from "../data/generations.js";
 import { TapTooltip } from "./TapTooltip.js";
 import { ItemIcon } from "./ItemIcon.js";
@@ -43,6 +45,8 @@ function TeamGridSlot({ pokemon, activeMega }) {
   }
 
   const { data, loading } = usePokemon(pokemon.id);
+  const { data: speciesData } = usePokemonSpecies(pokemon.id);
+  const genderSymbol = getGenderSymbol(speciesData?.genderRate ?? null, pokemon.id);
   // Sprite reale della forma Mega/Gigamax se la specie ne ha una su PokeAPI
   // (molte non ce l'hanno, esattamente come nei giochi originali — in quel
   // caso resta lo sprite normale, il bonus di potenza si applica comunque).
@@ -64,10 +68,15 @@ function TeamGridSlot({ pokemon, activeMega }) {
     "div",
     {
       className: `team-grid-slot ${pokemon.isShiny ? "shiny-slot" : ""} ${isMegaShown ? "mega-slot" : ""}`,
-      title: `${name} Lv.${pokemon.level}${bstHint}${natureHint}${pokemon.isShiny ? " ✨ (Shiny)" : ""}${isMegaShown ? " 🔮 (Mega/Gigamax)" : ""}`,
+      title: `${name} Lv.${pokemon.level}${bstHint}${natureHint}${genderSymbol ? ` | ${genderSymbol}` : ""}${pokemon.isShiny ? " ✨ (Shiny)" : ""}${isMegaShown ? " 🔮 (Mega/Gigamax)" : ""}`,
     },
     e("img", { src: spriteUrl, alt: name, className: "team-slot-img" }),
-    e("span", { className: "team-slot-name" }, name),
+    e(
+      "span",
+      { className: "team-slot-name" },
+      name,
+      genderSymbol && e("span", { className: `gender-symbol gender-${genderSymbol === "♀" ? "female" : "male"}` }, ` ${genderSymbol}`)
+    ),
     e("span", { className: "team-slot-level" }, `Lv.${pokemon.level}`),
     pokemon.isShiny && e("span", { className: "shiny-sparkle" }, "✨"),
     isMegaShown && e("span", { className: "mega-sparkle" }, "🔮")

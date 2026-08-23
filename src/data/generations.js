@@ -14,6 +14,7 @@ export const GENERATIONS = [
     id: "kanto",
     name: "Kanto",
     starterIds: [1, 4, 7], // Bulbasaur, Charmander, Squirtle
+    regionalDex: "kanto", // slug PokeAPI /pokedex/{slug} per la numerazione regionale
 
     // Tre "livelli" di zone, riusati durante le 8 palestre (le prime tre
     // palestre usano il tier 0, la 4-6 il tier 1, la 7-8 il tier 2).
@@ -96,6 +97,7 @@ export const GENERATIONS = [
     id: "johto",
     name: "Johto",
     starterIds: [152, 155, 158], // Chikorita, Cyndaquil, Totodile
+    regionalDex: "updated-johto",
 
     explorationTiers: [
       {
@@ -174,6 +176,7 @@ export const GENERATIONS = [
     id: "hoenn",
     name: "Hoenn",
     starterIds: [252, 255, 258], // Treecko, Torchic, Mudkip
+    regionalDex: "updated-hoenn",
 
     explorationTiers: [
       {
@@ -251,6 +254,7 @@ export const GENERATIONS = [
     id: "sinnoh",
     name: "Sinnoh",
     starterIds: [387, 390, 393], // Turtwig, Chimchar, Piplup
+    regionalDex: "extended-sinnoh",
 
     explorationTiers: [
       {
@@ -328,6 +332,7 @@ export const GENERATIONS = [
     id: "unova",
     name: "Unova",
     starterIds: [495, 498, 501], // Snivy, Tepig, Oshawott
+    regionalDex: "updated-unova",
 
     explorationTiers: [
       {
@@ -405,6 +410,10 @@ export const GENERATIONS = [
     id: "kalos",
     name: "Kalos",
     starterIds: [650, 653, 656], // Chespin, Fennekin, Froakie
+    // Kalos è l'unica regione senza un Pokédex regionale unificato su PokeAPI:
+    // nei giochi reali è diviso in 3 sotto-Pokédex (Centro/Costa/Montagna) — qui
+    // controlliamo tutti e 3 in ordine e usiamo il primo che contiene la specie.
+    regionalDex: ["kalos-central", "kalos-coastal", "kalos-mountain"],
 
     explorationTiers: [
       {
@@ -482,6 +491,7 @@ export const GENERATIONS = [
     id: "alola",
     name: "Alola",
     starterIds: [722, 725, 728], // Rowlet, Litten, Popplio
+    regionalDex: "updated-alola",
 
     explorationTiers: [
       {
@@ -559,6 +569,7 @@ export const GENERATIONS = [
     id: "galar",
     name: "Galar",
     starterIds: [810, 813, 816], // Grookey, Scorbunny, Sobble
+    regionalDex: "galar",
 
     explorationTiers: [
       {
@@ -636,6 +647,7 @@ export const GENERATIONS = [
     id: "paldea",
     name: "Paldea",
     starterIds: [906, 909, 912], // Sprigatito, Fuecoco, Quaxly
+    regionalDex: "paldea",
 
     explorationTiers: [
       {

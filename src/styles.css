@@ -442,6 +442,10 @@ body {
   font-weight: bold;
 }
 
+.gender-symbol { font-weight: bold; }
+.gender-male { color: #60a5fa; }
+.gender-female { color: #f472b6; }
+
 .shiny-sparkle {
   position: absolute;
   top: 2px;
