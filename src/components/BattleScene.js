@@ -7,6 +7,7 @@ import { computeMegaPower } from "../engine/megaLogic.js";
 import { playMegaSound, playVictoryJingle } from "../engine/soundEngine.js";
 import { recordBattle } from "../engine/runRecorder.js";
 import { TapTooltip } from "./TapTooltip.js";
+import { ParticleBurst } from "./ParticleBurst.js";
 import { computeTeamAbilities } from "../data/abilities.js";
 import { getTypeIcon, TYPE_LIST } from "../data/types.js";
 
@@ -52,6 +53,7 @@ export function BattleScene({
   items = [],
   rewardBadge,
   isNuzlocke = false,
+  celebrateOnWin = false,
   onUseItem,
   onOpenBox,
   onPowerBoost,
@@ -112,6 +114,7 @@ export function BattleScene({
   return e(
     "div",
     { className: "panel" },
+    result?.won && celebrateOnWin && e(ParticleBurst, { type: "confetti" }),
     e("h2", { className: "scene-title" }, title),
     e("p", { className: "scene-text" }, text),
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { usePokemon } from "../hooks/usePokemon.js";
+import { ParticleBurst } from "./ParticleBurst.js";
 
 const e = React.createElement;
 
@@ -82,6 +83,7 @@ export function EvolutionNotice({ evolutions, onDismiss }) {
   return e(
     "div",
     { className: `evo-overlay ${visible ? "evo-visible" : ""}` },
+    visible && e(ParticleBurst, { type: "sparkle", count: 18 }),
     e(
       "div",
       { className: "evo-panel" },

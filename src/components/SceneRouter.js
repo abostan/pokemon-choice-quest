@@ -156,6 +156,7 @@ export function SceneRouter({ game }) {
       items: state.items,
       rewardBadge: null,
       isNuzlocke: state.isNuzlocke,
+      celebrateOnWin: state.tournamentRound >= CHAMPIONS_TOURNAMENT.length - 1,
       onUseItem: useItem,
       onOpenBox: () => update({ boxModalOpen: true }),
       onPowerBoost: update,

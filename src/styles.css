@@ -19,8 +19,62 @@
   --tera: #38bdf8;
   --tera-light: #7dd3fc;
   --panel-darker: #0f172a;
+  --bg-glow: #1a2636;
   --radius: 14px;
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* === Temi visivi personalizzabili (vedi ROADMAP.md Fase 5) ===
+   Ogni tema sovrascrive lo stesso set di custom property di :root — nessun
+   componente sa quale tema è attivo, cambia solo il valore dei token che
+   già usa. Applicato via attributo data-theme sulla radice (src/engine/theme.js). */
+
+:root[data-theme="synthwave"] {
+  --bg: #0a0118;
+  --bg-glow: #2d0b4e;
+  --panel: #1a0b2e;
+  --panel-alt: #24123f;
+  --panel-darker: #0a0118;
+  --accent: #ff2e88;
+  --accent-2: #7b2ff7;
+  --text: #f5e6ff;
+  --text-dim: #b892d6;
+}
+
+:root[data-theme="gameboy"] {
+  --bg: #0f380f;
+  --bg-glow: #306230;
+  --panel: #1b4d1b;
+  --panel-alt: #306230;
+  --panel-darker: #0f380f;
+  --accent: #9bbc0f;
+  --accent-2: #8bac0f;
+  --text: #e0f8cf;
+  --text-dim: #9bbc0f;
+}
+
+:root[data-theme="emerald"] {
+  --bg: #0d2b1f;
+  --bg-glow: #1f5c3f;
+  --panel: #163a28;
+  --panel-alt: #1f5c3f;
+  --panel-darker: #0a1f16;
+  --accent: #f4c542;
+  --accent-2: #2f8f5b;
+  --text: #eafff2;
+  --text-dim: #a3d9bb;
+}
+
+:root[data-theme="cyberpunk"] {
+  --bg: #0a0e14;
+  --bg-glow: #131b26;
+  --panel: #12161f;
+  --panel-alt: #1a212e;
+  --panel-darker: #05070a;
+  --accent: #fcee0a;
+  --accent-2: #00f0ff;
+  --text: #e8f9ff;
+  --text-dim: #7fa8b8;
 }
 
 /* === Sistema di livelli visivi (vedi ANALISI_TECNICA.md 4.5) ===
@@ -99,7 +153,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at top, #1a2636 0%, var(--bg) 60%);
+  background: radial-gradient(circle at top, var(--bg-glow) 0%, var(--bg) 60%);
   color: var(--text);
 }
 
@@ -519,6 +573,71 @@ body {
 .pokedex-header-btn:hover {
   border-color: var(--accent);
   background: #24374a;
+}
+
+/* ------------------------------------------------------------------
+   Menu header: fila completa su schermi larghi, "☰ Menu" a tendina sotto
+   i 640px (vedi ROADMAP.md Fase 5, "Header Responsive Compatto Mobile") —
+   con 8 pulsanti il flexWrap da solo occupava troppa altezza su telefono.
+   ------------------------------------------------------------------ */
+.header-menu-mobile {
+  display: none;
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .header-actions-full {
+    display: none !important;
+  }
+  .header-menu-mobile {
+    display: block;
+  }
+}
+
+.header-menu-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+  padding: 10px;
+  background: var(--panel);
+  border: 1px solid var(--accent-2);
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  animation: fadeIn 0.15s ease;
+}
+
+.header-menu-dropdown .pokedex-header-btn {
+  width: 100%;
+  text-align: left;
+}
+
+/* ------------------------------------------------------------------
+   Effetti particellari (brillantini/coriandoli) — vedi ROADMAP.md Fase 5.
+   ------------------------------------------------------------------ */
+.particle-burst-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 500;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  top: -40px;
+  animation-name: particle-fall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes particle-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
 }
 
 /* ------------------------------------------------------------------

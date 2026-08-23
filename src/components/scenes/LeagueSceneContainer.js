@@ -100,6 +100,7 @@ export function LeagueSceneContainer({ game }) {
         items: state.items,
         rewardBadge: champion.badge,
         isNuzlocke: state.isNuzlocke,
+        celebrateOnWin: true,
         onUseItem: useItem,
         onOpenBox: () => update({ boxModalOpen: true }),
         onPowerBoost: update,

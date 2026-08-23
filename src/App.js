@@ -93,6 +93,22 @@ export default function App() {
   const [showSettings, setShowSettings] = React.useState(false);
   const [showAchievements, setShowAchievements] = React.useState(false);
 
+  // Menu header mobile a tendina: sotto un certo numero di pulsanti (ora 8)
+  // la fila orizzontale diventa ingombrante su schermi stretti anche con il
+  // flexWrap già presente — sotto i 640px li raggruppiamo in un menu "☰"
+  // (vedi ROADMAP.md Fase 5, "Header Responsive Compatto Mobile").
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const mobileMenuRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!mobileMenuOpen) return;
+    function handleOutside(ev) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(ev.target)) setMobileMenuOpen(false);
+    }
+    document.addEventListener("pointerdown", handleOutside);
+    return () => document.removeEventListener("pointerdown", handleOutside);
+  }, [mobileMenuOpen]);
+
   // -------------------------------------------------------
   // Barra di avanzamento
   // -------------------------------------------------------
@@ -223,15 +239,16 @@ export default function App() {
             ? `${generation.name} — guidato dalle tue scelte`
             : "Ispirato a Pokemon Roulette, ma guidato dalle tue scelte"
         ),
-        // Pulsanti Header: Audio, Home, Pokédex, Sala della Fama e Punteggio
+        // Pulsanti Header: Audio, Home, Pokédex, Impostazioni, Trofei,
+        // Onboarding, Sala della Fama e Punteggio. Definiti una volta sola e
+        // renderizzati in due modi (fila desktop / menu a tendina mobile,
+        // vedi sotto) invece di duplicare il markup.
         state.phase !== "generationSelect" && state.phase !== "resume" &&
-          e(
-            "div",
-            { style: { display: "flex", gap: "8px", flexWrap: "wrap" } },
-            e(
-              "button",
+          (() => {
+            const headerButtons = [
               {
-                className: "pokedex-header-btn",
+                key: "audio",
+                label: muted ? "🔇 Audio Off" : "🔊 Audio On",
                 style: {
                   background: muted ? "linear-gradient(135deg, #881337, #4c0519)" : "linear-gradient(135deg, #15803d, #14532d)",
                   border: muted ? "1px solid #f43f5e" : "1px solid #4ade80",
@@ -239,78 +256,110 @@ export default function App() {
                 onClick: handleToggleAudio,
                 title: muted ? "Attiva audio retro 8-bit" : "Disattiva audio retro 8-bit",
               },
-              muted ? "🔇 Audio Off" : "🔊 Audio On"
-            ),
-            e(
-              "button",
               {
-                className: "pokedex-header-btn",
+                key: "home",
+                label: "🏠 Home",
                 style: { background: "linear-gradient(135deg, #4b5563, #374151)", border: "1px solid #6b7280" },
                 onClick: () => goTo("resume"),
                 title: "Torna al Menu Principale / Homepage",
               },
-              "🏠 Home"
-            ),
-            e(
-              "button",
               {
-                className: "pokedex-header-btn",
+                key: "pokedex",
+                label: "📖 Pokédex",
+                style: null,
                 onClick: () => update({ pokedexOpen: true }),
                 title: "Apri il Pokédex",
               },
-              "📖 Pokédex"
-            ),
-            e(
-              "button",
               {
-                className: "pokedex-header-btn",
+                key: "settings",
+                label: "⚙️ Impostazioni",
                 style: { background: "linear-gradient(135deg, #4b5563, #374151)", border: "1px solid #6b7280" },
                 onClick: () => setShowSettings(true),
                 title: "Impostazioni",
               },
-              "⚙️ Impostazioni"
-            ),
-            e(
-              "button",
               {
-                className: "pokedex-header-btn",
+                key: "achievements",
+                label: "🏆 Trofei",
                 style: { background: "linear-gradient(135deg, #b45309, #78350f)", border: "1px solid var(--gold)" },
                 onClick: () => setShowAchievements(true),
                 title: "Medagliere Trofei",
               },
-              "🏆 Trofei"
-            ),
-            e(
-              "button",
               {
-                className: "pokedex-header-btn",
+                key: "onboarding",
+                label: "❓ Come si gioca",
                 style: { background: "linear-gradient(135deg, #4b5563, #374151)", border: "1px solid #6b7280" },
                 onClick: () => setShowOnboarding(true),
                 title: "Come si gioca",
               },
-              "❓ Come si gioca"
-            ),
-            e(
-              "button",
               {
-                className: "pokedex-header-btn",
+                key: "hof",
+                label: "🏆 Sala della Fama",
                 style: { background: "linear-gradient(135deg, #d97706, #92400e)", border: "1px solid #f59e0b" },
                 onClick: () => update({ hallOfFameOpen: true }),
                 title: "Apri la Sala della Fama",
               },
-              "🏆 Sala della Fama"
-            ),
-            e(
-              "button",
               {
-                className: "pokedex-header-btn",
+                key: "score",
+                label: "📊 Punteggio",
                 style: { background: "linear-gradient(135deg, #0284c7, #0369a1)", border: "1px solid #38bdf8" },
                 onClick: () => update({ scoreModalOpen: true }),
                 title: "Vedi Punteggio & Grado",
               },
-              "📊 Punteggio"
-            )
-          )
+            ];
+
+            return e(
+              React.Fragment,
+              null,
+              // Fila completa: visibile da tablet in su, nascosta sotto i 640px (CSS)
+              e(
+                "div",
+                { className: "header-actions-full", style: { display: "flex", gap: "8px", flexWrap: "wrap" } },
+                headerButtons.map((btn) =>
+                  e(
+                    "button",
+                    { key: btn.key, className: "pokedex-header-btn", style: btn.style, onClick: btn.onClick, title: btn.title },
+                    btn.label
+                  )
+                )
+              ),
+              // Menu "☰" a tendina: nascosto da tablet in su, visibile sotto i 640px (CSS)
+              e(
+                "div",
+                { className: "header-menu-mobile", ref: mobileMenuRef },
+                e(
+                  "button",
+                  {
+                    className: "pokedex-header-btn header-menu-toggle",
+                    onClick: () => setMobileMenuOpen((o) => !o),
+                    "aria-expanded": mobileMenuOpen,
+                    "aria-label": "Menu",
+                  },
+                  "☰ Menu"
+                ),
+                mobileMenuOpen &&
+                  e(
+                    "div",
+                    { className: "header-menu-dropdown" },
+                    headerButtons.map((btn) =>
+                      e(
+                        "button",
+                        {
+                          key: btn.key,
+                          className: "pokedex-header-btn",
+                          style: btn.style,
+                          onClick: () => {
+                            btn.onClick();
+                            setMobileMenuOpen(false);
+                          },
+                          title: btn.title,
+                        },
+                        btn.label
+                      )
+                    )
+                  )
+              )
+            );
+          })()
       )
     ),
 

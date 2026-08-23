@@ -5,6 +5,7 @@ import { computeTeamAbilities } from "../data/abilities.js";
 import { playShinySound, playCaptureSound, playMasterBallSound } from "../engine/soundEngine.js";
 import { recordEncounter, recordCapture } from "../engine/runRecorder.js";
 import { getShinyChance } from "../engine/settings.js";
+import { ParticleBurst } from "./ParticleBurst.js";
 
 const e = React.createElement;
 
@@ -78,6 +79,7 @@ export function EncounterScene({ title, text, pool = [], level = 4, isLegendary 
   return e(
     "div",
     { className: `panel ${isLegendary ? "encounter-legendary" : ""} ${isShiny ? "encounter-shiny" : ""}` },
+    result?.success && isShiny && e(ParticleBurst, { type: "sparkle" }),
     e("h2", { className: "scene-title" }, isShiny ? `✨ Incontro Shiny: ${title}` : title),
     e("p", { className: "scene-text" }, isShiny ? "Un bagliore luccicante e speciale appare davanti ai tuoi occhi!" : text),
     isLegendary && e(

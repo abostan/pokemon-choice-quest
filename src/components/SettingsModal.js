@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { SHINY_RATE_MODES, getShinyRateMode, setShinyRateMode } from "../engine/settings.js";
+import { THEMES, getTheme, setTheme } from "../engine/theme.js";
 import { useModalA11y } from "../hooks/useModalA11y.js";
 
 const e = React.createElement;
 
 /**
- * Modale Impostazioni. Per ora contiene solo il tasso di Shiny — le voci
+ * Modale Impostazioni. Contiene tasso di Shiny e tema visivo — le voci
  * "velocità animazioni" e "selettore lingua" del backlog restano da fare
  * a parte (richiedono rispettivamente un sistema di animazione e una
  * traduzione completa del gioco, sforzi molto più grandi).
@@ -16,10 +17,16 @@ const e = React.createElement;
 export function SettingsModal({ onClose }) {
   const modalRef = useModalA11y(onClose);
   const [shinyMode, setShinyModeState] = useState(() => getShinyRateMode());
+  const [theme, setThemeState] = useState(() => getTheme());
 
   function handleShinyChange(mode) {
     setShinyRateMode(mode);
     setShinyModeState(mode);
+  }
+
+  function handleThemeChange(id) {
+    setTheme(id); // applica subito (data-theme sulla radice), feedback immediato
+    setThemeState(id);
   }
 
   return e(
@@ -74,8 +81,43 @@ export function SettingsModal({ onClose }) {
       ),
       e(
         "p",
-        { className: "scene-text", style: { fontSize: "0.78rem", marginTop: "14px", marginBottom: 0 } },
-        "Si applica ai prossimi incontri selvatici. Altre impostazioni (velocità animazioni, lingua) arriveranno più avanti."
+        { className: "scene-text", style: { fontSize: "0.78rem", margin: "8px 0 14px" } },
+        "Si applica ai prossimi incontri selvatici."
+      ),
+      e("h3", { style: { fontSize: "0.9rem", color: "var(--text-dim)", margin: "0 0 8px" } }, "🎨 Tema Visivo"),
+      e(
+        "div",
+        { style: { display: "flex", flexDirection: "column", gap: "8px" } },
+        THEMES.map((t) =>
+          e(
+            "label",
+            {
+              key: t.id,
+              style: {
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "10px 12px",
+                borderRadius: "8px",
+                background: theme === t.id ? "rgba(255, 203, 5, 0.12)" : "var(--panel-alt)",
+                border: theme === t.id ? "1px solid var(--accent)" : "1px solid transparent",
+                cursor: "pointer",
+              },
+            },
+            e("input", {
+              type: "radio",
+              name: "theme",
+              checked: theme === t.id,
+              onChange: () => handleThemeChange(t.id),
+            }),
+            e("span", null, t.label)
+          )
+        )
+      ),
+      e(
+        "p",
+        { className: "scene-text", style: { fontSize: "0.78rem", marginTop: "8px", marginBottom: 0 } },
+        "Applicato subito e ricordato per le prossime visite su questo browser."
       )
     )
   );
