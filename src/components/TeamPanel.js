@@ -2,6 +2,7 @@ import React from "react";
 import { PokemonChip } from "./PokemonSprite.js";
 import { getItemDescription } from "../data/items.js";
 import { computeTeamAbilities } from "../data/abilities.js";
+import { computeTeamPower } from "../engine/battleLogic.js";
 
 const e = React.createElement;
 
@@ -46,8 +47,24 @@ function BadgeItem({ name }) {
  *  - items: Array<string>
  *  - onOpenBox(): callback per aprire il BoxModal
  */
-export function TeamPanel({ team, box, badges, items, coins = 0, isNuzlocke = false, onOpenBox }) {
+export function TeamPanel({
+  team,
+  box,
+  badges,
+  items,
+  coins = 0,
+  isNuzlocke = false,
+  activeMega = false,
+  activeItemBoost = 0,
+  onOpenBox,
+  onSwapTeamPosition,
+}) {
   const abilities = computeTeamAbilities(team);
+  const baseTeamPower = computeTeamPower(team);
+  const itemBoost = activeItemBoost || 0;
+  const megaMult = activeMega ? 1.3 : 1.0;
+  const teamPower = Math.round((baseTeamPower + itemBoost) * megaMult);
+  const bonusDiff = teamPower - baseTeamPower;
 
   return e(
     "div",
@@ -59,7 +76,7 @@ export function TeamPanel({ team, box, badges, items, coins = 0, isNuzlocke = fa
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "8px",
+          marginBottom: "6px",
           background: "rgba(251, 191, 36, 0.12)",
           border: "1px solid rgba(251, 191, 36, 0.3)",
           padding: "4px 10px",
@@ -71,6 +88,32 @@ export function TeamPanel({ team, box, badges, items, coins = 0, isNuzlocke = fa
       },
       e("span", null, "💰 Pokédollari:"),
       e("span", null, `${coins} 💰`)
+    ),
+    e(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "10px",
+          background: bonusDiff > 0 ? "rgba(168, 85, 247, 0.18)" : "rgba(56, 189, 248, 0.12)",
+          border: bonusDiff > 0 ? "1px solid rgba(168, 85, 247, 0.5)" : "1px solid rgba(56, 189, 248, 0.3)",
+          padding: "4px 10px",
+          borderRadius: "6px",
+          fontSize: "0.85rem",
+          fontWeight: "bold",
+          color: bonusDiff > 0 ? "#e9d5ff" : "#7dd3fc",
+          boxShadow: bonusDiff > 0 ? "0 2px 8px rgba(168, 85, 247, 0.25)" : "none",
+        },
+      },
+      e("span", null, "⚡ Potenza Squadra:"),
+      e(
+        "span",
+        null,
+        `⚡ ${teamPower}`,
+        bonusDiff > 0 && e("span", { style: { fontSize: "0.72rem", marginLeft: "4px", color: "#f472b6" } }, `(+${bonusDiff})`)
+      )
     ),
     isNuzlocke && e(
       "div",
@@ -97,7 +140,43 @@ export function TeamPanel({ team, box, badges, items, coins = 0, isNuzlocke = fa
       : e(
           "div",
           { className: "team-list" },
-          team.map((p, idx) => e(PokemonChip, { key: `${p.id}-${idx}`, id: p.id, level: p.level, isShiny: p.isShiny }))
+          team.map((p, idx) =>
+            e(
+              "div",
+              {
+                key: `${p.id}-${idx}`,
+                style: { position: "relative", display: "inline-flex", flexDirection: "column", alignItems: "center" },
+              },
+              e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny }),
+              onSwapTeamPosition && team.length > 1 &&
+                e(
+                  "div",
+                  { style: { display: "flex", gap: "4px", marginTop: "2px" } },
+                  idx > 0 &&
+                    e(
+                      "button",
+                      {
+                        className: "mini-swap-btn",
+                        title: "Sposta a sinistra",
+                        style: { padding: "0 4px", fontSize: "0.65rem", cursor: "pointer", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "3px", color: "#fff" },
+                        onClick: () => onSwapTeamPosition(idx, idx - 1),
+                      },
+                      "◄"
+                    ),
+                  idx < team.length - 1 &&
+                    e(
+                      "button",
+                      {
+                        className: "mini-swap-btn",
+                        title: "Sposta a destra",
+                        style: { padding: "0 4px", fontSize: "0.65rem", cursor: "pointer", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "3px", color: "#fff" },
+                        onClick: () => onSwapTeamPosition(idx, idx + 1),
+                      },
+                      "►"
+                    )
+                )
+            )
+          )
         ),
 
     // Sezione Abilità Passive Attive

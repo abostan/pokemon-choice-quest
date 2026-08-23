@@ -151,6 +151,8 @@ export default function App() {
         team: state.team,
         box: state.box,
         onSwap: swapPokemon,
+        onWithdraw: game.withdrawFromBox,
+        onDeposit: game.depositToBox,
         onClose: () => update({ boxModalOpen: false }),
       }),
 
@@ -263,7 +265,10 @@ export default function App() {
           items: state.items,
           coins: state.coins || 0,
           isNuzlocke: state.isNuzlocke,
+          activeMega: state.activeMega,
+          activeItemBoost: state.activeItemBoost,
           onOpenBox: () => update({ boxModalOpen: true }),
+          onSwapTeamPosition: game.swapTeamPosition,
         })
     ),
 

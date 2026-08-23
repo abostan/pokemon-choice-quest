@@ -32,6 +32,8 @@ export function sanitizeGameState(raw) {
     isNuzlocke: !!raw.isNuzlocke,
     pokedexRun: raw.pokedexRun && typeof raw.pokedexRun === "object" ? raw.pokedexRun : {},
     pokedexOpen: false,
+    activeMega: false,
+    activeItemBoost: 0,
 
     pendingEvolutions: Array.isArray(raw.pendingEvolutions) ? raw.pendingEvolutions : [],
     caughtLegendaries: Array.isArray(raw.caughtLegendaries) ? raw.caughtLegendaries : [],

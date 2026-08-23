@@ -4,23 +4,15 @@ import { PokemonChip } from "./PokemonSprite.js";
 const e = React.createElement;
 
 /**
- * Modale di gestione Box: permette di scambiare un Pokémon della squadra
- * attiva con uno nel Box.
- *
- * props:
- *  - team: Array<{id, level}>
- *  - box: Array<{id, level}>
- *  - onSwap(teamIdx, boxIdx): callback che esegue lo swap
- *  - onClose(): chiude il modale
+ * Modale di gestione Box: permette di scambiare, ritirare o depositare Pokémon.
  */
-export function BoxModal({ team, box, onSwap, onClose }) {
+export function BoxModal({ team, box, onSwap, onWithdraw, onDeposit, onClose }) {
   const [selectedBox, setSelectedBox] = useState(null);   // indice nel box selezionato
   const [selectedTeam, setSelectedTeam] = useState(null); // indice nel team selezionato
 
   function handleBoxClick(idx) {
-    if (box[idx]?.isFainted) return; // Morte permanente Nuzlocke!
+    if (box[idx]?.isFainted) return; // Nuzlocke fainted!
     if (selectedTeam !== null) {
-      // Ho già selezionato un membro della squadra → esegui swap
       onSwap(selectedTeam, idx);
       setSelectedTeam(null);
       setSelectedBox(null);
@@ -32,7 +24,6 @@ export function BoxModal({ team, box, onSwap, onClose }) {
   function handleTeamClick(idx) {
     if (selectedBox !== null) {
       if (box[selectedBox]?.isFainted) return;
-      // Ho già selezionato un Pokémon dal box → esegui swap
       onSwap(idx, selectedBox);
       setSelectedTeam(null);
       setSelectedBox(null);
@@ -43,10 +34,10 @@ export function BoxModal({ team, box, onSwap, onClose }) {
 
   const hint =
     selectedBox !== null
-      ? "Seleziona un Pokémon della squadra con cui scambiarlo"
+      ? "Seleziona un Pokémon della squadra con cui scambiarlo, oppure usa il tasto Ritira"
       : selectedTeam !== null
-      ? "Seleziona un Pokémon dal Box con cui scambiarlo"
-      : "Clicca su un Pokémon per selezionarlo, poi clicca sull'altro per scambiare";
+      ? "Seleziona un Pokémon dal Box con cui scambiarlo, oppure usa il tasto Deposita"
+      : "Clicca su un Pokémon per selezionarlo o usa le azioni rapide Deposita / Ritira";
 
   return e(
     "div",
@@ -81,9 +72,28 @@ export function BoxModal({ team, box, onSwap, onClose }) {
                   {
                     key: `team-${p.id}-${idx}`,
                     className: `box-slot ${selectedTeam === idx ? "selected" : ""}`,
-                    onClick: () => handleTeamClick(idx),
+                    style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" },
                   },
-                  e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny })
+                  e(
+                    "div",
+                    { onClick: () => handleTeamClick(idx), style: { flex: 1, cursor: "pointer" } },
+                    e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny })
+                  ),
+                  onDeposit && team.length > 1 &&
+                    e(
+                      "button",
+                      {
+                        className: "mini-swap-btn",
+                        title: "Deposita nel Box",
+                        style: { background: "rgba(239, 68, 68, 0.2)", border: "1px solid #ef4444", color: "#fca5a5", fontSize: "0.7rem", padding: "2px 6px", borderRadius: "4px", cursor: "pointer", marginLeft: "6px" },
+                        onClick: (ev) => {
+                          ev.stopPropagation();
+                          onDeposit(idx);
+                          setSelectedTeam(null);
+                        },
+                      },
+                      "📤 Deposita"
+                    )
                 )
               )
         ),
@@ -104,11 +114,36 @@ export function BoxModal({ team, box, onSwap, onClose }) {
                   {
                     key: `box-${p.id}-${idx}`,
                     className: `box-slot ${selectedBox === idx ? "selected" : ""} ${p.isFainted ? "fainted-slot" : ""}`,
-                    style: p.isFainted ? { opacity: 0.5, border: "1px dashed #ef4444", cursor: "not-allowed" } : {},
-                    onClick: () => handleBoxClick(idx),
+                    style: {
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "100%",
+                      opacity: p.isFainted ? 0.5 : 1,
+                      border: p.isFainted ? "1px dashed #ef4444" : undefined,
+                    },
                   },
-                  e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny }),
-                  p.isFainted && e("span", { style: { fontSize: "0.72rem", color: "#f87171", fontWeight: "bold" } }, "⚰️ Esausto")
+                  e(
+                    "div",
+                    { onClick: () => handleBoxClick(idx), style: { flex: 1, cursor: p.isFainted ? "not-allowed" : "pointer" } },
+                    e(PokemonChip, { id: p.id, level: p.level, isShiny: p.isShiny }),
+                    p.isFainted && e("span", { style: { fontSize: "0.72rem", color: "#f87171", fontWeight: "bold", marginLeft: "4px" } }, "⚰️ Esausto")
+                  ),
+                  onWithdraw && !p.isFainted && team.length < 6 &&
+                    e(
+                      "button",
+                      {
+                        className: "mini-swap-btn",
+                        title: "Ritira in Squadra",
+                        style: { background: "rgba(34, 197, 94, 0.2)", border: "1px solid #22c55e", color: "#86efac", fontSize: "0.7rem", padding: "2px 6px", borderRadius: "4px", cursor: "pointer", marginLeft: "6px" },
+                        onClick: (ev) => {
+                          ev.stopPropagation();
+                          onWithdraw(idx);
+                          setSelectedBox(null);
+                        },
+                      },
+                      "📥 Ritira"
+                    )
                 )
               )
         )

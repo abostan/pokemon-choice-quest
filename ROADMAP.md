@@ -128,6 +128,14 @@ Questo documento traccia l'evoluzione del progetto, le funzionalità implementat
   - 👑 *"Master Nuzlocke"*: Completa una regione in modalità Nuzlocke senza perdere l'intera squadra.
   - 🌋 *"Monte Argento"*: Sconfiggi Rosso Leggendario nel post-game.
   - 🌍 *"Gran Maestro dei Continenti"*: Conquista tutte e 9 le regioni in una sola run.
+- [x] **🎨 Carte Bivio in Griglia 2x2 con Border Glow**: layout a griglia con sfondi sfumati a tema per le scelte di esplorazione e bordi illuminati al passaggio del mouse.
+- [ ] **📊 Indicatore Visivo Dinamico Probabilità di Vittoria**: barra a colori cangianti (Rosso/Giallo/Verde) con riempimento animato durante la scelta della tattica di battaglia.
+- [ ] **📱 Header Responsive Compatto Mobile**: raggruppamento dei pulsanti dell'header sotto un menu a tendina "⚙️ Menu / Extra" su schermi piccoli.
+- [ ] **🎉 Effetti Particellari (Sparkles & Confetti)**: animazione con brillantini e coriandoli d'oro durante catture Shiny, evoluzioni e vittorie importanti.
+- [x] **⚡ Display Potenza Complessiva della Squadra**: indicatore visivo "⚡ Potenza Squadra: XXX" nel pannello laterale per confrontarla immediatamente con quella degli avversari.
+- [x] **📐 Layout Griglia 2x3 Perfetto per il Team Panel**: struttura CSS Grid a 3 colonne per mantenere la squadra ordinata e bilanciata.
+- [x] **📥 Gestione Flessibile del Box (Deposita / Ritira)**: possibilità di ritirare Pokémon dal Box se la squadra ha slot liberi (< 6) o depositare membri senza obbligo di scambio 1:1.
+- [x] **↕️ Quick-Swap Posizione Pokémon**: pulsanti ◄ / ► sulle schede della squadra per riordinare la posizione dei Pokémon con un solo click.
 
 ---
 

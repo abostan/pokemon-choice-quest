@@ -42,6 +42,8 @@ export function initialState() {
     isNuzlocke: false,
     pokedexRun: {},
     pokedexOpen: false,
+    activeMega: false,
+    activeItemBoost: 0,
     pendingEvolutions: [],
     caughtLegendaries: [],
     boxModalOpen: false,
@@ -81,6 +83,41 @@ export function useGameState() {
 
   function update(patch) {
     setState((prev) => ({ ...prev, ...patch }));
+  }
+
+  function swapTeamPosition(fromIdx, toIdx) {
+    if (fromIdx < 0 || fromIdx >= state.team.length) return;
+    if (toIdx < 0 || toIdx >= state.team.length) return;
+    setState((prev) => {
+      const newTeam = [...prev.team];
+      const temp = newTeam[fromIdx];
+      newTeam[fromIdx] = newTeam[toIdx];
+      newTeam[toIdx] = temp;
+      return { ...prev, team: newTeam };
+    });
+  }
+
+  function withdrawFromBox(boxIdx) {
+    setState((prev) => {
+      if (prev.team.length >= MAX_TEAM_SIZE) return prev;
+      if (boxIdx < 0 || boxIdx >= prev.box.length) return prev;
+      const target = prev.box[boxIdx];
+      if (target?.isFainted) return prev;
+      const newBox = prev.box.filter((_, idx) => idx !== boxIdx);
+      const newTeam = [...prev.team, target];
+      return { ...prev, team: newTeam, box: newBox };
+    });
+  }
+
+  function depositToBox(teamIdx) {
+    setState((prev) => {
+      if (prev.team.length <= 1) return prev;
+      if (teamIdx < 0 || teamIdx >= prev.team.length) return prev;
+      const target = prev.team[teamIdx];
+      const newTeam = prev.team.filter((_, idx) => idx !== teamIdx);
+      const newBox = [...prev.box, target];
+      return { ...prev, team: newTeam, box: newBox };
+    });
   }
 
   function addToTeam(pokemon) {
@@ -260,6 +297,9 @@ export function useGameState() {
     useItem,
     boostTeam,
     swapPokemon,
+    swapTeamPosition,
+    withdrawFromBox,
+    depositToBox,
     generation,
     isPostgame,
     difficultyMult,

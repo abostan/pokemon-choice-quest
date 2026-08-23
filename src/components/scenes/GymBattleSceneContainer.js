@@ -54,6 +54,7 @@ export function GymBattleSceneContainer({ game }) {
         isNuzlocke: state.isNuzlocke,
         onUseItem: useItem,
         onOpenBox: () => update({ boxModalOpen: true }),
+        onPowerBoost: update,
         onResolved: ({ won }) => {
           if (won) resolveBattleWin(gym.badge);
           else handleNuzlockeLoss();
@@ -83,6 +84,7 @@ export function GymBattleSceneContainer({ game }) {
         isNuzlocke: state.isNuzlocke,
         onUseItem: useItem,
         onOpenBox: () => update({ boxModalOpen: true }),
+        onPowerBoost: update,
         onResolved: ({ won }) => {
           if (won) resolveBattleWin(null);
           else handleNuzlockeLoss();
@@ -112,6 +114,7 @@ export function GymBattleSceneContainer({ game }) {
         isNuzlocke: state.isNuzlocke,
         onUseItem: useItem,
         onOpenBox: () => update({ boxModalOpen: true }),
+        onPowerBoost: update,
         onResolved: ({ won }) => {
           if (won) {
             resolveBattleWin(null);

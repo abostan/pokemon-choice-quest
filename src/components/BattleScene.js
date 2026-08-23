@@ -66,6 +66,7 @@ export function BattleScene({
   isNuzlocke = false,
   onUseItem,
   onOpenBox,
+  onPowerBoost,
   onResolved,
 }) {
   const [result, setResult] = useState(null); // { tactic, won, winChance } | null
@@ -99,6 +100,7 @@ export function BattleScene({
     else if (itemName.includes("Pietra") || itemName.includes("Rimedio")) boost = 14;
 
     setUsedItem({ name: itemName, boost });
+    if (onPowerBoost) onPowerBoost({ activeItemBoost: boost });
     if (onUseItem) onUseItem(itemIdx);
   }
 
@@ -189,6 +191,7 @@ export function BattleScene({
         onClick: () => {
           playMegaSound();
           setIsMegaActive(true);
+          if (onPowerBoost) onPowerBoost({ activeMega: true });
         },
       },
       "🔮 Attiva MEGAEVOLUZIONE / GIGAMAX! (+30% Potenza Squadra)"
@@ -286,7 +289,13 @@ export function BattleScene({
           result.won
             ? e(
                 "button",
-                { className: "continue-btn", onClick: () => onResolved({ won: true }) },
+                {
+                  className: "continue-btn",
+                  onClick: () => {
+                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeItemBoost: 0 });
+                    onResolved({ won: true });
+                  },
+                },
                 "Continua"
               )
             : isNuzlocke
@@ -295,7 +304,10 @@ export function BattleScene({
                 {
                   className: "continue-btn",
                   style: { background: "linear-gradient(135deg, #be123c, #881337)", color: "#fff" },
-                  onClick: () => onResolved({ won: false }),
+                  onClick: () => {
+                    if (onPowerBoost) onPowerBoost({ activeMega: false, activeItemBoost: 0 });
+                    onResolved({ won: false });
+                  },
                 },
                 "💀 Registra la sconfitta"
               )
@@ -307,7 +319,10 @@ export function BattleScene({
                     key: "skip",
                     className: "continue-btn",
                     style: { background: "#2c3e4e", color: "#eef3f8" },
-                    onClick: () => onResolved({ won: false }),
+                    onClick: () => {
+                      if (onPowerBoost) onPowerBoost({ activeMega: false, activeItemBoost: 0 });
+                      onResolved({ won: false });
+                    },
                   },
                   "Ritirati e prosegui comunque"
                 ),

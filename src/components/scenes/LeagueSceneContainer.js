@@ -58,6 +58,7 @@ export function LeagueSceneContainer({ game }) {
         isNuzlocke: state.isNuzlocke,
         onUseItem: useItem,
         onOpenBox: () => update({ boxModalOpen: true }),
+        onPowerBoost: update,
         onResolved: ({ won }) => {
           if (won) resolveBattleWin(null);
           else handleNuzlockeLoss();
@@ -93,6 +94,7 @@ export function LeagueSceneContainer({ game }) {
         isNuzlocke: state.isNuzlocke,
         onUseItem: useItem,
         onOpenBox: () => update({ boxModalOpen: true }),
+        onPowerBoost: update,
         onResolved: ({ won }) => {
           if (won) {
             resolveBattleWin(champion.badge);

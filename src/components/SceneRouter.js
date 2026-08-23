@@ -155,6 +155,7 @@ export function SceneRouter({ game }) {
       isNuzlocke: state.isNuzlocke,
       onUseItem: useItem,
       onOpenBox: () => update({ boxModalOpen: true }),
+      onPowerBoost: update,
       onResolved: ({ won }) => {
         if (won) {
           resolveBattleWin(null);
@@ -201,6 +202,7 @@ export function SceneRouter({ game }) {
       items: state.items,
       rewardBadge: null,
       onUseItem: useItem,
+      onPowerBoost: update,
       onResolved: ({ won }) => {
         if (won) {
           boostTeam(2);
