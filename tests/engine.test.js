@@ -5,6 +5,7 @@ import {
   computeTeamPower,
   computeWinChance,
   computeCaptureChance,
+  computeStatMultiplier,
   clampLevel,
   clamp,
 } from "../src/engine/battleLogic.js";
@@ -18,9 +19,33 @@ test("battleLogic - computeTeamPower", () => {
     { id: 1, level: 10 },
     { id: 4, level: 20 },
   ];
-  // 10 + 20 + (2 * 2) = 34
+  // 10 + 20 + (2 * 2) = 34 (nessuna statsById => moltiplicatore neutro 1.0 per ognuno)
   const power = computeTeamPower(team);
   assert.strictEqual(power, 34);
+});
+
+test("battleLogic - computeStatMultiplier: nella media 1.0, forte/debole entro i limiti 0.7..1.4", () => {
+  assert.strictEqual(computeStatMultiplier(430), 1.0); // esattamente la media di riferimento
+  assert.strictEqual(computeStatMultiplier(0), 1.0); // dato mancante/non ancora caricato => neutro
+  assert.strictEqual(computeStatMultiplier(undefined), 1.0);
+  assert.ok(computeStatMultiplier(680) > 1.0 && computeStatMultiplier(680) <= 1.4); // es. Mewtwo
+  assert.strictEqual(computeStatMultiplier(2000), 1.4); // clampato al massimo
+  assert.ok(computeStatMultiplier(200) < 1.0 && computeStatMultiplier(200) >= 0.7); // es. Magikarp
+  assert.strictEqual(computeStatMultiplier(1), 0.7); // clampato al minimo
+});
+
+test("battleLogic - computeTeamPower con statsById: specie forti pesano di più di quelle nella media", () => {
+  const team = [
+    { id: 1, level: 50 },
+    { id: 2, level: 50 },
+  ];
+  const averagePower = computeTeamPower(team, { 1: 430, 2: 430 });
+  const strongPower = computeTeamPower(team, { 1: 680, 2: 680 }); // squadra di "legendari"
+  const weakPower = computeTeamPower(team, { 1: 200, 2: 200 }); // squadra di Magikarp
+  assert.ok(strongPower > averagePower);
+  assert.ok(weakPower < averagePower);
+  // Con statsById assente il risultato deve combaciare con la squadra "nella media"
+  assert.strictEqual(computeTeamPower(team), averagePower);
 });
 
 test("battleLogic - computeWinChance bounds", () => {

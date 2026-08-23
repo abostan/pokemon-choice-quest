@@ -1538,6 +1538,61 @@ body {
   color: var(--text);
 }
 
+/* Statistiche base ufficiali (PokeAPI /pokemon → stats), mostrate come barre
+   nel pannello di dettaglio del Pokédex — vedi ROADMAP.md Fase 6. */
+.pokedex-stat-bars {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pokedex-stat-row {
+  display: grid;
+  grid-template-columns: 58px 1fr 32px;
+  align-items: center;
+  gap: 8px;
+}
+
+.pokedex-stat-label {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.pokedex-stat-bar-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.pokedex-stat-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.pokedex-stat-value {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: right;
+  color: var(--text);
+}
+
+.pokedex-stat-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pokedex-stat-total .pokedex-stat-label,
+.pokedex-stat-total .pokedex-stat-value {
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
 .pokedex-grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));

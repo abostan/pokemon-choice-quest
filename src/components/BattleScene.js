@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { PokemonChip } from "./PokemonSprite.js";
 import { computeTeamPower, computeWinChance, rollBattle, TACTICS } from "../engine/battleLogic.js";
+import { useTeamStats } from "../hooks/useTeamStats.js";
 import { getItemDescription } from "../data/items.js";
 import { computeTypeEffectiveness } from "../engine/typeMatchup.js";
 import { computeMegaPower } from "../engine/megaLogic.js";
@@ -72,7 +73,8 @@ export function BattleScene({
   const detectedType = opponentType || (opponentTitle.match(/tipo ([A-Za-z]+)/)?.[1] ?? "");
   const typeEff = computeTypeEffectiveness(team, detectedType);
 
-  const baseTeamPower = computeTeamPower(team);
+  const statsById = useTeamStats(team);
+  const baseTeamPower = computeTeamPower(team, statsById);
   const itemBoost = usedItem ? usedItem.boost : 0;
   const rawTeamPower = baseTeamPower + itemBoost;
 

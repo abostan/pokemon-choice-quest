@@ -5,6 +5,7 @@ import { computeTeamAbilities } from "../data/abilities.js";
 import { computeTeamPower } from "../engine/battleLogic.js";
 import { usePokemon } from "../hooks/usePokemon.js";
 import { useMegaSprite } from "../hooks/useMegaSprite.js";
+import { useTeamStats } from "../hooks/useTeamStats.js";
 import { getTypeIcon } from "../data/types.js";
 import { getBadgeType } from "../data/generations.js";
 import { TapTooltip } from "./TapTooltip.js";
@@ -51,12 +52,13 @@ function TeamGridSlot({ pokemon, activeMega }) {
     : pokemon.isShiny
     ? (data?.spriteShiny || data?.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`)
     : (data?.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`);
+  const bstHint = data?.bst ? ` | BST: ${data.bst}` : "";
 
   return e(
     "div",
     {
       className: `team-grid-slot ${pokemon.isShiny ? "shiny-slot" : ""} ${isMegaShown ? "mega-slot" : ""}`,
-      title: `${name} Lv.${pokemon.level}${pokemon.isShiny ? " ✨ (Shiny)" : ""}${isMegaShown ? " 🔮 (Mega/Gigamax)" : ""}`,
+      title: `${name} Lv.${pokemon.level}${bstHint}${pokemon.isShiny ? " ✨ (Shiny)" : ""}${isMegaShown ? " 🔮 (Mega/Gigamax)" : ""}`,
     },
     e("img", { src: spriteUrl, alt: name, className: "team-slot-img" }),
     e("span", { className: "team-slot-name" }, name),
@@ -84,7 +86,8 @@ export function TeamPanel({
   onOpenBox,
 }) {
   const abilities = computeTeamAbilities(team);
-  const baseTeamPower = computeTeamPower(team);
+  const statsById = useTeamStats(team);
+  const baseTeamPower = computeTeamPower(team, statsById);
   const itemBoost = activeItemBoost || 0;
   const megaMult = activeMega ? 1.3 : 1.0;
   const teraMult = activeTerastal ? 1.25 : 1.0;

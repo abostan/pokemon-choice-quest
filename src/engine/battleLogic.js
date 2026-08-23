@@ -51,15 +51,38 @@ export function clampLevel(level) {
   return Math.min(MAX_LEVEL, Math.max(1, level));
 }
 
+// Somma statistiche base (BST) media approssimativa tra tutte le circa 1000
+// specie di PokeAPI. Non serve precisione assoluta: è solo il punto di
+// riferimento "0% bonus/malus" attorno a cui oscilla computeStatMultiplier,
+// così una squadra di specie nella media ottiene la stessa potenza di prima
+// di questa funzionalità (nessuna necessità di ricalibrare gli opponentPower
+// già bilanciati in generations.js/championsTournament.js).
+export const AVERAGE_BST = 430;
+
+/**
+ * Moltiplicatore di potenza (0.7..1.4) in base a quanto la Somma Statistiche
+ * Base di una specie si scosta dalla media. bst assente/0 (dato PokeAPI non
+ * ancora caricato) → nessun bonus/malus, per non far "saltare" la potenza
+ * squadra mentre le statistiche sono ancora in fetch.
+ */
+export function computeStatMultiplier(bst) {
+  if (!bst || bst <= 0) return 1.0;
+  return clamp(bst / AVERAGE_BST, 0.7, 1.4);
+}
+
 /**
  * Potenza complessiva di una squadra, usata per stimare l'esito delle
- * battaglie. Più Pokémon e livelli più alti = squadra più forte.
+ * battaglie. Più Pokémon, livelli più alti e specie con statistiche base
+ * migliori della media (`statsById`, mappa id → BST) = squadra più forte.
  */
-export function computeTeamPower(team) {
+export function computeTeamPower(team, statsById = {}) {
   if (!team || team.length === 0) return 0;
-  const totalLevels = team.reduce((sum, p) => sum + Math.min(p.level, MAX_LEVEL), 0);
+  const totalLevels = team.reduce((sum, p) => {
+    const mult = computeStatMultiplier(statsById[p.id]);
+    return sum + Math.min(p.level, MAX_LEVEL) * mult;
+  }, 0);
   const countBonus = team.length * 2; // avere più Pokémon aiuta comunque
-  return totalLevels + countBonus;
+  return Math.round(totalLevels + countBonus);
 }
 
 export const TACTICS = [

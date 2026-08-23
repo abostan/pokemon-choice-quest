@@ -12,20 +12,34 @@ async function fetchPokemon(id) {
       if (!res.ok) throw new Error(`PokeAPI ha risposto ${res.status} per l'id ${id}`);
       return res.json();
     })
-    .then((data) => ({
-      id: data.id,
-      name: data.name,
-      types: data.types.map((t) => t.type.name),
-      sprite:
-        data.sprites?.other?.["official-artwork"]?.front_default ||
-        data.sprites?.front_default ||
-        "",
-      spriteShiny:
-        data.sprites?.other?.["official-artwork"]?.front_shiny ||
-        data.sprites?.front_shiny ||
-        "",
-      cry: data.cries?.latest || data.cries?.legacy || null,
-    }));
+    .then((data) => {
+      const statByName = (name) => data.stats?.find((s) => s.stat.name === name)?.base_stat ?? 0;
+      const stats = {
+        hp: statByName("hp"),
+        attack: statByName("attack"),
+        defense: statByName("defense"),
+        spAttack: statByName("special-attack"),
+        spDefense: statByName("special-defense"),
+        speed: statByName("speed"),
+      };
+      const bst = Object.values(stats).reduce((sum, v) => sum + v, 0);
+      return {
+        id: data.id,
+        name: data.name,
+        types: data.types.map((t) => t.type.name),
+        sprite:
+          data.sprites?.other?.["official-artwork"]?.front_default ||
+          data.sprites?.front_default ||
+          "",
+        spriteShiny:
+          data.sprites?.other?.["official-artwork"]?.front_shiny ||
+          data.sprites?.front_shiny ||
+          "",
+        cry: data.cries?.latest || data.cries?.legacy || null,
+        stats,
+        bst,
+      };
+    });
 
   cache.set(id, promise);
   return promise;

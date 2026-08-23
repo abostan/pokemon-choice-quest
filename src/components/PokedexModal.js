@@ -142,6 +142,50 @@ function PokedexListRow({ pokemonId, status, hasShiny, onSelect }) {
  * scoperta. Caricata su richiesta invece che per tutte le 1025 specie in
  * una volta, per non intasare PokeAPI di chiamate inutili.
  */
+const STAT_LABELS = [
+  { key: "hp", label: "PS", color: "#4ade80" },
+  { key: "attack", label: "Attacco", color: "#f87171" },
+  { key: "defense", label: "Difesa", color: "#60a5fa" },
+  { key: "spAttack", label: "Att. Sp.", color: "#c084fc" },
+  { key: "spDefense", label: "Dif. Sp.", color: "#38bdf8" },
+  { key: "speed", label: "Velocità", color: "#fbbf24" },
+];
+// 255 è il massimo storico per una singola statistica base tra tutte le
+// specie (es. la Velocità di Deoxys-Speed): usato come scala fissa per le
+// barre, così un valore alto "riempie" visivamente la barra in modo coerente
+// tra specie diverse invece di normalizzare sul massimo del solo Pokémon mostrato.
+const MAX_SINGLE_STAT = 255;
+
+function StatBars({ stats, bst }) {
+  if (!stats) return null;
+  return e(
+    "div",
+    { className: "pokedex-stat-bars" },
+    STAT_LABELS.map(({ key, label, color }) =>
+      e(
+        "div",
+        { key, className: "pokedex-stat-row" },
+        e("span", { className: "pokedex-stat-label" }, label),
+        e(
+          "div",
+          { className: "pokedex-stat-bar-track" },
+          e("div", {
+            className: "pokedex-stat-bar-fill",
+            style: { width: `${Math.min(100, (stats[key] / MAX_SINGLE_STAT) * 100)}%`, background: color },
+          })
+        ),
+        e("span", { className: "pokedex-stat-value" }, stats[key])
+      )
+    ),
+    e(
+      "div",
+      { className: "pokedex-stat-row pokedex-stat-total" },
+      e("span", { className: "pokedex-stat-label" }, "Totale"),
+      e("span", { className: "pokedex-stat-value" }, bst)
+    )
+  );
+}
+
 function PokedexDetailPanel({ pokemonId, hasShiny, onClose }) {
   const { data: pokeData, loading: pokeLoading } = usePokemon(pokemonId);
   const { data: speciesData, loading: speciesLoading } = usePokemonSpecies(pokemonId);
@@ -179,7 +223,8 @@ function PokedexDetailPanel({ pokemonId, hasShiny, onClose }) {
         speciesLoading
           ? "Caricamento descrizione..."
           : speciesData?.description || "Nessuna descrizione italiana disponibile per questa specie."
-      )
+      ),
+      !pokeLoading && pokeData?.stats && e(StatBars, { stats: pokeData.stats, bst: pokeData.bst })
     )
   );
 }
