@@ -2,12 +2,8 @@ import React from "react";
 import { ChoiceScene } from "../ChoiceScene.js";
 import { getExplorationTier } from "../../data/generations.js";
 import { MAX_LEVEL } from "../../hooks/useGameState.js";
-import { filterEncounterPoolByChallenge } from "../../engine/challengeEngine.js";
 
 const e = React.createElement;
-
-// Alias locale per compatibilità con le chiamate interne
-const applyChallengeFilters = filterEncounterPoolByChallenge;
 
 export function ExploreSceneContainer({ game }) {
   const {
@@ -370,7 +366,7 @@ export function ExploreSceneContainer({ game }) {
   const allSpecialOptions = [
     {
       id: "legendary",
-      weight: 0.10,
+      weight: 0.06,
       label: "⭐ Santuario Antico (Incontro Leggendario)",
       hint: "Segui antichi segni per scovare un Pokémon Leggendario della regione!",
       onSelect: () => {
@@ -645,8 +641,14 @@ export function ExploreSceneContainer({ game }) {
     },
   ];
 
-  // Shuffle e selezione deterministica basata su gymIndex (nessun Math.random() in render)
-  const explSeed = (state.gymIndex || 0) * 1013 + (state.badges ? state.badges.length * 37 : 0) + 7;
+  // Shuffle e selezione deterministica (nessun Math.random() in render, per evitare
+  // ricalcoli instabili tra un render e l'altro). Il seed incorpora choicesCount, che
+  // avanza ad ogni transizione di stato (goTo), così il bivio varia visita dopo visita
+  // invece di ripetersi identico finché gymIndex/badges non cambiano.
+  const explSeed = (state.gymIndex || 0) * 1013
+    + (state.badges ? state.badges.length * 37 : 0)
+    + (state.choicesCount || 0) * 151
+    + 7;
   function seededRandom(extra) {
     return ((explSeed + extra) * 1664525 + 1013904223) % 2147483647 / 2147483647;
   }
@@ -661,14 +663,14 @@ export function ExploreSceneContainer({ game }) {
   for (const opt of shuffled) {
     if (seededRandom(++extraSeed) < opt.weight) {
       rolledSpecials.push(opt);
-      if (rolledSpecials.length >= 3) break;
+      if (rolledSpecials.length >= 6) break;
     }
   }
-  if (rolledSpecials.length < 3) {
+  if (rolledSpecials.length < 6) {
     for (const opt of shuffled) {
       if (!rolledSpecials.some((o) => o.id === opt.id)) {
         rolledSpecials.push(opt);
-        if (rolledSpecials.length >= 3) break;
+        if (rolledSpecials.length >= 6) break;
       }
     }
   }

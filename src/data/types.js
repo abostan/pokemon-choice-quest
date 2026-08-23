@@ -1,5 +1,11 @@
 // Modulo di mappatura dei tipi Pokémon primari (18 tipi ufficiali).
 
+export const TYPE_LIST = [
+  "Normale", "Fuoco", "Acqua", "Erba", "Elettrico", "Ghiaccio",
+  "Lotta", "Veleno", "Terra", "Volante", "Psico", "Coleottero",
+  "Roccia", "Spettro", "Drago", "Buio", "Acciaio", "Folletto",
+];
+
 export const POKEMON_TYPES = {
   // Gen 1 Starters & iconic
   1: "Erba", 2: "Erba", 3: "Erba",

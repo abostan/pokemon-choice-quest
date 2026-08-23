@@ -27,7 +27,7 @@ export function computeCaptureChance(method, baseRate = 0.55, isLegendary = fals
   const sereneBonus = hasSereneGrace ? 0.10 : 0;
   if (isLegendary) {
     const legMod = method === 'food' ? 1.2 : 1.0;
-    return clamp(0.15 * legMod + sereneBonus, 0.05, 0.30);
+    return clamp(0.10 * legMod + sereneBonus / 2, 0.03, 0.20);
   }
   const modifiers = {
     ball: 1.0,

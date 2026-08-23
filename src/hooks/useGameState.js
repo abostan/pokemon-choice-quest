@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { logger } from "../engine/logger.js";
 import { getGeneration, getNextGeneration } from "../data/generations.js";
 import { checkEvolution } from "../data/evolutions.js";
+import { filterEncounterPoolByChallenge } from "../engine/challengeEngine.js";
 import { hasSave } from "../engine/saveGame.js";
 import { useSaveSlot } from "./useSaveSlot.js";
 import { usePokedexState } from "./usePokedexState.js";
@@ -184,7 +185,18 @@ export function useGameState() {
   function goTo(phase, patch = {}) {
     playButtonClickSound();
     logger.stateTransition(state.phase, phase, patch);
-    update({ phase, ...patch });
+    let finalPatch = patch;
+    if (patch.pendingEncounterPool && !patch.pendingEncounterIsLegendary) {
+      const challengeState = {
+        isRandomizer: patch.isRandomizer ?? state.isRandomizer,
+        monoType: patch.monoType ?? state.monoType,
+      };
+      finalPatch = {
+        ...patch,
+        pendingEncounterPool: filterEncounterPoolByChallenge(patch.pendingEncounterPool, challengeState),
+      };
+    }
+    update({ choicesCount: (state.choicesCount || 0) + 1, phase, ...finalPatch });
   }
 
   const generation = state.generationId ? getGeneration(state.generationId) : null;

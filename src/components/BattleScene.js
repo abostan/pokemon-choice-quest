@@ -174,8 +174,8 @@ export function BattleScene({
       typeEff.message
     ),
 
-    // Megaevoluzione Button / Badge
-    hasTeam && !result && !isMegaActive && e(
+    // Megaevoluzione Button / Badge (esclusiva con la Terastallizzazione)
+    hasTeam && !result && !isMegaActive && !isTerastalActive && e(
       "button",
       {
         className: "mega-btn",
@@ -219,8 +219,8 @@ export function BattleScene({
       "🔮 MEGAEVOLUZIONE / GIGAMAX ATTIVA (+30% POTENZA SQUADRA!)"
     ),
 
-    // Terastallizzazione Button / Badge
-    hasTeam && !result && !isTerastalActive && e(
+    // Terastallizzazione Button / Badge (esclusiva con la Megaevoluzione)
+    hasTeam && !result && !isTerastalActive && !isMegaActive && e(
       "button",
       {
         className: "tera-btn",

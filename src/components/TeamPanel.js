@@ -187,6 +187,23 @@ export function TeamPanel({
           },
         },
         "🎲 RANDOMIZER CAOS MODE"
+      ),
+      monoType && e(
+        "div",
+        {
+          style: {
+            padding: "4px 8px",
+            borderRadius: "6px",
+            background: "linear-gradient(135deg, #b45309, #78350f)",
+            color: "#fef3c7",
+            fontSize: "0.75rem",
+            fontWeight: "bold",
+            textAlign: "center",
+            letterSpacing: "0.5px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+          },
+        },
+        `🎯 MONO-TIPO: ${monoType.toUpperCase()}`
       )
     ),
 

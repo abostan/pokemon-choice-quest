@@ -36,10 +36,13 @@ test("battleLogic - computeCaptureChance masterball & legendary", () => {
   assert.strictEqual(mbChance, 1.0);
 
   const legChance = computeCaptureChance("ball", 0.5, true, false);
-  assert.strictEqual(legChance, 0.15);
+  assert.strictEqual(legChance, 0.10);
 
   const legFoodChance = computeCaptureChance("food", 0.5, true, false);
-  assert.strictEqual(legFoodChance, 0.18);
+  assert.strictEqual(legFoodChance, 0.12);
+
+  const legSereneChance = computeCaptureChance("ball", 0.5, true, true);
+  assert.ok(Math.abs(legSereneChance - 0.15) < 1e-9);
 });
 
 test("battleLogic - clampLevel", () => {
