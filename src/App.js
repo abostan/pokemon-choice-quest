@@ -98,21 +98,21 @@ export default function App() {
   const [showAchievements, setShowAchievements] = React.useState(false);
   const [showBadges, setShowBadges] = React.useState(false);
 
-  // Menu header mobile a tendina: sotto un certo numero di pulsanti (ora 8)
-  // la fila orizzontale diventa ingombrante su schermi stretti anche con il
-  // flexWrap già presente — sotto i 640px li raggruppiamo in un menu "☰"
-  // (vedi ROADMAP.md Fase 5, "Header Responsive Compatto Mobile").
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  const mobileMenuRef = React.useRef(null);
+  // Menu "⋯ Altro" a tendina: solo le azioni pinnate (Audio, Home, Pokédex,
+  // Impostazioni) restano sempre visibili nell'header; le altre (Trofei,
+  // Come si gioca, Sala della Fama, Punteggio) finiscono qui invece di
+  // affollare la riga con un pulsante colorato ciascuna.
+  const [moreMenuOpen, setMoreMenuOpen] = React.useState(false);
+  const moreMenuRef = React.useRef(null);
 
   React.useEffect(() => {
-    if (!mobileMenuOpen) return;
+    if (!moreMenuOpen) return;
     function handleOutside(ev) {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(ev.target)) setMobileMenuOpen(false);
+      if (moreMenuRef.current && !moreMenuRef.current.contains(ev.target)) setMoreMenuOpen(false);
     }
     document.addEventListener("pointerdown", handleOutside);
     return () => document.removeEventListener("pointerdown", handleOutside);
-  }, [mobileMenuOpen]);
+  }, [moreMenuOpen]);
 
   // -------------------------------------------------------
   // Barra di avanzamento
@@ -258,13 +258,14 @@ export default function App() {
             ? `${generation.name} — guidato dalle tue scelte`
             : "Ispirato a Pokemon Roulette, ma guidato dalle tue scelte"
         ),
-        // Pulsanti Header: Audio, Home, Pokédex, Impostazioni, Trofei,
-        // Onboarding, Sala della Fama e Punteggio. Definiti una volta sola e
-        // renderizzati in due modi (fila desktop / menu a tendina mobile,
-        // vedi sotto) invece di duplicare il markup.
+        // Pulsanti Header: solo Audio, Home, Pokédex e Impostazioni restano
+        // pinnati in vista — sono le azioni toccate quasi ogni sessione.
+        // Trofei, Come si gioca, Sala della Fama e Punteggio (usati una
+        // tantum) finiscono nel menu "⋯ Altro" invece di occupare la riga
+        // con un pulsante colorato ciascuno.
         state.phase !== "generationSelect" && state.phase !== "resume" &&
           (() => {
-            const headerButtons = [
+            const pinnedButtons = [
               {
                 key: "audio",
                 label: muted ? "🔇 Audio Off" : "🔊 Audio On",
@@ -278,7 +279,7 @@ export default function App() {
               {
                 key: "home",
                 label: "🏠 Home",
-                style: { background: "linear-gradient(135deg, #4b5563, #374151)", border: "1px solid #6b7280" },
+                style: null,
                 onClick: () => goTo("resume"),
                 title: "Torna al Menu Principale / Homepage",
               },
@@ -292,83 +293,75 @@ export default function App() {
               {
                 key: "settings",
                 label: "⚙️ Impostazioni",
-                style: { background: "linear-gradient(135deg, #4b5563, #374151)", border: "1px solid #6b7280" },
+                style: null,
                 onClick: () => setShowSettings(true),
                 title: "Impostazioni",
               },
+            ];
+
+            const moreButtons = [
               {
                 key: "achievements",
                 label: "🏆 Trofei",
-                style: { background: "linear-gradient(135deg, #b45309, #78350f)", border: "1px solid var(--gold)" },
                 onClick: () => setShowAchievements(true),
                 title: "Medagliere Trofei",
               },
               {
                 key: "onboarding",
                 label: "❓ Come si gioca",
-                style: { background: "linear-gradient(135deg, #4b5563, #374151)", border: "1px solid #6b7280" },
                 onClick: () => setShowOnboarding(true),
                 title: "Come si gioca",
               },
               {
                 key: "hof",
                 label: "🏆 Sala della Fama",
-                style: { background: "linear-gradient(135deg, #d97706, #92400e)", border: "1px solid #f59e0b" },
                 onClick: () => update({ hallOfFameOpen: true }),
                 title: "Apri la Sala della Fama",
               },
               {
                 key: "score",
                 label: "📊 Punteggio",
-                style: { background: "linear-gradient(135deg, #0284c7, #0369a1)", border: "1px solid #38bdf8" },
                 onClick: () => update({ scoreModalOpen: true }),
                 title: "Vedi Punteggio & Grado",
               },
             ];
 
             return e(
-              React.Fragment,
-              null,
-              // Fila completa: visibile da tablet in su, nascosta sotto i 640px (CSS)
-              e(
-                "div",
-                { className: "header-actions-full", style: { display: "flex", gap: "8px", flexWrap: "wrap" } },
-                headerButtons.map((btn) =>
-                  e(
-                    "button",
-                    { key: btn.key, className: "pokedex-header-btn", style: btn.style, onClick: btn.onClick, title: btn.title },
-                    btn.label
-                  )
+              "div",
+              { style: { display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" } },
+              pinnedButtons.map((btn) =>
+                e(
+                  "button",
+                  { key: btn.key, className: "pokedex-header-btn", style: btn.style, onClick: btn.onClick, title: btn.title },
+                  btn.label
                 )
               ),
-              // Menu "☰" a tendina: nascosto da tablet in su, visibile sotto i 640px (CSS)
               e(
                 "div",
-                { className: "header-menu-mobile", ref: mobileMenuRef },
+                { className: "header-more-menu", ref: moreMenuRef },
                 e(
                   "button",
                   {
                     className: "pokedex-header-btn header-menu-toggle",
-                    onClick: () => setMobileMenuOpen((o) => !o),
-                    "aria-expanded": mobileMenuOpen,
-                    "aria-label": "Menu",
+                    onClick: () => setMoreMenuOpen((o) => !o),
+                    "aria-expanded": moreMenuOpen,
+                    "aria-label": "Altro",
                   },
-                  "☰ Menu"
+                  "⋯ Altro"
                 ),
-                mobileMenuOpen &&
+                moreMenuOpen &&
                   e(
                     "div",
                     { className: "header-menu-dropdown" },
-                    headerButtons.map((btn) =>
+                    moreButtons.map((btn) =>
                       e(
                         "button",
                         {
                           key: btn.key,
                           className: "pokedex-header-btn",
-                          style: btn.style,
                           onClick: () => {
                             btn.onClick();
-                            setMobileMenuOpen(false);
+                            setMoreMenuOpen(false);
                           },
                           title: btn.title,
                         },

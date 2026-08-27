@@ -762,22 +762,15 @@ body {
 }
 
 /* ------------------------------------------------------------------
-   Menu header: fila completa su schermi larghi, "☰ Menu" a tendina sotto
-   i 640px (vedi ROADMAP.md Fase 5, "Header Responsive Compatto Mobile") —
-   con 8 pulsanti il flexWrap da solo occupava troppa altezza su telefono.
+   Menu header "⋯ Altro": le azioni pinnate (Audio/Home/Pokédex/Impostazioni)
+   restano sempre in vista, quelle usate una tantum (Trofei, Come si gioca,
+   Sala della Fama, Punteggio) sono raccolte qui invece di affollare la riga
+   con un pulsante colorato ciascuna — a qualunque larghezza di schermo,
+   non solo su mobile (vedi ROADMAP.md Fase 5, "Header Responsive Compatto Mobile").
    ------------------------------------------------------------------ */
-.header-menu-mobile {
-  display: none;
+.header-more-menu {
+  display: inline-block;
   position: relative;
-}
-
-@media (max-width: 640px) {
-  .header-actions-full {
-    display: none !important;
-  }
-  .header-menu-mobile {
-    display: block;
-  }
 }
 
 .header-menu-dropdown {
