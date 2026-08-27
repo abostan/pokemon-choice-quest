@@ -319,7 +319,9 @@ export function ExploreSceneContainer({ game }) {
     // Shuffle deterministico basato su postgameRound (nessun Math.random() in render → no loop infinito)
     const postgameSeed = computePostgameSeed({ postgameRound: state.postgameRound });
     const postgameById = new Map(postgameSpecialPool.map((o) => [o.id, o]));
-    const rolledSpecials = pickTopIds(postgameSpecialPool.map((o) => o.id), postgameSeed, 6)
+    // 3 speciali + erba + ruota del destino = 5 bottoni per bivio (vedi
+    // motivazione sul bivio principale poco più sotto in questo file).
+    const rolledSpecials = pickTopIds(postgameSpecialPool.map((o) => o.id), postgameSeed, 3)
       .map((id) => postgameById.get(id));
 
     const baseGrassChoice = {
@@ -633,7 +635,9 @@ export function ExploreSceneContainer({ game }) {
     choicesCount: state.choicesCount || 0,
   });
   const specialsById = new Map(allSpecialOptions.map((o) => [o.id, o]));
-  const rolledSpecials = pickWeightedIds(allSpecialOptions, explSeed, 6)
+  // 2 speciali + erba + allenamento + ruota del destino = 5 bottoni per bivio,
+  // per restare leggibili su schermo mobile (prima erano 9, vedi ROADMAP.md).
+  const rolledSpecials = pickWeightedIds(allSpecialOptions, explSeed, 2)
     .map((id) => specialsById.get(id));
 
   const baseGrassChoice = {
@@ -686,11 +690,15 @@ export function ExploreSceneContainer({ game }) {
     },
   });
 
+  const isFirstGymCycle = state.gymIndex === 0;
+  const isSecondPrepRound = isFirstGymCycle && (state.gym1PrepRounds || 0) >= 1;
+
   return e(ChoiceScene, {
-    key: `explore-${state.gymIndex}`,
-    title: state.gymIndex === 0 ? "Il primo bivio" : "Verso la prossima palestra",
-    text:
-      state.gymIndex === 0
+    key: `explore-${state.gymIndex}-${state.gym1PrepRounds || 0}`,
+    title: isSecondPrepRound ? "Un ultimo bivio" : isFirstGymCycle ? "Il primo bivio" : "Verso la prossima palestra",
+    text: isSecondPrepRound
+      ? "Prima di affrontare la prima palestra, un'ultima occasione per rinforzare la squadra."
+      : isFirstGymCycle
         ? "Lasci il laboratorio del Professore. Le strade intorno si biforcano in modi inaspettati..."
         : `Ti lasci alle spalle l'ultima palestra. Quali opportunità ti riserva il percorso verso "${nextGymTitle}"?`,
     choices: withRecordedChoices(exploreChoices, state.phase),

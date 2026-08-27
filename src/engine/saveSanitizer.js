@@ -10,6 +10,7 @@ export function sanitizeGameState(raw) {
     generationId: typeof raw.generationId === "string" ? raw.generationId : null,
     nextGenId: typeof raw.nextGenId === "string" ? raw.nextGenId : null,
     gymIndex: typeof raw.gymIndex === "number" && !isNaN(raw.gymIndex) ? Math.max(0, raw.gymIndex) : 0,
+    gym1PrepRounds: typeof raw.gym1PrepRounds === "number" && !isNaN(raw.gym1PrepRounds) ? Math.max(0, raw.gym1PrepRounds) : 0,
     eliteIndex: typeof raw.eliteIndex === "number" && !isNaN(raw.eliteIndex) ? Math.max(0, raw.eliteIndex) : 0,
     // Era un booleano prima che il Rivale diventasse ricorrente (Fase 7): ora
     // è un contatore di stage già affrontati. Un salvataggio vecchio con

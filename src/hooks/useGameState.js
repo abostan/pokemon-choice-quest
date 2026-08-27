@@ -35,6 +35,14 @@ export function initialState() {
     generationId: null,
     nextGenId: null,
     gymIndex: 0,
+    // Conta i bivi di esplorazione già concessi prima della prima palestra
+    // della regione corrente (si azzera ad ogni starterSelect, vedi
+    // SceneRouter.js). Con una sola squadra iniziale (lo starter da solo)
+    // il winrate contro la Palestra 1 è troppo basso se il giocatore non
+    // riesce a catturare nulla al primo bivio: goTo() in questo file
+    // intercetta la transizione verso "gymBattle" con gymIndex 0 e
+    // reindirizza a un secondo bivio finché questo contatore non raggiunge 2.
+    gym1PrepRounds: 0,
     eliteIndex: 0,
     rivalDone: 0, // contatore di stage del Rivale già affrontati (era booleano)
     villainBossDone: false,
@@ -218,19 +226,28 @@ export function useGameState() {
 
   function goTo(phase, patch = {}) {
     playButtonClickSound();
-    logger.stateTransition(state.phase, phase, patch);
+    let finalPhase = phase;
     let finalPatch = patch;
-    if (patch.pendingEncounterPool && !patch.pendingEncounterIsLegendary) {
+    // Concede un secondo bivio di esplorazione prima della Palestra 1 di ogni
+    // regione (gymIndex torna a 0 anche a inizio multi-regione): con un solo
+    // bivio lo starter da solo affronta la palestra con un winrate troppo
+    // basso se la cattura fallisce. Vedi initialState() per gym1PrepRounds.
+    if (phase === "gymBattle" && (state.gymIndex || 0) === 0 && (state.gym1PrepRounds || 0) < 1) {
+      finalPhase = "explore";
+      finalPatch = { gym1PrepRounds: (state.gym1PrepRounds || 0) + 1 };
+    }
+    logger.stateTransition(state.phase, finalPhase, finalPatch);
+    if (finalPatch.pendingEncounterPool && !finalPatch.pendingEncounterIsLegendary) {
       const challengeState = {
-        isRandomizer: patch.isRandomizer ?? state.isRandomizer,
-        monoType: patch.monoType ?? state.monoType,
+        isRandomizer: finalPatch.isRandomizer ?? state.isRandomizer,
+        monoType: finalPatch.monoType ?? state.monoType,
       };
       finalPatch = {
-        ...patch,
-        pendingEncounterPool: filterEncounterPoolByChallenge(patch.pendingEncounterPool, challengeState),
+        ...finalPatch,
+        pendingEncounterPool: filterEncounterPoolByChallenge(finalPatch.pendingEncounterPool, challengeState),
       };
     }
-    update({ choicesCount: (state.choicesCount || 0) + 1, phase, ...finalPatch });
+    update({ choicesCount: (state.choicesCount || 0) + 1, phase: finalPhase, ...finalPatch });
   }
 
   const generation = state.generationId ? getGeneration(state.generationId) : null;

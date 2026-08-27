@@ -48,7 +48,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Roccia", teamIds: [74, 95], opponentPower: 18 },
+      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Roccia", teamIds: [74, 95], opponentPower: 14 },
       { title: "Capopalestra di tipo Acqua", badge: "Medaglia Corrente", teamIds: [120, 121], opponentPower: 26 },
       { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Voltaggio", teamIds: [100, 25, 26], opponentPower: 35 },
       { title: "Capopalestra di tipo Erba", badge: "Medaglia Foglia", teamIds: [71, 114, 45], opponentPower: 46 },
@@ -130,7 +130,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capopalestra di tipo Volante", badge: "Medaglia Ala", teamIds: [16, 17], opponentPower: 18 },
+      { title: "Capopalestra di tipo Volante", badge: "Medaglia Ala", teamIds: [16, 17], opponentPower: 14 },
       { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Zanna", teamIds: [11, 14, 123], opponentPower: 26 },
       { title: "Capopalestra di tipo Normale", badge: "Medaglia Latte", teamIds: [35, 241], opponentPower: 35 },
       { title: "Capopalestra di tipo Spettro", badge: "Medaglia Ombra", teamIds: [92, 93, 94], opponentPower: 46 },
@@ -208,7 +208,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Pietra", teamIds: [304, 304], opponentPower: 18 },
+      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Pietra", teamIds: [304, 304], opponentPower: 14 },
       { title: "Capopalestra di tipo Lotta", badge: "Medaglia Pugno", teamIds: [296, 307], opponentPower: 26 },
       { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Dinamo", teamIds: [100, 309, 101, 310], opponentPower: 35 },
       { title: "Capopalestra di tipo Fuoco", badge: "Medaglia Fiamma", teamIds: [322, 218, 323], opponentPower: 46 },
@@ -285,7 +285,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Carbone", teamIds: [74, 408], opponentPower: 18 },
+      { title: "Capopalestra di tipo Roccia", badge: "Medaglia Carbone", teamIds: [74, 408], opponentPower: 14 },
       { title: "Capopalestra di tipo Erba", badge: "Medaglia Bosco", teamIds: [420, 315, 388], opponentPower: 26 },
       { title: "Capopalestra di tipo Lotta", badge: "Medaglia Ciottolo", teamIds: [307, 67, 448], opponentPower: 35 },
       { title: "Capopalestra di tipo Acqua", badge: "Medaglia Acstrino", teamIds: [418, 195, 423], opponentPower: 46 },
@@ -362,7 +362,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capopalestra di tipo Erba", badge: "Medaglia Tris", teamIds: [506, 512], opponentPower: 18 },
+      { title: "Capopalestra di tipo Erba", badge: "Medaglia Tris", teamIds: [506, 512], opponentPower: 14 },
       { title: "Capopalestra di tipo Normale", badge: "Medaglia Base", teamIds: [504, 505], opponentPower: 26 },
       { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Maggiolino", teamIds: [544, 556, 542], opponentPower: 35 },
       { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Volt", teamIds: [587, 587, 523], opponentPower: 46 },
@@ -442,7 +442,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Insetto", teamIds: [283, 665], opponentPower: 18 },
+      { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Insetto", teamIds: [283, 665], opponentPower: 14 },
       { title: "Capopalestra di tipo Roccia", badge: "Medaglia Muro", teamIds: [696, 698], opponentPower: 26 },
       { title: "Capopalestra di tipo Lotta", badge: "Medaglia Scontro", teamIds: [301, 112, 448], opponentPower: 35 },
       { title: "Capopalestra di tipo Erba", badge: "Medaglia Pianta", teamIds: [188, 673, 675], opponentPower: 46 },
@@ -519,7 +519,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capitano di tipo Normale", badge: "Cristallo Normale", teamIds: [734, 735], opponentPower: 18 },
+      { title: "Capitano di tipo Normale", badge: "Cristallo Normale", teamIds: [734, 735], opponentPower: 14 },
       { title: "Capitano di tipo Acqua", badge: "Cristallo Idrico", teamIds: [746, 752], opponentPower: 26 },
       { title: "Capitano di tipo Fuoco", badge: "Cristallo Pyros", teamIds: [758, 776], opponentPower: 35 },
       { title: "Capitano di tipo Erba", badge: "Cristallo Botanico", teamIds: [754, 756], opponentPower: 46 },
@@ -596,7 +596,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capopalestra di tipo Erba", badge: "Medaglia Erba", teamIds: [829, 830], opponentPower: 18 },
+      { title: "Capopalestra di tipo Erba", badge: "Medaglia Erba", teamIds: [829, 830], opponentPower: 14 },
       { title: "Capopalestra di tipo Acqua", badge: "Medaglia Acqua", teamIds: [846, 834], opponentPower: 26 },
       { title: "Capopalestra di tipo Fuoco", badge: "Medaglia Fuoco", teamIds: [850, 851], opponentPower: 35 },
       { title: "Capopalestra di tipo Lotta", badge: "Medaglia Lotta", teamIds: [852, 853], opponentPower: 46 },
@@ -673,7 +673,7 @@ export const GENERATIONS = [
     },
 
     gymLeaders: [
-      { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Insetto Paldea", teamIds: [917, 918], opponentPower: 18 },
+      { title: "Capopalestra di tipo Coleottero", badge: "Medaglia Insetto Paldea", teamIds: [917, 918], opponentPower: 14 },
       { title: "Capopalestra di tipo Erba", badge: "Medaglia Erba Paldea", teamIds: [928, 929], opponentPower: 26 },
       { title: "Capopalestra di tipo Elettrico", badge: "Medaglia Volt Paldea", teamIds: [938, 939], opponentPower: 35 },
       { title: "Capopalestra di tipo Acqua", badge: "Medaglia Acqua Paldea", teamIds: [963, 964], opponentPower: 46 },

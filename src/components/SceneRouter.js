@@ -88,16 +88,20 @@ export function SceneRouter({ game }) {
             isNuzlocke: isNuz,
             box: [...prev.box, ...prev.team],
             team: [{ id, level: 5 }],
+            items: [...prev.items, "Pallina Esca"],
             phase: "explore",
             gymIndex: 0,
+            gym1PrepRounds: 0,
           }));
         } else {
           setState((prev) => ({
             ...prev,
             isNuzlocke: isNuz,
             team: [{ id, level: 5 }],
+            items: [...prev.items, "Pallina Esca"],
             phase: "explore",
             gymIndex: 0,
+            gym1PrepRounds: 0,
           }));
         }
       },
