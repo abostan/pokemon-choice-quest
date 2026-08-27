@@ -10,9 +10,35 @@
 // questa logica viveva solo dentro un hook React non testabile in isolamento.
 
 import { GENERATIONS, getNextGeneration } from "../data/generations.js";
+import { computeTeamPower, computeWinChance } from "./battleLogic.js";
 
 export const MAX_LEVEL = 100;
 export const LEGENDARY_CHANCE = 0.05;
+
+// Meccanismo "catch-up" ibrido (ROADMAP.md, richiesta di bilanciamento dopo il
+// caso reale della Palestra 1): la curva di potenza resta quella statica di
+// generations.js (ricompensa catturare/allenarsi con progressi reali), ma se
+// con la squadra ATTUALE quella potenza produrrebbe un winrate sotto
+// CATCHUP_MIN_WINCHANCE, l'avversario viene ammorbidito verso quella soglia —
+// mai oltre, e mai il contrario: una squadra già forte non viene mai
+// rincorsa/penalizzata, altrimenti catturare Pokémon smetterebbe di contare
+// (rischio segnalato esplicitamente durante la discussione di bilanciamento).
+// CATCHUP_STRENGTH < 1 lascia comunque una vera sfida sotto la soglia, invece
+// di garantire un porto sicuro assoluto.
+export const CATCHUP_MIN_WINCHANCE = 0.35;
+export const CATCHUP_STRENGTH = 0.65;
+
+/**
+ * Potenza avversaria che produrrebbe esattamente CATCHUP_MIN_WINCHANCE dato
+ * teamPower, invertendo computeWinChance in tattica "balanced" e senza
+ * abilità passive (stessa baseline mostrata prima che il giocatore scelga
+ * tattica/oggetti/mega in battaglia — vedi BattleScene.js).
+ */
+function computeCatchUpTargetPower(teamPower) {
+  // raw = 0.5 + (team - opp) / (1.5 * opp)  =>  opp = team / (1.5*(raw-0.5) + 1)
+  const denom = 1.5 * (CATCHUP_MIN_WINCHANCE - 0.5) + 1;
+  return teamPower / denom;
+}
 
 /**
  * True se il giocatore ha completato tutte le regioni disponibili, oppure è
@@ -36,9 +62,24 @@ export function computeDifficultyMultiplier(state) {
   return 1.0 + completedGens * 0.15 + nuzlockeBonus;
 }
 
-/** Applica computeDifficultyMultiplier a una potenza base, arrotondando. */
+/**
+ * Applica computeDifficultyMultiplier a una potenza base, poi ammorbidisce
+ * (solo verso il basso, vedi CATCHUP_STRENGTH sopra) il risultato se la
+ * squadra attuale del giocatore ne uscirebbe con un winrate troppo basso.
+ * `state.team` assente/vuoto (es. chiamate di test con solo completedGensCount
+ * /isNuzlocke) disattiva la correzione e restituisce la sola curva statica.
+ */
 export function computeScaledPower(basePower, state) {
-  return Math.round(basePower * computeDifficultyMultiplier(state));
+  const staticPower = basePower * computeDifficultyMultiplier(state);
+  const teamPower = computeTeamPower(state.team || [], {});
+  if (teamPower <= 0) return Math.round(staticPower);
+
+  const winChance = computeWinChance(teamPower, staticPower);
+  if (winChance >= CATCHUP_MIN_WINCHANCE) return Math.round(staticPower);
+
+  const targetPower = computeCatchUpTargetPower(teamPower);
+  const blended = staticPower + (targetPower - staticPower) * CATCHUP_STRENGTH;
+  return Math.round(Math.max(1, blended));
 }
 
 /**
