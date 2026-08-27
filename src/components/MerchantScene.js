@@ -83,8 +83,9 @@ export function MerchantScene({ coins = 0, pool = [], onBuyItem, onLeave }) {
             key: entry.name,
             style: {
               display: "flex",
-              justify: "space-between",
+              justifyContent: "space-between",
               alignItems: "center",
+              gap: "12px",
               background: "rgba(30, 41, 59, 0.6)",
               border: "1px solid rgba(255,255,255,0.1)",
               padding: "10px 14px",
@@ -93,7 +94,7 @@ export function MerchantScene({ coins = 0, pool = [], onBuyItem, onLeave }) {
           },
           e(
             "div",
-            { style: { display: "flex", alignItems: "center", gap: "10px" } },
+            { style: { display: "flex", alignItems: "center", gap: "10px", flex: "1 1 auto", minWidth: 0 } },
             e("span", { style: { fontSize: "1.5rem" } }, e(ItemIcon, { name: entry.name, size: 28 })),
             e(
               "div",
@@ -105,10 +106,10 @@ export function MerchantScene({ coins = 0, pool = [], onBuyItem, onLeave }) {
           e(
             "button",
             {
-              className: "btn btn-secondary",
+              className: "btn btn-secondary btn-sm",
               onClick: () => handleBuy(entry),
               disabled: coins < entry.price,
-              style: { minWidth: "110px" },
+              style: { flexShrink: 0 },
             },
             `💰 ${entry.price} Coin`
           )

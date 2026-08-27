@@ -10,6 +10,7 @@ import { SettingsModal } from "./components/SettingsModal.js";
 import { AchievementsModal } from "./components/AchievementsModal.js";
 import { BadgesModal } from "./components/BadgesModal.js";
 import { SceneRouter } from "./components/SceneRouter.js";
+import { MilestoneProgressBar } from "./components/MilestoneProgressBar.js";
 import { useGameState, initialState } from "./hooks/useGameState.js";
 import { updateHistoricPokedex } from "./engine/saveGame.js";
 import { unlockAchievement } from "./engine/achievements.js";
@@ -135,7 +136,6 @@ export default function App() {
       completedMilestones = totalMilestones;
     }
   }
-  const progressPct = Math.round((completedMilestones / totalMilestones) * 100);
 
   const showSidebar =
     state.phase !== "generationSelect" &&
@@ -382,8 +382,11 @@ export default function App() {
       )
     ),
 
-    // Barra avanzamento
-    e("div", { className: "progress-bar" }, e("div", { style: { width: `${progressPct}%` } })),
+    // Barra avanzamento a tappe (8 palestre + 4 Alto Comando + Campione,
+    // un'icona per tipo avversario al posto della singola barra piatta)
+    state.phase !== "generationSelect" &&
+      state.phase !== "resume" &&
+      e(MilestoneProgressBar, { generation, completedMilestones, totalMilestones }),
 
     // Layout principale con SceneRouter
     e(

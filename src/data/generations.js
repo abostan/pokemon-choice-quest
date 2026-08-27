@@ -1,3 +1,5 @@
+import { TYPE_LIST } from "./types.js";
+
 // Dati per generazione: starter, zone di esplorazione (a "livelli" di difficoltà
 // crescente), le 8 palestre, l'Alto Comando, il Campione e il Rivale.
 //
@@ -755,4 +757,20 @@ const BADGE_TYPE_BY_NAME = (() => {
  */
 export function getBadgeType(badgeName) {
   return BADGE_TYPE_BY_NAME[badgeName] ?? null;
+}
+
+/**
+ * Restituisce il tipo Pokémon associato al titolo di una tappa (capopalestra
+ * o membro dell'Alto Comando), leggendo l'ultima parola del titolo e
+ * validandola contro TYPE_LIST invece di indovinare per sottostringa — sia
+ * "Capopalestra di tipo Roccia" che "Torneo — Sfida Erba" o "Kahuna — Lotta"
+ * finiscono sempre con il nome del tipo, nonostante il prefisso vari da
+ * generazione a generazione (vedi ANALISI_TECNICA.md 2.5 sul pattern fragile
+ * precedente basato su string-matching). Usata dalla barra di avanzamento a
+ * tappe (MilestoneProgressBar); i titoli da Campione non hanno un tipo
+ * singolo e vanno gestiti a parte da chi chiama.
+ */
+export function getMilestoneType(title) {
+  const lastWord = title?.trim().split(/\s+/).pop();
+  return TYPE_LIST.includes(lastWord) ? lastWord : null;
 }

@@ -192,8 +192,9 @@ export function PokeCenterScene({
                 key: item.name,
                 style: {
                   display: "flex",
-                  justify: "space-between",
+                  justifyContent: "space-between",
                   alignItems: "center",
+                  gap: "12px",
                   background: "rgba(30, 41, 59, 0.6)",
                   border: "1px solid rgba(255,255,255,0.1)",
                   padding: "10px 14px",
@@ -202,7 +203,7 @@ export function PokeCenterScene({
               },
               e(
                 "div",
-                { style: { display: "flex", alignItems: "center", gap: "10px" } },
+                { style: { display: "flex", alignItems: "center", gap: "10px", flex: "1 1 auto", minWidth: 0 } },
                 e("span", { style: { fontSize: "1.5rem" } }, e(ItemIcon, { name: item.name, fallbackEmoji: item.icon, size: 28 })),
                 e(
                   "div",
@@ -214,10 +215,10 @@ export function PokeCenterScene({
               e(
                 "button",
                 {
-                  className: "btn btn-secondary",
+                  className: "btn btn-secondary btn-sm",
                   onClick: () => handleBuy(item),
                   disabled: coins < item.price,
-                  style: { minWidth: "110px" },
+                  style: { flexShrink: 0 },
                 },
                 `💰 ${item.price} Coin`
               )
